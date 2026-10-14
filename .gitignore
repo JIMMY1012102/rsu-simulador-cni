@@ -29,3 +29,8 @@ Homestead.json
 .env.production
 .phpactor.json
 auth.json
+
+# Archivos locales adicionales
+/database/*.sqlite
+/.idea/
+/.vscode/
