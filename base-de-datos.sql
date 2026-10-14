@@ -20,7 +20,7 @@ USE simulador_cni;
 -- =====================================================================
 --  1. secciones
 -- =====================================================================
-CREATE TABLE secciones (
+CREATE TABLE IF NOT EXISTS secciones (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     nombre      VARCHAR(10)     NOT NULL COMMENT 'Sección: A, B, C, D',
     grado       VARCHAR(20)     NOT NULL DEFAULT '5to',
@@ -35,7 +35,7 @@ CREATE TABLE secciones (
 -- =====================================================================
 --  2. areas_postulacion  (Áreas A–E del examen de admisión)
 -- =====================================================================
-CREATE TABLE areas_postulacion (
+CREATE TABLE IF NOT EXISTS areas_postulacion (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     codigo      CHAR(1)         NOT NULL COMMENT 'A, B, C, D o E',
     nombre      VARCHAR(100)    NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE areas_postulacion (
 -- =====================================================================
 --  3. carreras
 -- =====================================================================
-CREATE TABLE carreras (
+CREATE TABLE IF NOT EXISTS carreras (
     id                   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     area_postulacion_id  BIGINT UNSIGNED NOT NULL,
     nombre               VARCHAR(150)    NOT NULL,
@@ -70,7 +70,7 @@ CREATE TABLE carreras (
 -- =====================================================================
 --  4. usuarios  (administrador, docente, estudiante)
 -- =====================================================================
-CREATE TABLE usuarios (
+CREATE TABLE IF NOT EXISTS usuarios (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     nombres         VARCHAR(100)    NOT NULL,
     apellidos       VARCHAR(100)    NOT NULL,
@@ -100,7 +100,7 @@ CREATE TABLE usuarios (
 -- =====================================================================
 --  5. areas  (áreas de contenido del examen)
 -- =====================================================================
-CREATE TABLE areas (
+CREATE TABLE IF NOT EXISTS areas (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     nombre      VARCHAR(100)    NOT NULL,
     bloque      ENUM('habilidad_verbal','habilidad_logico_matematica','conocimientos') NOT NULL
@@ -116,7 +116,7 @@ CREATE TABLE areas (
 -- =====================================================================
 --  6. temas
 -- =====================================================================
-CREATE TABLE temas (
+CREATE TABLE IF NOT EXISTS temas (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     area_id     BIGINT UNSIGNED NOT NULL,
     nombre      VARCHAR(150)    NOT NULL,
@@ -134,7 +134,7 @@ CREATE TABLE temas (
 -- =====================================================================
 --  7. preguntas  (banco de preguntas)
 -- =====================================================================
-CREATE TABLE preguntas (
+CREATE TABLE IF NOT EXISTS preguntas (
     id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     tema_id     BIGINT UNSIGNED NOT NULL,
     enunciado   TEXT            NOT NULL,
@@ -160,10 +160,10 @@ CREATE TABLE preguntas (
 -- =====================================================================
 --  8. alternativas  (4 por pregunta: A, B, C, D)
 -- =====================================================================
-CREATE TABLE alternativas (
+CREATE TABLE IF NOT EXISTS alternativas (
     id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     pregunta_id  BIGINT UNSIGNED NOT NULL,
-    letra        ENUM('A','B','C','D') NOT NULL,
+    letra        CHAR(1) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
     texto        VARCHAR(500)    NOT NULL,
     es_correcta  TINYINT(1)      NOT NULL DEFAULT 0,
     created_at   TIMESTAMP       NULL DEFAULT NULL,
@@ -172,22 +172,26 @@ CREATE TABLE alternativas (
     UNIQUE KEY uq_alternativas_pregunta_letra (pregunta_id, letra),
     CONSTRAINT fk_alternativas_pregunta
         FOREIGN KEY (pregunta_id) REFERENCES preguntas (id)
-        ON DELETE CASCADE ON UPDATE CASCADE
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT chk_alternativas_letra CHECK (letra BETWEEN 'A' AND 'Z')
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
   COMMENT='Cuatro alternativas por pregunta, una correcta';
 
 -- =====================================================================
 --  9. simulacros
 -- =====================================================================
-CREATE TABLE simulacros (
+CREATE TABLE IF NOT EXISTS simulacros (
     id                  BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     nombre              VARCHAR(150)      NOT NULL,
     tiempo_limite       SMALLINT UNSIGNED NOT NULL COMMENT 'Duración máxima en minutos',
     total_preguntas     SMALLINT UNSIGNED NOT NULL DEFAULT 100,
+    cantidad_alternativas SMALLINT UNSIGNED NOT NULL DEFAULT 4
+                         COMMENT 'Cantidad de opciones por pregunta para este simulacro',
     puntaje_correcta    DECIMAL(7,3)      NOT NULL DEFAULT 20.000  COMMENT 'Puntos por respuesta correcta',
     puntaje_incorrecta  DECIMAL(7,3)      NOT NULL DEFAULT -1.125  COMMENT 'Penalización por respuesta incorrecta',
     puntaje_blanco      DECIMAL(7,3)      NOT NULL DEFAULT 0.000   COMMENT 'Puntos por respuesta en blanco o doble marca',
-    puntaje_maximo      DECIMAL(8,2)      NOT NULL DEFAULT 2000.00 COMMENT 'total_preguntas x puntaje_correcta',
+    puntaje_maximo      DECIMAL(12,3)     AS (total_preguntas * puntaje_correcta) STORED
+                         COMMENT 'Calculado como total_preguntas x puntaje_correcta',
     fecha_inicio        DATETIME          NOT NULL,
     fecha_fin           DATETIME          NOT NULL,
     activo              TINYINT(1)        NOT NULL DEFAULT 1,
@@ -201,6 +205,7 @@ CREATE TABLE simulacros (
         ON DELETE SET NULL ON UPDATE CASCADE,
     CONSTRAINT chk_simulacros_tiempo      CHECK (tiempo_limite > 0),
     CONSTRAINT chk_simulacros_total       CHECK (total_preguntas > 0),
+    CONSTRAINT chk_simulacros_alternativas CHECK (cantidad_alternativas BETWEEN 2 AND 26),
     CONSTRAINT chk_simulacros_fechas      CHECK (fecha_fin > fecha_inicio),
     CONSTRAINT chk_simulacros_p_correcta  CHECK (puntaje_correcta > 0),
     CONSTRAINT chk_simulacros_p_incorrecta CHECK (puntaje_incorrecta <= 0)
@@ -210,7 +215,7 @@ CREATE TABLE simulacros (
 -- =====================================================================
 --  10. area_postulacion_simulacro  (N:M)
 -- =====================================================================
-CREATE TABLE area_postulacion_simulacro (
+CREATE TABLE IF NOT EXISTS area_postulacion_simulacro (
     id                   BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     area_postulacion_id  BIGINT UNSIGNED NOT NULL,
     simulacro_id         BIGINT UNSIGNED NOT NULL,
@@ -231,7 +236,7 @@ CREATE TABLE area_postulacion_simulacro (
 -- =====================================================================
 --  11. simulacro_area  (preguntas por área y nivel en cada simulacro)
 -- =====================================================================
-CREATE TABLE simulacro_area (
+CREATE TABLE IF NOT EXISTS simulacro_area (
     id                  BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     simulacro_id        BIGINT UNSIGNED   NOT NULL,
     area_id             BIGINT UNSIGNED   NOT NULL,
@@ -255,7 +260,7 @@ CREATE TABLE simulacro_area (
 -- =====================================================================
 --  12. intentos  (simulacros rendidos y prácticas)
 -- =====================================================================
-CREATE TABLE intentos (
+CREATE TABLE IF NOT EXISTS intentos (
     id               BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     usuario_id       BIGINT UNSIGNED   NOT NULL,
     carrera_id       BIGINT UNSIGNED   NULL COMMENT 'Carrera del estudiante al momento del intento',
@@ -303,7 +308,7 @@ CREATE TABLE intentos (
 -- =====================================================================
 --  13. respuestas_estudiante  (examen propio de cada intento)
 -- =====================================================================
-CREATE TABLE respuestas_estudiante (
+CREATE TABLE IF NOT EXISTS respuestas_estudiante (
     id                BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     intento_id        BIGINT UNSIGNED   NOT NULL,
     pregunta_id       BIGINT UNSIGNED   NOT NULL,
@@ -335,7 +340,7 @@ CREATE TABLE respuestas_estudiante (
 -- =====================================================================
 --  14. resultados_area
 -- =====================================================================
-CREATE TABLE resultados_area (
+CREATE TABLE IF NOT EXISTS resultados_area (
     id               BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT,
     intento_id       BIGINT UNSIGNED   NOT NULL,
     area_id          BIGINT UNSIGNED   NOT NULL,
@@ -365,36 +370,93 @@ CREATE TABLE resultados_area (
 -- =====================================================================
 
 -- Secciones del 5.º grado
-INSERT INTO secciones (nombre, grado, activo, created_at, updated_at) VALUES
-    ('A', '5to', 1, NOW(), NOW()),
-    ('B', '5to', 1, NOW(), NOW()),
-    ('C', '5to', 1, NOW(), NOW()),
-    ('D', '5to', 1, NOW(), NOW());
+INSERT INTO secciones (nombre, grado, activo, created_at, updated_at)
+SELECT seed.nombre, seed.grado, 1, NOW(), NOW()
+FROM (
+    SELECT 'A' AS nombre, '5to' AS grado
+    UNION ALL SELECT 'B', '5to'
+    UNION ALL SELECT 'C', '5to'
+    UNION ALL SELECT 'D', '5to'
+) AS seed
+WHERE NOT EXISTS (
+    SELECT 1 FROM secciones s
+    WHERE s.nombre = seed.nombre AND s.grado = seed.grado
+);
 
 -- Áreas de postulación
-INSERT INTO areas_postulacion (codigo, nombre, activo, created_at, updated_at) VALUES
-    ('A', 'Ciencias de la Salud', 1, NOW(), NOW()),
-    ('B', 'Ciencias Básicas', 1, NOW(), NOW()),
-    ('C', 'Ingenierías', 1, NOW(), NOW()),
-    ('D', 'Ciencias Económicas y de la Gestión', 1, NOW(), NOW()),
-    ('E', 'Humanidades y Ciencias Jurídicas y Sociales', 1, NOW(), NOW());
+INSERT INTO areas_postulacion (codigo, nombre, activo, created_at, updated_at)
+SELECT seed.codigo, seed.nombre, 1, NOW(), NOW()
+FROM (
+    SELECT 'A' AS codigo, 'Ciencias de la Salud' AS nombre
+    UNION ALL SELECT 'B', 'Ciencias Básicas'
+    UNION ALL SELECT 'C', 'Ingenierías'
+    UNION ALL SELECT 'D', 'Ciencias Económicas y de la Gestión'
+    UNION ALL SELECT 'E', 'Humanidades y Ciencias Jurídicas y Sociales'
+) AS seed
+WHERE NOT EXISTS (
+    SELECT 1 FROM areas_postulacion ap
+    WHERE ap.codigo = seed.codigo OR ap.nombre = seed.nombre
+);
 
 -- Áreas de contenido (15 + 15 + 70 = 100 preguntas)
-INSERT INTO areas (nombre, bloque, activo, created_at, updated_at) VALUES
-    ('Habilidad Verbal', 'habilidad_verbal', 1, NOW(), NOW()),
-    ('Habilidad Lógico-Matemática', 'habilidad_logico_matematica', 1, NOW(), NOW()),
-    ('Matemática', 'conocimientos', 1, NOW(), NOW()),
-    ('Ciencias', 'conocimientos', 1, NOW(), NOW()),
-    ('Letras', 'conocimientos', 1, NOW(), NOW());
+INSERT INTO areas (nombre, bloque, activo, created_at, updated_at)
+SELECT seed.nombre, seed.bloque, 1, NOW(), NOW()
+FROM (
+    SELECT 'Habilidad Verbal' AS nombre, 'habilidad_verbal' AS bloque
+    UNION ALL SELECT 'Habilidad Lógico-Matemática', 'habilidad_logico_matematica'
+    UNION ALL SELECT 'Matemática', 'conocimientos'
+    UNION ALL SELECT 'Ciencias', 'conocimientos'
+    UNION ALL SELECT 'Letras', 'conocimientos'
+) AS seed
+WHERE NOT EXISTS (
+    SELECT 1 FROM areas a WHERE a.nombre = seed.nombre
+);
 
 -- Temas iniciales de Habilidad Verbal (los demás los definen los docentes)
 INSERT INTO temas (area_id, nombre, activo, created_at, updated_at)
-SELECT id, 'Comprensión de lectura', 1, NOW(), NOW() FROM areas WHERE nombre = 'Habilidad Verbal';
+SELECT a.id, 'Comprensión de lectura', 1, NOW(), NOW()
+FROM areas a
+WHERE a.nombre = 'Habilidad Verbal'
+  AND NOT EXISTS (
+      SELECT 1 FROM temas t
+      WHERE t.area_id = a.id AND t.nombre = 'Comprensión de lectura'
+  );
 
 INSERT INTO temas (area_id, nombre, activo, created_at, updated_at)
-SELECT id, 'Inglés', 1, NOW(), NOW() FROM areas WHERE nombre = 'Habilidad Verbal';
+SELECT a.id, 'Inglés', 1, NOW(), NOW()
+FROM areas a
+WHERE a.nombre = 'Habilidad Verbal'
+  AND NOT EXISTS (
+      SELECT 1 FROM temas t
+      WHERE t.area_id = a.id AND t.nombre = 'Inglés'
+  );
 
--- Pendientes: catálogo de carreras (tabla carreras) y usuario administrador inicial (tabla usuarios).
+-- Las carreras se cargan con el catálogo oficial aprobado para la institución.
+-- El administrador se crea desde Laravel con una contraseña proporcionada de forma segura.
 
--- Verificación
+-- Verificación de tablas y datos de referencia
 SHOW TABLES;
+
+SELECT 'secciones' AS tabla, COUNT(*) AS filas FROM secciones
+UNION ALL SELECT 'areas_postulacion', COUNT(*) FROM areas_postulacion
+UNION ALL SELECT 'carreras', COUNT(*) FROM carreras
+UNION ALL SELECT 'usuarios', COUNT(*) FROM usuarios
+UNION ALL SELECT 'areas', COUNT(*) FROM areas
+UNION ALL SELECT 'temas', COUNT(*) FROM temas
+UNION ALL SELECT 'preguntas', COUNT(*) FROM preguntas
+UNION ALL SELECT 'alternativas', COUNT(*) FROM alternativas
+UNION ALL SELECT 'simulacros', COUNT(*) FROM simulacros
+UNION ALL SELECT 'area_postulacion_simulacro', COUNT(*) FROM area_postulacion_simulacro
+UNION ALL SELECT 'simulacro_area', COUNT(*) FROM simulacro_area
+UNION ALL SELECT 'intentos', COUNT(*) FROM intentos
+UNION ALL SELECT 'respuestas_estudiante', COUNT(*) FROM respuestas_estudiante
+UNION ALL SELECT 'resultados_area', COUNT(*) FROM resultados_area;
+
+SELECT COUNT(*) AS claves_foraneas
+FROM information_schema.TABLE_CONSTRAINTS
+WHERE CONSTRAINT_SCHEMA = DATABASE()
+  AND CONSTRAINT_TYPE = 'FOREIGN KEY';
+
+SELECT COUNT(DISTINCT CONCAT(TABLE_NAME, ':', INDEX_NAME)) AS indices
+FROM information_schema.STATISTICS
+WHERE TABLE_SCHEMA = DATABASE();

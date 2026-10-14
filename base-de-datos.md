@@ -13,7 +13,7 @@
 
 Este documento define el modelo de datos de la plataforma a partir de los requerimientos funcionales y no funcionales del sistema y del diseño del backend. Establece las entidades, sus campos, tipos de datos, claves primarias (PK) y foráneas (FK), relaciones (1:N y N:M), restricciones de integridad y el diagrama entidad-relación (DER).
 
-Esta versión incorpora la estructura del examen de admisión (5 áreas de postulación, selección de carrera, 100 preguntas por simulacro y sistema de puntuación con penalización) y las garantías de cantidad de preguntas y variación de orden por estudiante.
+Esta versión incorpora la estructura del examen de admisión (5 áreas de postulación, selección de carrera, un perfil predeterminado de 100 preguntas y sistema de puntuación con penalización) y las garantías de cantidad de preguntas y variación de orden por estudiante. Los parámetros de CNI son valores iniciales configurables en cada simulacro para admitir otros formatos institucionales.
 
 El diseño está pensado para que **Laravel** cree las tablas mediante migraciones sobre **MariaDB**, y para ser administrado con **DBeaver**.
 
@@ -39,11 +39,11 @@ El diseño está pensado para que **Laravel** cree las tablas mediante migracion
 | 3 | `areas` recibe el campo `bloque` (habilidad verbal, habilidad lógico-matemática, conocimientos) | Distribución 15 / 15 / 70 del examen |
 | 4 | Se elimina `simulacro_preguntas` | Cada estudiante recibe su propio sorteo de preguntas, guardado en `respuestas_estudiante` |
 | 5 | `respuestas_intento` pasa a llamarse `respuestas_estudiante`; `simulacro_areas` pasa a `simulacro_area` | Coincidir con los nombres del diseño del backend |
-| 6 | Puntajes por defecto: +20.000 correcta, −1.125 incorrecta, 0 en blanco o doble marca; puntaje máximo 2000.00 | Sistema de puntuación del examen |
+| 6 | Puntajes predeterminados por simulacro: +20.000 correcta, −1.125 incorrecta, 0 en blanco o doble marca; puntaje máximo calculado | Sistema de puntuación configurable |
 | 7 | `respuestas_estudiante.estado_respuesta` (`correcta`, `incorrecta`, `en_blanco`, `doble_marca`) y `puntaje_obtenido` | Registrar la doble marca y el puntaje de cada pregunta |
 | 8 | `intentos` recibe `carrera_id`, `area_id`, `total_preguntas` y `doble_marca`; el estado `enviado_automatico` pasa a `enviado_auto`; el rol `administrador` pasa a `admin` | Reportes por carrera, práctica por área y coherencia con el backend |
 | 9 | `resultados_area` recibe `incorrectas`, `en_blanco` y `puntaje` | Desglose del puntaje por área |
-| 10 | Cada pregunta tiene 4 alternativas (A a D) en lugar de 5; `alternativas.letra` pasa a `ENUM('A','B','C','D')` | Formato real del examen |
+| 10 | El perfil CNI predeterminado tiene 4 alternativas (A a D); se admiten perfiles por simulacro de 2 a 26 alternativas, identificadas de A a Z | Soportar formatos de distintas instituciones |
 
 ## 4. Estructura y reglas del examen
 
@@ -61,7 +61,7 @@ El estudiante elige una carrera profesional y, a través de ella, queda asignado
 
 ### 4.2. Composición del examen
 
-El examen completo tiene **100 preguntas**, que se organizan por bloque mediante el campo `areas.bloque`:
+El perfil predeterminado de CNI tiene **100 preguntas**, organizadas por bloque mediante el campo `areas.bloque`:
 
 | Bloque (`areas.bloque`) | Preguntas | Contenido |
 |---|---|---|
@@ -70,7 +70,9 @@ El examen completo tiene **100 preguntas**, que se organizan por bloque mediante
 | `conocimientos` | 70 | Matemática, Ciencias y Letras |
 | **Total** | **100** | |
 
-Cada fila de `areas` pertenece a un solo bloque. La cantidad de preguntas de cada área dentro de un simulacro se define en `simulacro_area` (RF-07).
+Cada fila de `areas` pertenece a un solo bloque. La cantidad de preguntas de cada área dentro de un simulacro se define en `simulacro_area` (RF-07). Para el perfil predeterminado, la suma es 15 + 15 + 70; cada simulacro puede establecer su propia cantidad total y distribución por bloque, siempre que la suma de `simulacro_area.cantidad_preguntas` coincida con `simulacros.total_preguntas`.
+
+El perfil predeterminado usa cuatro alternativas (A–D). `simulacros.cantidad_alternativas` permite configurar entre 2 y 26 opciones por simulacro; las alternativas se identifican con letras de A a Z.
 
 ### 4.3. Sistema de puntuación
 
@@ -83,15 +85,15 @@ Cada fila de `areas` pertenece a un solo bloque. La cantidad de preguntas de cad
 
 `puntaje_total = correctas × puntaje_correcta + incorrectas × puntaje_incorrecta + (en_blanco + doble_marca) × puntaje_blanco`
 
-- **Puntaje máximo:** 100 × 20.000 = **2000.00**.
-- **Puntaje mínimo teórico:** 100 × (−1.125) = −112.500.
+- **Puntaje máximo predeterminado:** 100 × 20.000 = **2000.000**. Se calcula a partir del total y el puntaje por correcta de cada simulacro.
+- **Puntaje mínimo teórico predeterminado:** 100 × (−1.125) = −112.500.
 - **Ejemplo:** 70 correctas, 20 incorrectas y 10 en blanco: 70 × 20 − 20 × 1.125 + 0 = **1377.500**.
 
 Por la penalización de 3 decimales, los puntajes se almacenan como `DECIMAL(7,3)` o `DECIMAL(8,3)` con signo.
 
 ### 4.4. Garantía de cantidad de preguntas y variación del orden
 
-1. **Cantidad exacta por estudiante.** Al iniciar un intento, el sistema sortea, por cada fila de `simulacro_area`, exactamente `cantidad_preguntas` preguntas activas distintas. El intento solo se crea si el sorteo completa el total del simulacro (100 en el examen completo); de lo contrario la operación se revierte y se responde con error 422.
+1. **Cantidad exacta por estudiante.** Al iniciar un intento, el sistema sortea, por cada fila de `simulacro_area`, exactamente `cantidad_preguntas` preguntas activas distintas. El intento solo se crea si el sorteo completa el total configurado para el simulacro (100 por defecto); de lo contrario la operación se revierte y se responde con error 422.
 2. **Banco suficiente.** Antes de habilitar un simulacro, el sistema verifica que cada área (y nivel, si no es `mixto`) tenga al menos `cantidad_preguntas` preguntas activas. Se recomienda mantener en el banco un margen de al menos el doble de preguntas por área, para que los estudiantes no reciban exactamente las mismas preguntas (consulta de verificación en la sección 10.2).
 3. **Examen propio por estudiante.** Las preguntas sorteadas se guardan en `respuestas_estudiante` con la alternativa vacía, de modo que cada estudiante conserva su propio examen.
 4. **Orden distinto por estudiante.** El campo `respuestas_estudiante.orden` se asigna de forma aleatoria en cada intento. Se mezclan las preguntas dentro de cada bloque y los bloques mantienen la secuencia habilidad verbal → habilidad lógico-matemática → conocimientos (ver supuestos, sección 13).
@@ -245,11 +247,11 @@ Restricción adicional: `UNIQUE (area_id, nombre)`.
 |---|---|---|---|---|
 | `id` | BIGINT UNSIGNED | NN | PK, autoincremental | Identificador de la alternativa. |
 | `pregunta_id` | BIGINT UNSIGNED | NN | FK → `preguntas.id` | Pregunta a la que pertenece. |
-| `letra` | ENUM('A','B','C','D') | NN | — | Posición de la alternativa. |
+| `letra` | CHAR(1) ASCII | NN | Entre `A` y `Z`; UQ con `pregunta_id` | Posición de la alternativa. |
 | `texto` | VARCHAR(500) | NN | — | Contenido de la alternativa. |
 | `es_correcta` | BOOLEAN | NN | Por defecto `0` | Indica si es la respuesta correcta. |
 
-Restricción adicional: `UNIQUE (pregunta_id, letra)`. Cada pregunta debe tener exactamente 4 alternativas y una sola correcta (validado por la aplicación).
+Restricciones adicionales: `UNIQUE (pregunta_id, letra)` y letra entre `A` y `Z`. Cada pregunta seleccionada para un simulacro debe tener exactamente `simulacros.cantidad_alternativas` alternativas y una sola correcta; el backend valida esta regla antes de publicar el simulacro y al sortear preguntas, porque una pregunta puede reutilizarse en simulacros con perfiles diferentes.
 
 ### 7.9. `simulacros`
 
@@ -259,10 +261,11 @@ Restricción adicional: `UNIQUE (pregunta_id, letra)`. Cada pregunta debe tener 
 | `nombre` | VARCHAR(150) | NN | — | Nombre del simulacro. |
 | `tiempo_limite` | SMALLINT UNSIGNED | NN | Mayor que 0 | Duración máxima en minutos (RF-09). |
 | `total_preguntas` | SMALLINT UNSIGNED | NN | Por defecto `100` | Total de preguntas por intento; debe coincidir con la suma de `simulacro_area.cantidad_preguntas`. |
+| `cantidad_alternativas` | SMALLINT UNSIGNED | NN | Por defecto `4`; entre 2 y 26 | Número de opciones por pregunta; las opciones usan letras A–Z. |
 | `puntaje_correcta` | DECIMAL(7,3) | NN | Por defecto `20.000` | Puntos por respuesta correcta. |
 | `puntaje_incorrecta` | DECIMAL(7,3) | NN | Por defecto `-1.125` | Puntos por respuesta incorrecta (valor negativo o cero). |
 | `puntaje_blanco` | DECIMAL(7,3) | NN | Por defecto `0.000` | Puntos por respuesta en blanco o con doble marca. |
-| `puntaje_maximo` | DECIMAL(8,2) | NN | Por defecto `2000.00` | Puntaje máximo posible (`total_preguntas × puntaje_correcta`). |
+| `puntaje_maximo` | DECIMAL(12,3) | Calculado | `total_preguntas × puntaje_correcta` | Puntaje máximo posible, calculado por la base de datos. |
 | `fecha_inicio` | DATETIME | NN | — | Inicio de la disponibilidad (RF-07). |
 | `fecha_fin` | DATETIME | NN | Mayor que `fecha_inicio` | Fin de la disponibilidad. |
 | `activo` | BOOLEAN | NN | Por defecto `1` | Estado del simulacro. |
@@ -537,9 +540,9 @@ erDiagram
 ### 10.1. Reglas de negocio que valida la aplicación
 
 1. Un usuario con `rol = estudiante` debe tener `seccion_id`. Debe elegir su carrera (`carrera_id`) antes de ver o rendir simulacros.
-2. Cada pregunta activa debe tener exactamente 4 alternativas (A a D) y una sola con `es_correcta = 1`.
-3. En un simulacro, `fecha_fin` debe ser posterior a `fecha_inicio`, `tiempo_limite` debe ser mayor que 0 y `total_preguntas` debe ser igual a la suma de `simulacro_area.cantidad_preguntas`. Para el examen completo, las áreas deben sumar 15 de `habilidad_verbal`, 15 de `habilidad_logico_matematica` y 70 de `conocimientos`.
-4. `puntaje_correcta` debe ser mayor que 0, `puntaje_incorrecta` menor o igual que 0, y `puntaje_maximo` igual a `total_preguntas × puntaje_correcta` (2000.00 en el examen completo).
+2. Cada pregunta seleccionada para un simulacro debe tener exactamente `simulacros.cantidad_alternativas` alternativas y una sola con `es_correcta = 1`.
+3. En un simulacro, `fecha_fin` debe ser posterior a `fecha_inicio`, `tiempo_limite` debe ser mayor que 0 y `total_preguntas` debe ser igual a la suma de `simulacro_area.cantidad_preguntas`. El perfil predeterminado de CNI suma 15 de `habilidad_verbal`, 15 de `habilidad_logico_matematica` y 70 de `conocimientos`; otros perfiles configuran su propia distribución.
+4. `puntaje_correcta` debe ser mayor que 0, `puntaje_incorrecta` menor o igual que 0, y `puntaje_maximo` se calcula como `total_preguntas × puntaje_correcta` (2000.000 en el perfil predeterminado).
 5. Los puntajes de un simulacro no pueden modificarse una vez que existen intentos asociados.
 6. Un estudiante solo ve y puede iniciar simulacros abiertos para su área de postulación (`area_postulacion_simulacro`) y dentro de su rango de fechas.
 7. El tiempo se controla desde el servidor: `fecha_limite = fecha_inicio + tiempo_limite`. Una respuesta recibida después del límite se rechaza, y el comando programado `intentos:cerrar-vencidos` cierra los intentos vencidos con `estado = enviado_auto`.
@@ -589,21 +592,28 @@ El archivo `base-de-datos.sql` crea la base de datos `simulador_cni` con las 14 
 **Contenido del script:**
 
 1. Creación de la base de datos con codificación `utf8mb4`.
-2. Eliminación previa de las tablas (en orden inverso), para poder ejecutar el script más de una vez.
-3. Creación de las 14 tablas con claves primarias, claves foráneas con sus acciones (`RESTRICT`, `CASCADE`, `SET NULL`), restricciones únicas, índices y comentarios por campo.
-4. Restricciones `CHECK` a nivel de base de datos:
+2. Creación no destructiva de las 14 tablas con `CREATE TABLE IF NOT EXISTS`; no elimina tablas ni datos existentes.
+3. Carga idempotente de los datos de referencia: si una fila ya existe, se conserva sin duplicarla ni sobrescribirla.
+4. Creación de claves primarias, claves foráneas con sus acciones (`RESTRICT`, `CASCADE`, `SET NULL`), restricciones únicas, índices y comentarios por campo.
+5. Restricciones `CHECK` a nivel de base de datos:
    - En `simulacros`: `tiempo_limite > 0`, `total_preguntas > 0`, `fecha_fin > fecha_inicio`, `puntaje_correcta > 0` y `puntaje_incorrecta <= 0`.
+   - En `simulacros`: `cantidad_alternativas` entre 2 y 26.
+   - En `alternativas`: letra entre A y Z.
    - En `simulacro_area`: `cantidad_preguntas > 0`.
    - En `resultados_area`: `porcentaje` entre 0 y 100.
-5. Datos iniciales: secciones A–D, las 5 áreas de postulación, las 5 áreas de contenido con su bloque y los temas Comprensión de lectura e Inglés.
+6. Datos iniciales: secciones A–D, las 5 áreas de postulación, las 5 áreas de contenido con su bloque y los temas Comprensión de lectura e Inglés.
+
+Volver a ejecutar el script conserva los datos y no duplica las filas iniciales. `IF NOT EXISTS` no actualiza una tabla existente para reflejar cambios futuros en el esquema: esos cambios deben aplicarse con migraciones versionadas y respaldos, nunca recreando tablas sobre datos reales. Al final, el script muestra las 14 tablas, el número de filas de cada una y los totales de claves foráneas e índices. En el esquema inicial se esperan 22 claves foráneas y 45 índices.
 
 **Para visualizar la estructura en DBeaver:**
 
 1. Conectarse a MariaDB (versión 10.4 o superior).
 2. Abrir `base-de-datos.sql` en el editor SQL y ejecutarlo completo (Alt + X).
-3. Actualizar el navegador de bases de datos y hacer clic derecho sobre `simulador_cni` > **Ver diagrama**.
+3. En una base de datos de desarrollo desechable, ejecutar el script dos veces y confirmar que siguen existiendo 14 tablas y que los conteos de filas iniciales no cambian en la segunda ejecución.
+4. Revisar los conteos de claves foráneas e índices que devuelve el script; comprobar que son 22 y 45, respectivamente.
+5. Actualizar el navegador de bases de datos y hacer clic derecho sobre `simulador_cni` > **Ver diagrama**.
 
-Pendientes que no incluye el script: el catálogo de carreras (`carreras`) y el usuario administrador inicial (`usuarios`).
+El catálogo oficial de carreras no se inventa ni se carga hasta ser aprobado por la institución. El usuario administrador se crea con un seeder/comando de Laravel que recibe sus datos mediante un canal seguro y cifra la contraseña con `Hash::make`; no se incluye una cuenta ni una contraseña en el SQL.
 
 ## 12. Preparación para migraciones de Laravel
 
@@ -632,18 +642,21 @@ Observaciones para la implementación:
 - Los datos iniciales (administrador, secciones, 5 áreas de postulación, carreras, áreas y temas base) se cargan con *seeders*.
 - Se debe eliminar la migración `users` que trae Laravel por defecto, porque el proyecto usa `usuarios`; el modelo `Usuario` declara `protected $table = 'usuarios'`.
 - La migración de Sanctum (`personal_access_tokens`) se publica con `php artisan vendor:publish --provider="Laravel\Sanctum\SanctumServiceProvider"` y debe ejecutarse después de crear `usuarios`.
-- Los campos de puntaje usan `decimal('campo', 7, 3)` y `decimal('puntaje_total', 8, 3)`, con signo.
+- Los campos de puntaje usan `decimal('campo', 7, 3)` y `decimal('puntaje_total', 8, 3)`, con signo. `puntaje_maximo` debe ser una columna generada almacenada con la expresión `total_preguntas * puntaje_correcta` (`storedAs` en Laravel), para evitar discrepancias al editar el perfil.
+- La migración de `alternativas` usa `char('letra', 1)`, charset/collation ASCII binaria y la restricción A–Z. La migración de `simulacros` agrega `cantidad_alternativas` con valor inicial 4 y restricción de 2 a 26.
+- El backend valida en una transacción que la suma de preguntas configuradas por área coincide con `total_preguntas`, valida por separado la distribución de cada bloque y que cada pregunta tenga el número de alternativas configurado y exactamente una correcta. El perfil inicial de CNI usa 100 preguntas, distribución 15/15/70, 4 alternativas y puntajes +20/−1.125/0; estos son valores predeterminados, no límites globales.
+- Seeders previstos: `SeccionesSeeder`, `AreasPostulacionSeeder`, `AreasSeeder`, `TemasSeeder` y `CarrerasSeeder` (con catálogo oficial aprobado). El alta de administrador se realiza con un comando de bootstrap seguro o `UsuarioAdminSeeder` parametrizado por secretos de entorno; debe fallar claramente si faltan datos requeridos y nunca guardar contraseñas en el repositorio.
 
 ## 13. Supuestos y puntos por validar
 
 1. **Examen propio por estudiante.** Las preguntas se sortean al iniciar cada intento y se guardan en `respuestas_estudiante`. Por eso se eliminó `simulacro_preguntas`; la relación `belongsToMany Pregunta` del modelo `Simulacro` en el diseño del backend debe quitarse o definirse a través de `respuestas_estudiante`.
 2. **Orden de las preguntas.** Se asume que el orden se mezcla dentro de cada bloque y que los bloques mantienen su secuencia. Si debe mezclarse todo el examen, solo cambia la lógica del sorteo, no la estructura de datos.
-3. **Distribución de los 70 puntos de conocimientos.** No se ha definido cuántas preguntas corresponden a Matemática, Ciencias y Letras, ni si cambia según el área de postulación. Se asume una sola distribución por simulacro; si varía por área, se crea un simulacro distinto para cada una (abierto solo a esa área mediante `area_postulacion_simulacro`).
+3. **Distribución por bloque y área.** El perfil predeterminado usa 15/15/70 preguntas por bloque. La cantidad de Matemática, Ciencias y Letras y las distribuciones de otros perfiles se configuran en `simulacro_area`; el backend debe validar que las sumas coincidan con el total y la distribución elegidos para el simulacro.
 4. **Catálogo de carreras.** Falta definir la lista de carreras de cada área y la universidad de referencia; se cargará mediante seeder.
 5. **Doble marca.** Una interfaz web con una sola alternativa por pregunta normalmente no genera doble marca. El estado `doble_marca` queda previsto para respuestas cargadas desde hoja física o si la interfaz permite marcar más de una alternativa.
 6. **Áreas A–E.** El diseño del backend menciona "área A–D" en `PUT /me/carrera`; debe corregirse a A–E.
 7. **Valores del backend.** En el diseño del backend, la fórmula de la sección 7 indica p_c = 1 y p_i = 0 por defecto; deben actualizarse a 20.000 y −1.125. Además, el rol se llama `admin` y el estado de cierre automático `enviado_auto`, valores que este documento adopta.
 8. **Tiempo límite.** No se ha indicado la duración del examen de 100 preguntas; se configura en `simulacros.tiempo_limite`.
 9. **Prácticas.** Se guardan en el historial con `tipo = practica`; debe confirmarse si deben aparecer en los reportes del docente.
-10. **Cuatro alternativas.** El examen usa 4 alternativas (A a D). El requerimiento RF-05 y el diseño del backend (`PreguntaRequest`, ruta `POST /preguntas`) mencionan 5 alternativas y deben actualizarse a 4, igual que la plantilla de Excel de carga masiva (RF-06).
+10. **Cantidad de alternativas.** El perfil predeterminado usa 4 alternativas (A a D). `simulacros.cantidad_alternativas` permite otros formatos entre 2 y 26 (A–Z); RF-05, `PreguntaRequest`, la ruta `POST /preguntas` y la plantilla de Excel de RF-06 deben validar el número configurado para cada simulacro y no asumir globalmente 4 o 5.
 11. **Penalización y puntaje negativo.** Se permite que `puntaje_total` sea negativo cuando las penalizaciones superan los puntos ganados. Debe confirmarse si el puntaje mínimo mostrado debe ser 0.
