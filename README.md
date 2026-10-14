@@ -75,4 +75,12 @@ Los aportes nuevos deben entregarse en ramas propias y en Pull Requests hacia `d
 
 ## Estado de esta entrega
 
-Este PR publica **el esqueleto y configuración inicial de Laravel**, no una instalación ejecutada en la laptop del integrador ni las migraciones del equipo. La instalación de dependencias con Composer, generación de `composer.lock`, comprobación de la conexión local a MariaDB y ejecución real de los tests se completarán en el entorno Linux Mint del integrador.
+Este PR publica **el esqueleto y configuración inicial de Laravel**, validado por el integrador el **14/10/2026** en Linux Mint con PHP 8.2.33, Composer 2.7.1 y MariaDB 10.11.14.
+
+- `composer install`: completado; `composer.lock` generado e incluido en la rama.
+- `php artisan key:generate`: correcto, con clave conservada únicamente en el `.env` local.
+- `php artisan db:show --database=mysql`: conexión correcta a `simulador_cni_validacion` con `cni_dev`. El informe enumeró 28 tablas entre **dos esquemas** visibles para el usuario; la base de validación contiene las 14 tablas de CNI.
+- `php artisan serve`: página inicial **Simulador CNI** cargada correctamente en Firefox, `http://127.0.0.1:8000`.
+- `php artisan test`: **3 pruebas aprobadas, 4 aserciones, 1.59 s** (resultado local).
+
+**Pendiente:** las migraciones y seeders de Nia, Dafne y Diego, y las pruebas de integración posteriores. Los resultados anteriores no acreditan que dichas migraciones estén implementadas ni que el simulador funcional esté terminado.
