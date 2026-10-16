@@ -25,7 +25,7 @@ return new class extends Migration
             $table->decimal('puntaje', 8, 3);
 
             $table->decimal('porcentaje', 5, 2)
-                ->comment('Porcentaje de aciertos del Ã¡rea');
+                ->comment('Porcentaje de aciertos del área');
 
             $table->timestamps();
 
@@ -58,11 +58,13 @@ return new class extends Migration
                 ->cascadeOnUpdate();
         });
 
-        DB::statement("
-            ALTER TABLE resultados_area
-            ADD CONSTRAINT chk_resultados_porcentaje
-            CHECK (porcentaje BETWEEN 0 AND 100)
-        ");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("
+                ALTER TABLE resultados_area
+                ADD CONSTRAINT chk_resultados_porcentaje
+                CHECK (porcentaje BETWEEN 0 AND 100)
+            ");
+        }
     }
 
     public function down(): void
