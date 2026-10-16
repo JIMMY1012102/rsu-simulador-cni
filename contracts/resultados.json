@@ -1,0 +1,42 @@
+
+{
+  "modulo": "resultados",
+  "version": "1.0.0",
+  "descripcion": "Modulo de calificacion y consulta de resultados del simulador CNI",
+  "autenticacion": {
+    "requerida": true,
+    "middleware": "auth"
+  },
+  "rutas": [
+    {
+      "metodo": "GET",
+      "ruta": "/resultados",
+      "accion": "listar",
+      "descripcion": "Lista los resultados accesibles para el usuario autenticado"
+    },
+    {
+      "metodo": "POST",
+      "ruta": "/resultados/calificar",
+      "accion": "calificar",
+      "descripcion": "Calcula y registra los resultados de un intento",
+      "request": {
+        "intento_id": "integer"
+      }
+    },
+    {
+      "metodo": "GET",
+      "ruta": "/resultados/{intentoId}",
+      "accion": "mostrar",
+      "descripcion": "Consulta el resultado de un intento",
+      "parametros": {
+        "intentoId": "integer"
+      }
+    }
+  ],
+  "integracion": {
+    "responsable": "Jimmy",
+    "registro_rutas": "pendiente",
+    "autenticacion_compartida": "pendiente",
+    "pruebas_base_datos": "pendiente"
+  }
+}

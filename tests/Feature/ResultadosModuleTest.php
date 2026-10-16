@@ -1,3 +1,5 @@
+<?php
+
 namespace Tests\Feature;
 
 use App\Http\Requests\Resultados\CalificarIntentoRequest;
