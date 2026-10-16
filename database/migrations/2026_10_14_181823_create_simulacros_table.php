@@ -65,41 +65,43 @@ return new class extends Migration
                 ->cascadeOnUpdate();
         });
 
-        DB::statement("
-            ALTER TABLE simulacros
-            ADD CONSTRAINT chk_simulacros_tiempo
-            CHECK (tiempo_limite > 0)
-        ");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("
+                ALTER TABLE simulacros
+                ADD CONSTRAINT chk_simulacros_tiempo
+                CHECK (tiempo_limite > 0)
+            ");
 
-        DB::statement("
-            ALTER TABLE simulacros
-            ADD CONSTRAINT chk_simulacros_total
-            CHECK (total_preguntas > 0)
-        ");
+            DB::statement("
+                ALTER TABLE simulacros
+                ADD CONSTRAINT chk_simulacros_total
+                CHECK (total_preguntas > 0)
+            ");
 
-        DB::statement("
-            ALTER TABLE simulacros
-            ADD CONSTRAINT chk_simulacros_alternativas
-            CHECK (cantidad_alternativas BETWEEN 2 AND 26)
-        ");
+            DB::statement("
+                ALTER TABLE simulacros
+                ADD CONSTRAINT chk_simulacros_alternativas
+                CHECK (cantidad_alternativas BETWEEN 2 AND 26)
+            ");
 
-        DB::statement("
-            ALTER TABLE simulacros
-            ADD CONSTRAINT chk_simulacros_fechas
-            CHECK (fecha_fin > fecha_inicio)
-        ");
+            DB::statement("
+                ALTER TABLE simulacros
+                ADD CONSTRAINT chk_simulacros_fechas
+                CHECK (fecha_fin > fecha_inicio)
+            ");
 
-        DB::statement("
-            ALTER TABLE simulacros
-            ADD CONSTRAINT chk_simulacros_p_correcta
-            CHECK (puntaje_correcta > 0)
-        ");
+            DB::statement("
+                ALTER TABLE simulacros
+                ADD CONSTRAINT chk_simulacros_p_correcta
+                CHECK (puntaje_correcta > 0)
+            ");
 
-        DB::statement("
-            ALTER TABLE simulacros
-            ADD CONSTRAINT chk_simulacros_p_incorrecta
-            CHECK (puntaje_incorrecta <= 0)
-        ");
+            DB::statement("
+                ALTER TABLE simulacros
+                ADD CONSTRAINT chk_simulacros_p_incorrecta
+                CHECK (puntaje_incorrecta <= 0)
+            ");
+        }
     }
 
     public function down(): void

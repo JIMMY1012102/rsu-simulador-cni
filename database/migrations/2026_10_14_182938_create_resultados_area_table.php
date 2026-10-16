@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -26,7 +25,7 @@ return new class extends Migration
             $table->decimal('puntaje', 8, 3);
 
             $table->decimal('porcentaje', 5, 2)
-                ->comment('Porcentaje de aciertos del área');
+                ->comment('Porcentaje de aciertos del Ã¡rea');
 
             $table->timestamps();
 
