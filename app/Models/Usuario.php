@@ -2,16 +2,20 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
- * Modelo inicial compatible con la tabla "usuarios" del SQL de Sebastián.
- * Nia puede ampliar validaciones, relaciones y funcionalidades de autenticación.
+ * Usuario del sistema (tabla "usuarios"): administradores, docentes y estudiantes.
+ * Se autentica con tokens de Sanctum desde el módulo de auth.
  */
 class Usuario extends Authenticatable
 {
-    use Notifiable;
+    use HasApiTokens, Notifiable;
+
+    public const ROLES = ['admin', 'docente', 'estudiante'];
 
     protected $table = 'usuarios';
 
@@ -37,5 +41,15 @@ class Usuario extends Authenticatable
             'activo' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function seccion(): BelongsTo
+    {
+        return $this->belongsTo(Seccion::class, 'seccion_id');
+    }
+
+    public function carrera(): BelongsTo
+    {
+        return $this->belongsTo(Carrera::class, 'carrera_id');
     }
 }
