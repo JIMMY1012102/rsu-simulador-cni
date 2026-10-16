@@ -1,0 +1,52 @@
+
+{
+  "modulo": "preguntas",
+  "prefijo": "/api",
+  "autenticacion": "auth:sanctum",
+  "endpoints": [
+    {
+      "metodo": "GET",
+      "ruta": "/preguntas",
+      "descripcion": "Listar preguntas activas"
+    },
+    {
+      "metodo": "GET",
+      "ruta": "/preguntas/{id}",
+      "descripcion": "Consultar una pregunta y sus alternativas"
+    },
+    {
+      "metodo": "POST",
+      "ruta": "/preguntas",
+      "roles": ["admin", "docente"]
+    },
+    {
+      "metodo": "PUT",
+      "ruta": "/preguntas/{id}",
+      "roles": ["admin", "docente"]
+    },
+    {
+      "metodo": "DELETE",
+      "ruta": "/preguntas/{id}",
+      "roles": ["admin", "docente"],
+      "descripcion": "Desactivacion logica"
+    }
+  ],
+  "restricciones": {
+    "estudiante_no_recibe": [
+      "solucion",
+      "es_correcta"
+    ],
+    "alternativas_correctas_por_pregunta": 1
+  },
+  "respuesta_exitosa": {
+    "success": true,
+    "data": {},
+    "message": "OK"
+  },
+  "respuesta_error": {
+    "success": false,
+    "data": null,
+    "message": "Error",
+    "errors": {}
+  }
+}
