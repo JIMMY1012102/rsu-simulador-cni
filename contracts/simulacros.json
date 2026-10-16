@@ -1,0 +1,120 @@
+{
+  "modulo": "simulacros",
+  "responsable": "Sebastián",
+  "autenticacion": "Todas las rutas requieren auth:sanctum (Authorization: Bearer <token>).",
+  "permisos": {
+    "admin_docente": "Listar y ver todos los simulacros, crear y editar.",
+    "estudiante": "Solo listar y ver simulacros activos. Crear o editar devuelve 403."
+  },
+  "mapeo_campos": {
+    "nombre": "simulacros.nombre (el título del simulacro)",
+    "tiempo_limite": "simulacros.tiempo_limite (duración en minutos)",
+    "puntaje_maximo": "simulacros.puntaje_maximo (columna calculada: total_preguntas x puntaje_correcta, solo lectura)",
+    "areas[]": "filas de simulacro_area (area_id, nivel, cantidad_preguntas)",
+    "areas_postulacion[]": "filas de area_postulacion_simulacro"
+  },
+  "reglas": [
+    "fecha_fin debe ser posterior a fecha_inicio.",
+    "La suma de areas[].cantidad_preguntas debe ser igual a total_preguntas.",
+    "No se puede repetir la misma combinación area_id + nivel.",
+    "nivel admite basico, intermedio, avanzado o mixto (por defecto mixto).",
+    "PUT reemplaza la configuración completa: las áreas enviadas sustituyen a las anteriores. Si no se envía areas_postulacion, se mantienen las que había.",
+    "No hay relación directa simulacro -> pregunta: las preguntas se sortean por área y nivel en el módulo de intentos."
+  ],
+  "rutas": [
+    {
+      "metodo": "GET",
+      "ruta": "/api/simulacros",
+      "respuesta_200": {
+        "success": true,
+        "data": [
+          {
+            "id": 1,
+            "nombre": "Simulacro CNI 1",
+            "tiempo_limite": 120,
+            "total_preguntas": 10,
+            "cantidad_alternativas": 4,
+            "puntaje_correcta": 20,
+            "puntaje_incorrecta": -1.125,
+            "puntaje_blanco": 0,
+            "puntaje_maximo": 200,
+            "fecha_inicio": "2026-10-20 08:00:00",
+            "fecha_fin": "2026-10-20 12:00:00",
+            "activo": true,
+            "areas": [
+              { "area_id": 1, "nivel": "basico", "cantidad_preguntas": 6 },
+              { "area_id": 2, "nivel": "mixto", "cantidad_preguntas": 4 }
+            ],
+            "areas_postulacion": [
+              { "id": 1, "codigo": "A", "nombre": "Ingenierías" }
+            ]
+          }
+        ],
+        "message": "OK"
+      }
+    },
+    {
+      "metodo": "GET",
+      "ruta": "/api/simulacros/{id}",
+      "respuesta_200": "Mismo objeto que un elemento de la lista, dentro de data.",
+      "respuesta_404": {
+        "success": false,
+        "data": null,
+        "message": "El simulacro no existe.",
+        "errors": {}
+      }
+    },
+    {
+      "metodo": "POST",
+      "ruta": "/api/simulacros",
+      "peticion": {
+        "nombre": "Simulacro CNI 1",
+        "tiempo_limite": 120,
+        "total_preguntas": 10,
+        "cantidad_alternativas": 4,
+        "puntaje_correcta": 20,
+        "puntaje_incorrecta": -1.125,
+        "puntaje_blanco": 0,
+        "fecha_inicio": "2026-10-20 08:00:00",
+        "fecha_fin": "2026-10-20 12:00:00",
+        "activo": true,
+        "areas": [
+          { "area_id": 1, "nivel": "basico", "cantidad_preguntas": 6 },
+          { "area_id": 2, "nivel": "mixto", "cantidad_preguntas": 4 }
+        ],
+        "areas_postulacion": [1]
+      },
+      "opcionales": ["cantidad_alternativas", "puntaje_correcta", "puntaje_incorrecta", "puntaje_blanco", "activo", "areas[].nivel", "areas_postulacion"],
+      "respuesta_201": {
+        "success": true,
+        "data": "Simulacro creado, con el mismo formato que GET /api/simulacros/{id}.",
+        "message": "Simulacro creado."
+      },
+      "respuesta_422": {
+        "success": false,
+        "data": null,
+        "message": "Los datos del simulacro no son válidos.",
+        "errors": {
+          "areas": ["La suma de cantidad_preguntas (10) debe ser igual a total_preguntas (100)."]
+        }
+      },
+      "respuesta_403": {
+        "success": false,
+        "data": null,
+        "message": "Solo un administrador o docente puede crear o editar simulacros.",
+        "errors": {}
+      }
+    },
+    {
+      "metodo": "PUT",
+      "ruta": "/api/simulacros/{id}",
+      "peticion": "Mismo cuerpo que POST.",
+      "respuesta_200": {
+        "success": true,
+        "data": "Simulacro actualizado.",
+        "message": "Simulacro actualizado."
+      },
+      "errores": "422, 403 y 404 con el mismo formato que arriba."
+    }
+  ]
+}
