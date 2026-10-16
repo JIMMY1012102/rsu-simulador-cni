@@ -1,0 +1,43 @@
+{
+  "module": "intentos",
+  "version": "1.0.0",
+  "endpoints": [
+    {
+      "method": "POST",
+      "path": "/intentos",
+      "action": "iniciar",
+      "description": "Inicia un intento para el usuario autenticado"
+    },
+    {
+      "method": "GET",
+      "path": "/intentos/{id}",
+      "action": "mostrar",
+      "description": "Muestra un intento propio y sus respuestas"
+    },
+    {
+      "method": "POST",
+      "path": "/intentos/{id}/respuestas",
+      "action": "guardarRespuesta",
+      "description": "Guarda o actualiza una respuesta del intento propio"
+    },
+    {
+      "method": "POST",
+      "path": "/intentos/{id}/finalizar",
+      "action": "finalizar",
+      "description": "Finaliza un intento propio"
+    }
+  ],
+  "responses": {
+    "success": {
+      "success": true,
+      "data": {},
+      "message": "OK"
+    },
+    "error": {
+      "success": false,
+      "data": null,
+      "message": "Error",
+      "errors": {}
+    }
+  }
+}
