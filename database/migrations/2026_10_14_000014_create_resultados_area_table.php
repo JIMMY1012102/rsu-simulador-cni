@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -59,11 +58,13 @@ return new class extends Migration
                 ->cascadeOnUpdate();
         });
 
-        DB::statement("
-            ALTER TABLE resultados_area
-            ADD CONSTRAINT chk_resultados_porcentaje
-            CHECK (porcentaje BETWEEN 0 AND 100)
-        ");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("
+                ALTER TABLE resultados_area
+                ADD CONSTRAINT chk_resultados_porcentaje
+                CHECK (porcentaje BETWEEN 0 AND 100)
+            ");
+        }
     }
 
     public function down(): void

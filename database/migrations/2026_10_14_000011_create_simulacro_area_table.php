@@ -1,4 +1,3 @@
-
 <?php
 
 use Illuminate\Database\Migrations\Migration;
@@ -56,11 +55,13 @@ return new class extends Migration
                 ->cascadeOnUpdate();
         });
 
-        DB::statement("
-            ALTER TABLE simulacro_area
-            ADD CONSTRAINT chk_simulacro_area_cantidad
-            CHECK (cantidad_preguntas > 0)
-        ");
+        if (DB::getDriverName() === 'mysql') {
+            DB::statement("
+                ALTER TABLE simulacro_area
+                ADD CONSTRAINT chk_simulacro_area_cantidad
+                CHECK (cantidad_preguntas > 0)
+            ");
+        }
     }
 
     public function down(): void
