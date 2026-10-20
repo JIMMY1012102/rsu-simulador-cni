@@ -14,7 +14,7 @@ class ResultadoService
             ->where('id', $intentoId)
             ->first();
 
-        if (!$intento) {
+        if (! $intento) {
             throw ValidationException::withMessages([
                 'intento_id' => 'El intento no existe.',
             ]);
@@ -25,9 +25,9 @@ class ResultadoService
 
     public function validarIntentoFinalizado(object $intento): void
     {
-        if (!in_array($intento->estado, ['finalizado', 'enviado_auto'], true)) {
+        if (! in_array($intento->estado, ['finalizado', 'enviado_auto'], true)) {
             throw ValidationException::withMessages([
-                'intento_id' => 'El intento todavÃ­a no ha finalizado.',
+                'intento_id' => 'El intento todavía no ha finalizado.',
             ]);
         }
     }
@@ -72,7 +72,7 @@ class ResultadoService
 
         if ($preguntasInvalidas->isNotEmpty()) {
             throw ValidationException::withMessages([
-                'preguntas' => 'Hay preguntas sin una Ãºnica alternativa correcta.',
+                'preguntas' => 'Hay preguntas sin una única alternativa correcta.',
             ]);
         }
     }
@@ -114,7 +114,7 @@ class ResultadoService
             'incorrecta' => (float) $simulacro->puntaje_incorrecta,
             'en_blanco', 'doble_marca' => (float) $simulacro->puntaje_blanco,
             default => throw ValidationException::withMessages([
-                'estado' => 'Estado de respuesta no vÃ¡lido.',
+                'estado' => 'Estado de respuesta no válido.',
             ]),
         };
     }
@@ -127,7 +127,7 @@ class ResultadoService
                 ->lockForUpdate()
                 ->first();
 
-            if (!$intento) {
+            if (! $intento) {
                 throw ValidationException::withMessages([
                     'intento_id' => 'El intento no existe.',
                 ]);
@@ -135,7 +135,7 @@ class ResultadoService
 
             $this->validarIntentoFinalizado($intento);
 
-            if ($intento->tipo !== 'simulacro' || !$intento->simulacro_id) {
+            if ($intento->tipo !== 'simulacro' || ! $intento->simulacro_id) {
                 throw ValidationException::withMessages([
                     'intento_id' => 'Solo se admiten simulacros.',
                 ]);
@@ -145,7 +145,7 @@ class ResultadoService
                 ->where('id', $intento->simulacro_id)
                 ->first();
 
-            if (!$simulacro) {
+            if (! $simulacro) {
                 throw ValidationException::withMessages([
                     'simulacro_id' => 'El simulacro no existe.',
                 ]);
@@ -183,7 +183,7 @@ class ResultadoService
 
                 if ($pendientes || $areasGuardadas !== $cantidadAreas) {
                     throw ValidationException::withMessages([
-                        'intento_id' => 'El intento tiene una calificaciÃ³n incompleta.',
+                        'intento_id' => 'El intento tiene una calificación incompleta.',
                     ]);
                 }
 
@@ -205,7 +205,12 @@ class ResultadoService
                 $estado = $this->clasificarRespuesta($respuesta);
                 $puntaje = $this->calcularPuntaje($estado, $simulacro);
 
-                $totales[$estado]++;
+                $contador = match ($estado) {
+                    'correcta' => 'correctas',
+                    'incorrecta' => 'incorrectas',
+                    default => $estado,
+                };
+                $totales[$contador]++;
                 $totales['puntaje_total'] += $puntaje;
 
                 $actualizaciones[] = [
@@ -216,7 +221,7 @@ class ResultadoService
 
                 $areaId = (int) $respuesta->area_id;
 
-                if (!isset($resultadosArea[$areaId])) {
+                if (! isset($resultadosArea[$areaId])) {
                     $resultadosArea[$areaId] = [
                         'area_id' => $areaId,
                         'total_preguntas' => 0,
@@ -308,7 +313,7 @@ class ResultadoService
 
         if ($intento->puntaje_total === null) {
             throw ValidationException::withMessages([
-                'intento_id' => 'El intento aÃºn no tiene resultados.',
+                'intento_id' => 'El intento aún no tiene resultados.',
             ]);
         }
 

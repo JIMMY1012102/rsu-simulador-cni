@@ -22,7 +22,7 @@ Las rutas `/api/*` se conservan para reutilizar el trabajo de los módulos, pero
 - `/logout`: cierre de sesión por POST.
 - Módulos JSON existentes unificados con la misma sesión; pruebas adaptadas al guard `web`.
 
-**Alcance:** establece la arquitectura y el acceso web. El panel inicial no sustituye las pantallas completas de gestión de preguntas, creación de simulacros y resolución del examen. Tampoco acredita que la lógica de asignación de preguntas y calificación esté integrada de extremo a extremo. Esas pantallas y verificaciones siguen pendientes.
+**Alcance:** establece la arquitectura y el acceso web. El panel inicial no sustituye las pantallas completas de gestión de preguntas, creación de simulacros y resolución del examen. El recorrido backend de simulacro (asignación, respuestas, cierre y calificación) cuenta con pruebas de integración; consulta `docs/recorrido-backend.md` para sus reglas y límites. Las pantallas completas siguen pendientes.
 
 ## Preparación local
 
@@ -72,3 +72,9 @@ php artisan test
 `phpunit.xml` selecciona SQLite en memoria, caché y sesiones de prueba. No uses la base MariaDB compartida para ejecutar tests. El workflow de GitHub repite instalación, validación, compilación de vistas y pruebas.
 
 Los cambios se proponen mediante Pull Request a `develop`; no se modifica `main` directamente.
+
+## Recorrido del simulacro
+
+`php artisan test --filter=RecorridoSimulacroTest` comprueba el recorrido usando SQLite en memoria. El inicio asigna preguntas, la finalización califica y los resultados se consultan con la misma sesión web. No requiere nuevas migraciones ni seeders.
+
+El cierre de intentos vencidos está definido cada minuto en Laravel Scheduler; al desplegar hay que activar el scheduler. En desarrollo puede mantenerse `php artisan schedule:work` en otra terminal. Las preguntas y configuraciones ya usadas no se editan; se crean nuevas versiones para proteger los intentos existentes.
