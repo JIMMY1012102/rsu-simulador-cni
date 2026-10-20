@@ -5,15 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 /**
  * Usuario del sistema (tabla "usuarios"): administradores, docentes y estudiantes.
- * Se autentica con tokens de Sanctum desde el módulo de auth.
+ * Se autentica mediante el guard web y sesiones de Laravel.
  */
 class Usuario extends Authenticatable
 {
-    use HasApiTokens, Notifiable;
+    use Notifiable;
 
     public const ROLES = ['admin', 'docente', 'estudiante'];
 

@@ -1,8 +1,7 @@
-
 {
   "modulo": "preguntas",
   "prefijo": "/api",
-  "autenticacion": "auth:sanctum",
+  "autenticacion": "Sesión de Laravel, auth:web y cuenta activa. Rutas JSON bajo middleware web con protección CSRF.",
   "endpoints": [
     {
       "metodo": "GET",
@@ -17,17 +16,26 @@
     {
       "metodo": "POST",
       "ruta": "/preguntas",
-      "roles": ["admin", "docente"]
+      "roles": [
+        "admin",
+        "docente"
+      ]
     },
     {
       "metodo": "PUT",
       "ruta": "/preguntas/{id}",
-      "roles": ["admin", "docente"]
+      "roles": [
+        "admin",
+        "docente"
+      ]
     },
     {
       "metodo": "DELETE",
       "ruta": "/preguntas/{id}",
-      "roles": ["admin", "docente"],
+      "roles": [
+        "admin",
+        "docente"
+      ],
       "descripcion": "Desactivacion logica"
     }
   ],

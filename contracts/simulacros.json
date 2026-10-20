@@ -1,7 +1,7 @@
 {
   "modulo": "simulacros",
   "responsable": "Sebastián",
-  "autenticacion": "Todas las rutas requieren auth:sanctum (Authorization: Bearer <token>).",
+  "autenticacion": "Sesión de Laravel, auth:web y cuenta activa. Rutas JSON bajo middleware web con protección CSRF.",
   "permisos": {
     "admin_docente": "Listar y ver todos los simulacros, crear y editar.",
     "estudiante": "Solo listar y ver simulacros activos. Crear o editar devuelve 403."
@@ -42,11 +42,23 @@
             "fecha_fin": "2026-10-20 12:00:00",
             "activo": true,
             "areas": [
-              { "area_id": 1, "nivel": "basico", "cantidad_preguntas": 6 },
-              { "area_id": 2, "nivel": "mixto", "cantidad_preguntas": 4 }
+              {
+                "area_id": 1,
+                "nivel": "basico",
+                "cantidad_preguntas": 6
+              },
+              {
+                "area_id": 2,
+                "nivel": "mixto",
+                "cantidad_preguntas": 4
+              }
             ],
             "areas_postulacion": [
-              { "id": 1, "codigo": "A", "nombre": "Ingenierías" }
+              {
+                "id": 1,
+                "codigo": "A",
+                "nombre": "Ingenierías"
+              }
             ]
           }
         ],
@@ -79,12 +91,30 @@
         "fecha_fin": "2026-10-20 12:00:00",
         "activo": true,
         "areas": [
-          { "area_id": 1, "nivel": "basico", "cantidad_preguntas": 6 },
-          { "area_id": 2, "nivel": "mixto", "cantidad_preguntas": 4 }
+          {
+            "area_id": 1,
+            "nivel": "basico",
+            "cantidad_preguntas": 6
+          },
+          {
+            "area_id": 2,
+            "nivel": "mixto",
+            "cantidad_preguntas": 4
+          }
         ],
-        "areas_postulacion": [1]
+        "areas_postulacion": [
+          1
+        ]
       },
-      "opcionales": ["cantidad_alternativas", "puntaje_correcta", "puntaje_incorrecta", "puntaje_blanco", "activo", "areas[].nivel", "areas_postulacion"],
+      "opcionales": [
+        "cantidad_alternativas",
+        "puntaje_correcta",
+        "puntaje_incorrecta",
+        "puntaje_blanco",
+        "activo",
+        "areas[].nivel",
+        "areas_postulacion"
+      ],
       "respuesta_201": {
         "success": true,
         "data": "Simulacro creado, con el mismo formato que GET /api/simulacros/{id}.",
@@ -95,7 +125,9 @@
         "data": null,
         "message": "Los datos del simulacro no son válidos.",
         "errors": {
-          "areas": ["La suma de cantidad_preguntas (10) debe ser igual a total_preguntas (100)."]
+          "areas": [
+            "La suma de cantidad_preguntas (10) debe ser igual a total_preguntas (100)."
+          ]
         }
       },
       "respuesta_403": {

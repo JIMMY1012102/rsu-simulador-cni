@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\AreaPostulacion;
-use App\Models\Simulacro;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -76,7 +75,7 @@ class SimulacrosModuleTest extends TestCase
 
     public function test_docente_crea_simulacro_con_sus_areas(): void
     {
-        $respuesta = $this->actingAs($this->docente, 'sanctum')
+        $respuesta = $this->actingAs($this->docente, 'web')
             ->postJson('/api/simulacros', $this->datosValidos());
 
         $respuesta->assertCreated()
@@ -93,7 +92,7 @@ class SimulacrosModuleTest extends TestCase
 
     public function test_datos_incompletos_devuelven_error_de_validacion(): void
     {
-        $this->actingAs($this->docente, 'sanctum')
+        $this->actingAs($this->docente, 'web')
             ->postJson('/api/simulacros', [])
             ->assertStatus(422)
             ->assertJsonPath('success', false)
@@ -103,7 +102,7 @@ class SimulacrosModuleTest extends TestCase
 
     public function test_la_suma_de_preguntas_por_area_debe_igualar_el_total(): void
     {
-        $this->actingAs($this->docente, 'sanctum')
+        $this->actingAs($this->docente, 'web')
             ->postJson('/api/simulacros', $this->datosValidos(['total_preguntas' => 100]))
             ->assertStatus(422)
             ->assertJsonValidationErrors(['areas']);
@@ -113,7 +112,7 @@ class SimulacrosModuleTest extends TestCase
 
     public function test_fecha_fin_debe_ser_posterior_a_fecha_inicio(): void
     {
-        $this->actingAs($this->docente, 'sanctum')
+        $this->actingAs($this->docente, 'web')
             ->postJson('/api/simulacros', $this->datosValidos(['fecha_fin' => '2026-10-19 08:00:00']))
             ->assertStatus(422)
             ->assertJsonValidationErrors(['fecha_fin']);
@@ -121,14 +120,14 @@ class SimulacrosModuleTest extends TestCase
 
     public function test_estudiante_no_puede_crear_ni_editar(): void
     {
-        $this->actingAs($this->estudiante, 'sanctum')
+        $this->actingAs($this->estudiante, 'web')
             ->postJson('/api/simulacros', $this->datosValidos())
             ->assertForbidden()
             ->assertJsonPath('success', false);
 
         $id = $this->crearSimulacro();
 
-        $this->actingAs($this->estudiante, 'sanctum')
+        $this->actingAs($this->estudiante, 'web')
             ->putJson("/api/simulacros/{$id}", $this->datosValidos(['nombre' => 'Cambiado']))
             ->assertForbidden();
 
@@ -142,13 +141,13 @@ class SimulacrosModuleTest extends TestCase
 
     public function test_simulacro_inexistente_devuelve_404(): void
     {
-        $this->actingAs($this->docente, 'sanctum')
+        $this->actingAs($this->docente, 'web')
             ->getJson('/api/simulacros/9999')
             ->assertNotFound()
             ->assertJsonPath('success', false)
             ->assertJsonPath('data', null);
 
-        $this->actingAs($this->docente, 'sanctum')
+        $this->actingAs($this->docente, 'web')
             ->putJson('/api/simulacros/9999', $this->datosValidos())
             ->assertNotFound();
     }
@@ -164,8 +163,8 @@ class SimulacrosModuleTest extends TestCase
         ]);
 
         // Dos PUT iguales deben dejar el mismo resultado.
-        $this->actingAs($this->docente, 'sanctum')->putJson("/api/simulacros/{$id}", $datos)->assertOk();
-        $this->actingAs($this->docente, 'sanctum')->putJson("/api/simulacros/{$id}", $datos)
+        $this->actingAs($this->docente, 'web')->putJson("/api/simulacros/{$id}", $datos)->assertOk();
+        $this->actingAs($this->docente, 'web')->putJson("/api/simulacros/{$id}", $datos)
             ->assertOk()
             ->assertJsonPath('data.nombre', 'Simulacro CNI 1 (corregido)')
             ->assertJsonPath('data.areas.0.nivel', 'avanzado');
@@ -180,24 +179,24 @@ class SimulacrosModuleTest extends TestCase
         $activo = $this->crearSimulacro();
         $inactivo = $this->crearSimulacro(['nombre' => 'Borrador', 'activo' => false]);
 
-        $this->actingAs($this->estudiante, 'sanctum')
+        $this->actingAs($this->estudiante, 'web')
             ->getJson('/api/simulacros')
             ->assertOk()
             ->assertJsonCount(1, 'data')
             ->assertJsonPath('data.0.id', $activo);
 
-        $this->actingAs($this->estudiante, 'sanctum')
+        $this->actingAs($this->estudiante, 'web')
             ->getJson("/api/simulacros/{$inactivo}")
             ->assertNotFound();
 
-        $this->actingAs($this->docente, 'sanctum')
+        $this->actingAs($this->docente, 'web')
             ->getJson('/api/simulacros')
             ->assertJsonCount(2, 'data');
     }
 
     private function crearSimulacro(array $cambios = []): int
     {
-        return $this->actingAs($this->docente, 'sanctum')
+        return $this->actingAs($this->docente, 'web')
             ->postJson('/api/simulacros', $this->datosValidos($cambios))
             ->assertCreated()
             ->json('data.id');
