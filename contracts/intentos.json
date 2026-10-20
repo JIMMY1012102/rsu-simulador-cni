@@ -1,6 +1,6 @@
 {
   "module": "intentos",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "endpoints": [
     {
       "method": "POST",
@@ -40,5 +40,15 @@
       "errors": {}
     }
   },
-  "autenticacion": "Sesión de Laravel, auth:web y cuenta activa. Rutas JSON bajo middleware web con protección CSRF."
+  "autenticacion": "Sesión de Laravel, auth:web y cuenta activa. Rutas JSON bajo middleware web con protección CSRF.",
+  "base_path": "/api",
+  "reglas": [
+    "El inicio del simulacro sortea y persiste todas las preguntas, o falla con 422 sin crear un intento parcial.",
+    "GET /intentos/{id} agrega data.preguntas con enunciados y alternativas sin solución ni es_correcta; no vuelve a sortear.",
+    "Guardar una alternativa null deja la respuesta en blanco; solo se admiten preguntas del intento y alternativas de esa pregunta.",
+    "Finalizar cierra y califica el simulacro en la misma transacción; repetir la petición es idempotente.",
+    "El servidor rechaza respuestas en o después de fecha_limite. El cierre vencido se confirma incluso si la respuesta recibe 422.",
+    "La carrera se copia del perfil del usuario. Las áreas de postulación configuradas se validan contra ese perfil.",
+    "El comando intentos:cerrar-vencidos permite el cierre periódico mediante Laravel Scheduler."
+  ]
 }

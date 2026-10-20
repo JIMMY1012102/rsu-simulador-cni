@@ -58,8 +58,14 @@ class PreguntaService
                 ->lockForUpdate()
                 ->exists();
 
-            if (!$existe) {
+            if (! $existe) {
                 return false;
+            }
+
+            if (DB::table('respuestas_estudiante')->where('pregunta_id', $id)->exists()) {
+                throw ValidationException::withMessages([
+                    'pregunta' => 'Esta pregunta ya se usó en un intento. Crea una nueva versión en lugar de editarla.',
+                ]);
             }
 
             $this->validarTema($datos['tema_id']);
@@ -124,7 +130,7 @@ class PreguntaService
             ->where('areas.activo', true)
             ->exists();
 
-        if (!$existe) {
+        if (! $existe) {
             throw ValidationException::withMessages([
                 'tema_id' => 'El tema o su área no están activos.',
             ]);

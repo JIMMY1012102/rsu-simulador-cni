@@ -7,6 +7,7 @@ use App\Models\Usuario;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Lógica del módulo de simulacros: consulta, creación y actualización
@@ -73,7 +74,14 @@ class SimulacroService
             return null;
         }
 
-        DB::transaction(function () use ($simulacro, $datos) {
+        DB::transaction(function () use ($simulacro, $datos, $id) {
+            // El inicio también bloquea esta fila: no se cambia la configuración de exámenes ya usados.
+            $simulacro->newQuery()->whereKey($simulacro->id)->lockForUpdate()->firstOrFail();
+            if (DB::table('intentos')->where('simulacro_id', $id)->exists()) {
+                throw ValidationException::withMessages([
+                    'simulacro' => 'Este simulacro ya tiene intentos. Crea uno nuevo para cambiar su configuración.',
+                ]);
+            }
             $simulacro->update(Arr::only($datos, self::CAMPOS_SIMULACRO));
             $this->guardarAsociaciones($simulacro, $datos);
         });

@@ -16,7 +16,7 @@ class IniciarIntentoRequest extends FormRequest
     {
         return [
             'tipo' => ['required', Rule::in(['simulacro', 'practica'])],
-            'simulacro_id' => ['nullable', 'integer', 'exists:simulacros,id'],
+            'simulacro_id' => ['required_if:tipo,simulacro', 'prohibited_if:tipo,practica', 'nullable', 'integer', 'exists:simulacros,id'],
             'carrera_id' => ['nullable', 'integer', 'exists:carreras,id'],
             'area_id' => ['nullable', 'integer', 'exists:areas,id'],
             'tema_id' => ['nullable', 'integer', 'exists:temas,id'],
