@@ -1,36 +1,40 @@
 # RSU-CNI — Simulador CNI
 
-Proyecto de Responsabilidad Social Universitaria: simulador de preparación académica para estudiantes del CNI.
+Proyecto de Responsabilidad Social Universitaria de preparación académica para estudiantes del CNI.
 
-**Stack inicial:** Laravel 12 (PHP 8.2+), MariaDB 10.11 (driver PDO MySQL), Vite.
+## Arquitectura KISS
 
-## Estructura del repositorio
+Una sola aplicación **Laravel 12 + Blade + Livewire 3 + MariaDB**, con autenticación por sesiones de Laravel. Las cuentas usan el modelo `Usuario` y la tabla `usuarios`. No se emiten tokens Bearer y no se necesita Firebase ni un frontend separado.
 
-- `app/`: controladores, modelos y proveedores.
-- `bootstrap/`, `config/`, `routes/`: arranque y configuración Laravel.
-- `database/migrations/`: **reservado** para las migraciones de Nia, Dafne y Diego.
-- `database/seeders/`: **reservado** para los datos de prueba y catálogos.
-- `resources/`, `public/`: vistas y recursos.
-- `tests/`: pruebas automatizadas.
-- `base-de-datos.sql` y `base-de-datos.md`: diseño SQL y documentación de Sebastián, conservados en la raíz.
+- **Presentación:** vistas en `resources/views/`, estilos en `public/css/app.css` y componentes en `app/Livewire/`.
+- **Autenticación:** `SessionController` y `AuthService`, usando exclusivamente el guard `web`. Login, logout, regeneración de sesión, CSRF y límite de solicitudes compartido entre HTML y JSON.
+- **Acceso:** `auth:web` y `EnsureActiveUser`; se conserva la autorización por roles y propietario de cada módulo.
+- **Negocio:** servicios existentes de preguntas, simulacros, intentos y resultados.
+- **Persistencia:** modelos/consultas y MariaDB. No cambia el esquema de negocio.
 
-## Requisitos locales
+Las rutas `/api/*` se conservan para reutilizar el trabajo de los módulos, pero ahora son **rutas JSON de la misma aplicación web**: se cargan desde `routes/web.php`, comparten la cookie de sesión y requieren CSRF en operaciones de escritura. No son una API pública ni una autenticación independiente. Los componentes Livewire pueden llamar directamente a los servicios.
 
-PHP >= 8.2 con las extensiones requeridas por Laravel (`pdo_mysql`, `mbstring`, `xml`, etc.); Composer 2; MariaDB activo. Node.js/npm para los recursos web es opcional durante las primeras pruebas.
+## Qué incluye esta adaptación
 
-## Inicio rápido en Linux Mint
+- `/`: bienvenida con enlace al acceso.
+- `/login`: formulario de usuario y contraseña.
+- `/panel`: componente Livewire que lista simulacros e intentos propios, incluidos puntajes ya registrados.
+- `/logout`: cierre de sesión por POST.
+- Módulos JSON existentes unificados con la misma sesión; pruebas adaptadas al guard `web`.
 
-Trabaja con la rama aprobada por el equipo (tras fusionar este PR a `develop`):
+**Alcance:** establece la arquitectura y el acceso web. El panel inicial no sustituye las pantallas completas de gestión de preguntas, creación de simulacros y resolución del examen. Tampoco acredita que la lógica de asignación de preguntas y calificación esté integrada de extremo a extremo. Esas pantallas y verificaciones siguen pendientes.
+
+## Preparación local
+
+Requiere PHP 8.2+, Composer 2 y MariaDB. PHP necesita las extensiones habituales de Laravel, `pdo_mysql` y, para las pruebas, `pdo_sqlite`.
 
 ```bash
-git clone -b develop https://github.com/JIMMY1012102/rsu-simulador-cni.git
-cd rsu-simulador-cni
 composer install
 cp .env.example .env
 php artisan key:generate
 ```
 
-Edita `.env` y configura la conexión **local** de cada integrante:
+Configura la conexión local en `.env`. No publiques ese archivo ni contraseñas.
 
 ```dotenv
 DB_CONNECTION=mysql
@@ -39,48 +43,32 @@ DB_PORT=3306
 DB_DATABASE=simulador_cni_validacion
 DB_USERNAME=cni_dev
 DB_PASSWORD=TU_CONTRASEÑA_LOCAL
+SESSION_DRIVER=file
 ```
 
-`simulador_cni_validacion` es el nombre usado por el integrador para probar la versión 2 del SQL; otros colaboradores pueden usar su propia base y usuario con permisos limitados. **Nunca subas `.env` ni contraseñas a GitHub.**
+**Base nueva y vacía:** revisar primero las migraciones y luego ejecutar `php artisan migrate`. Los seeders existentes crean cuentas de demostración con contraseña conocida; úsalos solo en una base local de prueba. No se ejecutan automáticamente.
 
-Para comprobar el arranque:
+**Base con el SQL importado:** no ejecutar `migrate`, `migrate:fresh` ni volver a importar `base-de-datos.sql` sin acordar la sincronización del historial de migraciones. `migrate:fresh` elimina tablas. La adaptación KISS no modifica ni elimina datos ni migraciones existentes; la antigua tabla de tokens se conserva por compatibilidad histórica, pero ya no se usa para autenticar.
 
 ```bash
-php artisan --version
 php artisan route:list
 php artisan serve
 ```
 
-Luego visita http://127.0.0.1:8000. Para comprobar la conexión (sin escribir tablas): `php artisan db:show --database=mysql`.
+Abre `http://127.0.0.1:8000/login`. No se necesita `npm run dev` para el login y el panel inicial: CSS local y recursos de Livewire se sirven desde Laravel.
 
-Para pruebas sin modificar MariaDB: `php artisan test`. Si necesitas frontend: `npm install && npm run build`.
+## Uso de respuestas JSON desde el mismo navegador
 
-## ⚠️ Importante: SQL existente y migraciones
+Primero ingresa por `/login`. Para llamadas `fetch`, envía `Accept: application/json`; en POST/PUT/DELETE añade `X-CSRF-TOKEN` con el valor de la etiqueta `meta[name="csrf-token"]`. No guardes un token Bearer ni contraseñas en localStorage. Las solicitudes sin sesión reciben 401; las escrituras sin CSRF reciben 419. Desde Blade/Livewire se recomienda usar formularios y acciones en lugar de hacer solicitudes HTTP internas a la propia aplicación.
 
-- Las 14 tablas de `base-de-datos.sql` ya fueron verificadas en MariaDB por separado. **No vuelvas a ejecutar ese archivo sobre una base con datos sin revisar antes su instrucción `USE simulador_cni`.**
-- **No ejecutes `php artisan migrate` ni `migrate:fresh` sobre las bases con el esquema SQL importado** hasta que las migraciones de Nia, Dafne y Diego estén revisadas y se acuerde cómo sincronizar el historial de migraciones. Una migración puede intentar recrear tablas existentes; `migrate:fresh` puede eliminarlas.
-- Se omitieron las migraciones predeterminadas de Laravel para `users`, `cache` y `jobs` a fin de no introducir tablas fuera del diseño CNI.
-- La autenticación queda **preparada**, no implementada: `App\Models\Usuario` apunta a la tabla SQL `usuarios`. Registro, inicio de sesión y recuperación de contraseña quedan para la fase backend.
-- Se usan sesiones en archivos, caché en archivos y cola síncrona por defecto para no requerir tablas auxiliares que todavía no existen.
+## Verificación
 
-## Distribución técnica
+```bash
+composer validate --strict
+php artisan view:cache
+php artisan test
+```
 
-- **Integración:** estructura Laravel, configuración MariaDB, PRs, pruebas y coordinación.
-- **Sebas:** SQL y documentación de las 14 tablas.
-- **Nia:** migraciones y seeders de secciones, áreas de postulación, carreras y usuarios.
-- **Dafne:** migraciones y pruebas del banco de preguntas.
-- **Diego:** migraciones y pruebas de simulacros, intentos y resultados.
+`phpunit.xml` selecciona SQLite en memoria, caché y sesiones de prueba. No uses la base MariaDB compartida para ejecutar tests. El workflow de GitHub repite instalación, validación, compilación de vistas y pruebas.
 
-Los aportes nuevos deben entregarse en ramas propias y en Pull Requests hacia `develop`; no modificar `main` directamente.
-
-## Estado de esta entrega
-
-Este PR publica **el esqueleto y configuración inicial de Laravel**, validado por el integrador el **14/10/2026** en Linux Mint con PHP 8.2.33, Composer 2.7.1 y MariaDB 10.11.14.
-
-- `composer install`: completado; `composer.lock` generado e incluido en la rama.
-- `php artisan key:generate`: correcto, con clave conservada únicamente en el `.env` local.
-- `php artisan db:show --database=mysql`: conexión correcta a `simulador_cni_validacion` con `cni_dev`. El informe enumeró 28 tablas entre **dos esquemas** visibles para el usuario; la base de validación contiene las 14 tablas de CNI.
-- `php artisan serve`: página inicial **Simulador CNI** cargada correctamente en Firefox, `http://127.0.0.1:8000`.
-- `php artisan test`: **3 pruebas aprobadas, 4 aserciones, 1.59 s** (resultado local).
-
-**Pendiente:** las migraciones y seeders de Nia, Dafne y Diego, y las pruebas de integración posteriores. Los resultados anteriores no acreditan que dichas migraciones estén implementadas ni que el simulador funcional esté terminado.
+Los cambios se proponen mediante Pull Request a `develop`; no se modifica `main` directamente.

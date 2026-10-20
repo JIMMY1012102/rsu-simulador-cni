@@ -1,12 +1,8 @@
-
 {
   "modulo": "resultados",
   "version": "1.0.0",
   "descripcion": "Modulo de calificacion y consulta de resultados del simulador CNI",
-  "autenticacion": {
-    "requerida": true,
-    "middleware": "auth"
-  },
+  "autenticacion": "Sesión de Laravel, auth:web y cuenta activa. Rutas JSON bajo middleware web con protección CSRF.",
   "rutas": [
     {
       "metodo": "GET",

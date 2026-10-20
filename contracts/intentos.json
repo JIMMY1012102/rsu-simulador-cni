@@ -39,5 +39,6 @@
       "message": "Error",
       "errors": {}
     }
-  }
+  },
+  "autenticacion": "Sesión de Laravel, auth:web y cuenta activa. Rutas JSON bajo middleware web con protección CSRF."
 }
