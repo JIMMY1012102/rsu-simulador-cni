@@ -104,7 +104,7 @@ class ExamenPantallaTest extends TestCase
         app(IntentoService::class)->finalizar($intento, $this->alumno->id);
 
         $this->actingAs($this->alumno, 'web')->get(route('examen', $intento))
-            ->assertRedirect(route('panel'))->assertSessionHasErrors('intento');
+            ->assertRedirect(route('panel'))->assertSessionHas('status')->assertSessionHasNoErrors();
     }
 
     public function test_responder_guarda_y_navegar_cambia_de_pregunta(): void
@@ -206,7 +206,8 @@ class ExamenPantallaTest extends TestCase
             ->assertRedirect(route('panel'));
 
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
-        $this->get(route('panel'))->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas');
+        $this->get(route('panel'))->assertSee('<div class="alert alert-ok" role="status">', false)
+            ->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas')->assertDontSee('role="alert"', false);
     }
 
     /** Regresión: si x-data cambia entre renders, Alpine reinicia el estado y el reloj se congela. */

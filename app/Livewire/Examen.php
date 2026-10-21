@@ -9,8 +9,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\MessageBag;
-use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
@@ -158,10 +156,10 @@ class Examen extends Component
         $this->skipRender();
     }
 
-    /** El panel muestra los avisos desde el bag de errores del layout común. */
+    /** Aviso informativo para el panel (layouts/app lo muestra en verde). */
     private function avisar(string $mensaje): void
     {
-        session()->flash('errors', (new ViewErrorBag)->put('default', new MessageBag(['intento' => $mensaje])));
+        session()->flash('status', $mensaje);
     }
 
     private function mensajeCierre(object $intento): string
