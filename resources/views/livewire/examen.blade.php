@@ -7,7 +7,7 @@
     $sinResponder = $preguntas->filter(fn ($p) => ($respuestas[$p->id] ?? null) === null);
 @endphp
 @push('scripts')
-    <script src="{{ asset('js/examen.js') }}"></script>
+    <script src="{{ asset('js/examen.js').'?v='.filemtime(public_path('js/examen.js')) }}"></script>
 @endpush
 
 {{-- x-data solo recibe valores fijos del intento: si cambiara en cada render, Alpine

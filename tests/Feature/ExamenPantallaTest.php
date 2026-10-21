@@ -80,7 +80,8 @@ class ExamenPantallaTest extends TestCase
             ->assertSee($primera->area)
             ->assertSee('0 de 40 respondidas')
             ->assertSee('JUAN')
-            ->assertSee('js/examen.js')
+            ->assertSee('js/examen.js?v='.filemtime(public_path('js/examen.js')))
+            ->assertSee('css/alumno.css?v='.filemtime(public_path('css/alumno.css')))
             ->assertDontSee('La respuesta correcta es')
             ->assertDontSee('es_correcta');
     }
