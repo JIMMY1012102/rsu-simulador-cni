@@ -210,15 +210,17 @@
             </ul>
 
             @if ($sinResponder->isNotEmpty())
-                <p class="examen-modal__subtitulo">Preguntas sin responder</p>
-                <div class="examen-modal__numeros">
-                    @foreach ($sinResponder as $indice => $item)
-                        <button type="button" class="examen-mapa__numero" wire:click="ir({{ $indice }})" @click="confirmar = false">{{ $dos($indice + 1) }}</button>
-                    @endforeach
+                <div class="examen-modal__grupo">
+                    <p class="examen-modal__subtitulo">Preguntas sin responder</p>
+                    <div class="examen-modal__numeros">
+                        @foreach ($sinResponder as $indice => $item)
+                            <button type="button" class="examen-mapa__numero" wire:click="ir({{ $indice }})" @click="confirmar = false">{{ $dos($indice + 1) }}</button>
+                        @endforeach
+                    </div>
                 </div>
             @endif
             <template x-if="revisar.length">
-                <div>
+                <div class="examen-modal__grupo">
                     <p class="examen-modal__subtitulo">Marcadas para revisar</p>
                     <div class="examen-modal__numeros">
                         <template x-for="orden in revisar" :key="orden">

@@ -449,7 +449,8 @@
 }
 .examen-modal__caja h2 { font-size: 20px; font-weight: 800; }
 .examen-modal__caja > p { font-size: 13px; color: var(--cni-texto-secundario); }
-.examen-modal__subtitulo { margin-bottom: -6px; font-size: 12px; font-weight: 600; color: var(--cni-texto-etiqueta); }
+.examen-modal__grupo { display: flex; flex-direction: column; gap: 10px; }
+.examen-modal__subtitulo { font-size: 12px; font-weight: 600; color: var(--cni-texto-etiqueta); }
 .examen-modal__numeros { display: flex; flex-wrap: wrap; gap: 8px; }
 .examen-modal__acciones { display: flex; justify-content: flex-end; gap: 12px; padding-top: 8px; }
 
