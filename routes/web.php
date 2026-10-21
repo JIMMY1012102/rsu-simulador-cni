@@ -18,6 +18,9 @@ Route::post('/logout', [SessionController::class, 'destroy'])
 
 Route::get('/panel', Panel::class)
     ->middleware(['auth:web', EnsureActiveUser::class])->name('panel');
+    Route::view('/examen-demo', 'examen-demo')
+    ->middleware(['auth:web', EnsureActiveUser::class])
+    ->name('examen.demo');
 
 // Compatibilidad con los módulos existentes: JSON con sesión y CSRF.
 // Se cargan dentro de web; no existe un segundo sistema de autenticación.
