@@ -20,9 +20,6 @@ Route::post('/logout', [SessionController::class, 'destroy'])
 
 Route::get('/panel', Panel::class)
     ->middleware(['auth:web', EnsureActiveUser::class])->name('panel');
-    Route::view('/examen-demo', 'examen-demo')
-    ->middleware(['auth:web', EnsureActiveUser::class])
-    ->name('examen.demo');
 
 // Examen del alumno: iniciar o reanudar un simulacro y rendirlo.
 Route::middleware(['auth:web', EnsureActiveUser::class])->group(function () {
