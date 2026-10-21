@@ -113,6 +113,7 @@
             <span class="portal-pie__enlaces"><a href="#">Privacidad</a><a href="#">Términos y condiciones</a></span>
         </footer>
     </div>
+    @stack('scripts')
     @livewireScripts
 </body>
 </html>
