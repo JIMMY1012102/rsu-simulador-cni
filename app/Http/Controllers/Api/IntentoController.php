@@ -8,7 +8,6 @@ use App\Http\Requests\Intentos\IniciarIntentoRequest;
 use App\Services\IntentoService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class IntentoController extends Controller
 {
@@ -36,23 +35,12 @@ class IntentoController extends Controller
 
         $intento = $this->intentoService->obtenerPropio($id, $usuarioId);
 
-        $respuestas = DB::table('respuestas_estudiante')
-            ->where('intento_id', $id)
-            ->orderBy('orden')
-            ->get([
-                'id',
-                'pregunta_id',
-                'orden',
-                'alternativa_id',
-                'respondida_en',
-            ]);
-
         return response()->json([
             'success' => true,
             'data' => [
                 'intento' => $intento,
                 'preguntas' => $this->intentoService->preguntas($id),
-                'respuestas' => $respuestas,
+                'respuestas' => $this->intentoService->respuestas($id),
             ],
             'message' => 'OK',
         ]);
