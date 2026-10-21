@@ -20,10 +20,7 @@
     <section class="examen-encabezado">
         <div>
             <h1>Simulador de examen</h1>
-            <p>
-                {{ $simulacro ? 'Simulacro de admisión · Práctica general' : 'Práctica · '.($pregunta->area ?? 'Por área') }}
-                · Intento {{ $dos($numeroIntento) }}
-            </p>
+            <p>{{ $simulacro ? 'Simulacro de admisión · '.$simulacro->nombre : 'Práctica · '.($pregunta->area ?? 'Por área') }} · Intento {{ $dos($numeroIntento) }}</p>
         </div>
         <span class="examen-estado">
             <img src="{{ asset('img/examen/indicador.svg') }}" width="6" height="6" alt="">

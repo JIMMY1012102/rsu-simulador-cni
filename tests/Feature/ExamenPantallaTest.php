@@ -76,6 +76,8 @@ class ExamenPantallaTest extends TestCase
 
         $this->actingAs($this->alumno, 'web')->get(route('examen', $intento))->assertOk()
             ->assertSee('Simulador de examen')
+            ->assertSee('Simulacro de admisión · '.ExamenDemoSeeder::SIMULACRO.' · Intento 01')
+            ->assertDontSee('Práctica general')
             ->assertSee($primera->enunciado)
             ->assertSee($primera->area)
             ->assertSee('0 de 40 respondidas')
