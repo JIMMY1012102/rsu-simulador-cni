@@ -5,6 +5,8 @@
     $tiempoInicial = $segundosRestantes === null ? null
         : sprintf('%02d:%02d:%02d', intdiv($segundosRestantes, 3600), intdiv($segundosRestantes % 3600, 60), $segundosRestantes % 60);
     $sinResponder = $preguntas->filter(fn ($p) => ($respuestas[$p->id] ?? null) === null);
+    // Mientras viaja cualquiera de estas acciones, no se puede responder ni navegar.
+    $ocupado = 'responder,siguiente,anterior,ir';
 @endphp
 @push('scripts')
     <script src="{{ asset('js/examen.js').'?v='.filemtime(public_path('js/examen.js')) }}"></script>
@@ -91,7 +93,8 @@
                         <button type="button" role="radio" aria-checked="{{ $marcada ? 'true' : 'false' }}"
                             @class(['examen-opcion', 'is-elegida' => $marcada])
                             wire:key="alternativa-{{ $alternativa->id }}"
-                            wire:click="responder({{ $alternativa->id }})" wire:loading.attr="disabled" wire:target="responder">
+                            wire:click="responder({{ $pregunta->id }}, {{ $alternativa->id }})"
+                            wire:loading.attr="disabled" wire:target="{{ $ocupado }}">
                             <span class="examen-opcion__selector" aria-hidden="true"></span>
                             <span class="examen-opcion__letra">{{ $alternativa->letra }}.</span>
                             <span class="examen-opcion__texto">{{ $alternativa->texto }}</span>
@@ -124,14 +127,17 @@
             </div>
 
             <footer class="examen-navegacion">
-                <button type="button" class="examen-boton" wire:click="anterior" @disabled($actual === 0)>
+                <button type="button" class="examen-boton" wire:click="anterior" @disabled($actual === 0)
+                    wire:loading.attr="disabled" wire:target="{{ $ocupado }}">
                     <img src="{{ asset('img/examen/arrow-left.svg') }}" width="16" height="16" alt="">
                     Anterior
                 </button>
                 <div class="examen-navegacion__avanzar">
                     @if ($actual < $total - 1)
-                        <button type="button" class="examen-omitir" wire:click="siguiente">Omitir pregunta</button>
-                        <button type="button" class="examen-boton examen-boton--primario" wire:click="siguiente">
+                        <button type="button" class="examen-omitir" wire:click="siguiente"
+                            wire:loading.attr="disabled" wire:target="{{ $ocupado }}">Omitir pregunta</button>
+                        <button type="button" class="examen-boton examen-boton--primario" wire:click="siguiente"
+                            wire:loading.attr="disabled" wire:target="{{ $ocupado }}">
                             Siguiente
                             <img src="{{ asset('img/examen/arrow-right.svg') }}" width="16" height="16" alt="">
                         </button>
@@ -160,6 +166,7 @@
                     @foreach ($preguntas as $indice => $item)
                         @php $respondida = ($respuestas[$item->id] ?? null) !== null; @endphp
                         <button type="button" wire:key="mapa-{{ $item->id }}" wire:click="ir({{ $indice }})"
+                            wire:loading.attr="disabled" wire:target="{{ $ocupado }}"
                             @class(['examen-mapa__numero', 'is-respondida' => $respondida, 'is-actual' => $indice === $actual])
                             :class="{ 'is-revisar': marcada({{ $item->orden }}) }"
                             @if ($indice === $actual) aria-current="step" @endif

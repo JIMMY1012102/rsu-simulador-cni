@@ -115,7 +115,7 @@ class ExamenPantallaTest extends TestCase
 
         Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
             ->assertSet('actual', 0)
-            ->call('responder', $alternativa)
+            ->call('responder', $preguntas[0]->id, $alternativa)
             ->assertSee('Respuesta guardada')
             ->assertSee('1 de 40 respondidas')
             ->call('siguiente')
@@ -130,6 +130,40 @@ class ExamenPantallaTest extends TestCase
 
         $this->assertSame($alternativa, (int) DB::table('respuestas_estudiante')
             ->where('intento_id', $intento)->where('pregunta_id', $preguntas[0]->id)->value('alternativa_id'));
+    }
+
+    /** Regresión: el clic llegó después de "Siguiente" y se guardaba en la pregunta nueva. */
+    public function test_responder_guarda_en_la_pregunta_indicada_aunque_ya_se_haya_avanzado(): void
+    {
+        $intento = $this->iniciar();
+        $preguntas = $this->preguntas($intento);
+        $alternativa = $preguntas[0]->alternativas[1]->id;
+
+        Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
+            ->call('siguiente')
+            ->assertSet('actual', 1)
+            ->call('responder', $preguntas[0]->id, $alternativa)
+            ->assertSee('1 de 40 respondidas');
+
+        $guardadas = DB::table('respuestas_estudiante')->where('intento_id', $intento)->pluck('alternativa_id', 'pregunta_id');
+        $this->assertSame($alternativa, (int) $guardadas[$preguntas[0]->id]);
+        $this->assertNull($guardadas[$preguntas[1]->id]);
+    }
+
+    public function test_responder_rechaza_preguntas_o_alternativas_ajenas_al_intento(): void
+    {
+        $intento = $this->iniciar();
+        $preguntas = $this->preguntas($intento);
+        $fuera = DB::table('preguntas')->insertGetId([
+            'tema_id' => DB::table('temas')->value('id'), 'enunciado' => 'Pregunta fuera del intento',
+            'nivel' => 'basico', 'solucion' => '-', 'activo' => true,
+        ]);
+        $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
+
+        $componente->call('responder', $fuera, $preguntas[0]->alternativas[0]->id)->assertHasErrors('pregunta_id');
+        $componente->call('responder', $preguntas[0]->id, $preguntas[1]->alternativas[0]->id)->assertHasErrors('alternativa_id');
+
+        $this->assertSame(0, DB::table('respuestas_estudiante')->where('intento_id', $intento)->whereNotNull('alternativa_id')->count());
     }
 
     public function test_al_reanudar_abre_la_primera_pregunta_sin_responder(): void
@@ -164,7 +198,7 @@ class ExamenPantallaTest extends TestCase
         $preguntas = $this->preguntas($intento);
 
         Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
-            ->call('responder', $preguntas[0]->alternativas[0]->id)
+            ->call('responder', $preguntas[0]->id, $preguntas[0]->alternativas[0]->id)
             ->call('siguiente')
             ->call('ir', 39)
             ->assertSee('Enviar examen')
@@ -184,7 +218,8 @@ class ExamenPantallaTest extends TestCase
         $antes = $xData($componente->html());
 
         $this->travel(7)->seconds();
-        $componente->call('responder', $this->preguntas($intento)[0]->alternativas[0]->id)->call('siguiente');
+        $primera = $this->preguntas($intento)[0];
+        $componente->call('responder', $primera->id, $primera->alternativas[0]->id)->call('siguiente');
 
         $this->assertNotNull($antes);
         $this->assertSame($antes, $xData($componente->html()));
@@ -199,7 +234,7 @@ class ExamenPantallaTest extends TestCase
         $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
 
         $this->travel(61)->minutes();
-        $componente->call('responder', $pregunta->alternativas[0]->id)->assertRedirect(route('panel'));
+        $componente->call('responder', $pregunta->id, $pregunta->alternativas[0]->id)->assertRedirect(route('panel'));
 
         $this->assertSame('enviado_auto', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->assertSame(0, DB::table('respuestas_estudiante')->where('intento_id', $intento)->whereNotNull('alternativa_id')->count());

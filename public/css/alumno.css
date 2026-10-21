@@ -193,6 +193,9 @@
 .examen { display: flex; flex-direction: column; gap: 24px; }
 .examen h1, .examen h2 { margin: 0; }
 .examen button:disabled { opacity: .5; cursor: not-allowed; }
+/* Bloqueo breve mientras viaja una petición: sin atenuar, para que no parpadee. */
+.examen .examen-opcion:disabled,
+.examen .examen-mapa__numero:disabled { opacity: 1; cursor: progress; }
 
 .examen-encabezado { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .examen-encabezado > div { display: flex; flex-direction: column; gap: 6px; }

@@ -57,15 +57,22 @@ class Examen extends Component
         return $this->servicio()->preguntas($this->intentoId)->values();
     }
 
-    public function responder(int $alternativaId): void
+    /**
+     * La pregunta viaja con el clic: si el alumno respondió antes de que llegara el render
+     * de "Siguiente", $actual ya no es la pregunta que estaba viendo.
+     */
+    public function responder(int $preguntaId, int $alternativaId): void
     {
-        $pregunta = $this->preguntas->get($this->actual);
+        if (! array_key_exists($preguntaId, $this->respuestas)) {
+            throw ValidationException::withMessages(['pregunta_id' => 'La pregunta no pertenece a este intento.']);
+        }
+        // IntentoService valida además que la alternativa sea de esa pregunta.
         $guardado = $this->mientrasSigaEnCurso(fn () => $this->servicio()->guardarRespuesta(
             $this->intentoId, $this->usuarioId(),
-            ['pregunta_id' => $pregunta->id, 'alternativa_id' => $alternativaId],
+            ['pregunta_id' => $preguntaId, 'alternativa_id' => $alternativaId],
         ));
         if ($guardado) {
-            $this->respuestas[$pregunta->id] = $alternativaId;
+            $this->respuestas[$preguntaId] = $alternativaId;
         }
     }
 
