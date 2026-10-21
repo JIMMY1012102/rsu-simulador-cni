@@ -120,6 +120,9 @@ class Examen extends Component
             'respondidas' => count(array_filter($this->respuestas, fn ($id) => $id !== null)),
             'segundosRestantes' => $intento->fecha_limite
                 ? (int) max(0, now()->diffInSeconds(Carbon::parse($intento->fecha_limite), false)) : null,
+            // Fijo durante todo el intento: el x-data de la vista no debe cambiar entre renders.
+            'limiteMs' => $intento->fecha_limite ? Carbon::parse($intento->fecha_limite)->getTimestampMs() : null,
+            'ahoraMs' => now()->getTimestampMs(),
         ])->layout('layouts.alumno', ['migas' => 'Examen en curso'])->title('Simulador de examen');
     }
 

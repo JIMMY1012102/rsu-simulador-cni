@@ -10,7 +10,10 @@
     <script src="{{ asset('js/examen.js') }}"></script>
 @endpush
 
-<div class="examen" x-data="examen({{ $intentoId }}, @js($segundosRestantes))" @keydown.escape.window="confirmar = false">
+{{-- x-data solo recibe valores fijos del intento: si cambiara en cada render, Alpine
+     reiniciaría el estado y el reloj y el modal quedarían atados a una copia vieja. --}}
+<div class="examen" x-data="examen({{ $intentoId }}, @js($limiteMs))" data-ahora="{{ $ahoraMs }}"
+    @keydown.escape.window="confirmar = false">
     {{-- Encabezado de página --}}
     <section class="examen-encabezado">
         <div>

@@ -1,12 +1,13 @@
 // Parte del examen que vive en el navegador: temporizador visual, "Marcar para revisar"
 // y la confirmación antes de enviar. El servidor sigue siendo quien valida el tiempo.
 document.addEventListener('alpine:init', () => {
-    window.Alpine.data('examen', (intentoId, segundos) => ({
+    // limiteMs: fecha_limite del intento (epoch en ms) o null si no tiene tiempo.
+    window.Alpine.data('examen', (intentoId, limiteMs) => ({
         revisar: [],
         confirmar: false,
         tiempo: '',
         agotado: false,
-        fin: null,
+        desfase: 0,
         reloj: null,
         clave: `cni.examen.${intentoId}.revisar`,
 
@@ -17,8 +18,9 @@ document.addEventListener('alpine:init', () => {
             } catch {
                 this.revisar = [];
             }
-            if (segundos !== null) {
-                this.fin = Date.now() + segundos * 1000;
+            if (limiteMs !== null) {
+                // Diferencia entre el reloj del servidor y el del navegador, medida al cargar.
+                this.desfase = Number(this.$el.dataset.ahora) - Date.now();
                 this.tick();
                 this.reloj = setInterval(() => this.tick(), 1000);
             }
@@ -28,15 +30,22 @@ document.addEventListener('alpine:init', () => {
             clearInterval(this.reloj);
         },
 
+        // Se recalcula desde la hora límite en cada tick; no es un contador que se descuenta.
         tick() {
-            const restante = Math.max(0, Math.round((this.fin - Date.now()) / 1000));
+            const restante = Math.max(0, Math.round((limiteMs - (Date.now() + this.desfase)) / 1000));
             this.tiempo = [Math.floor(restante / 3600), Math.floor(restante % 3600 / 60), restante % 60]
                 .map((n) => String(n).padStart(2, '0')).join(':');
             if (restante === 0 && !this.agotado) {
                 this.agotado = true;
                 clearInterval(this.reloj);
-                this.$wire.tiempoAgotado();
+                this.avisarAgotado();
             }
+        },
+
+        // El servidor cierra el intento como "enviado_auto" y redirige; si este navegador
+        // se adelantó unos segundos, el intento sigue abierto y se vuelve a consultar.
+        avisarAgotado() {
+            this.$wire.tiempoAgotado().then(() => setTimeout(() => this.avisarAgotado(), 2000));
         },
 
         // Se guarda el número de orden (1..N), que es fijo dentro del intento.

@@ -157,6 +157,40 @@ class ExamenPantallaTest extends TestCase
         $this->assertNotNull(DB::table('intentos')->where('id', $intento)->value('puntaje_total'));
     }
 
+    public function test_enviar_desde_el_modal_tras_responder_y_navegar_finaliza_y_redirige(): void
+    {
+        $intento = $this->iniciar();
+        $preguntas = $this->preguntas($intento);
+
+        Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
+            ->call('responder', $preguntas[0]->alternativas[0]->id)
+            ->call('siguiente')
+            ->call('ir', 39)
+            ->assertSee('Enviar examen')
+            ->call('finalizar')
+            ->assertRedirect(route('panel'));
+
+        $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
+        $this->get(route('panel'))->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas');
+    }
+
+    /** Regresión: si x-data cambia entre renders, Alpine reinicia el estado y el reloj se congela. */
+    public function test_el_x_data_del_examen_no_cambia_entre_renders(): void
+    {
+        $intento = $this->iniciar();
+        $xData = fn (string $html) => preg_match('/class="examen" x-data="([^"]+)"/', $html, $m) ? $m[1] : null;
+        $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
+        $antes = $xData($componente->html());
+
+        $this->travel(7)->seconds();
+        $componente->call('responder', $this->preguntas($intento)[0]->alternativas[0]->id)->call('siguiente');
+
+        $this->assertNotNull($antes);
+        $this->assertSame($antes, $xData($componente->html()));
+        $this->assertStringContainsString((string) Carbon::parse(
+            DB::table('intentos')->where('id', $intento)->value('fecha_limite'))->getTimestampMs(), $antes);
+    }
+
     public function test_si_el_tiempo_termino_no_guarda_y_envia_automaticamente(): void
     {
         $intento = $this->iniciar();
