@@ -1,0 +1,204 @@
+/* Portal del alumno · Figma "CNI · Simulador de examen" (nodo 214:3). Sin Tailwind ni CDN. */
+:root {
+    --cni-marino: #072b55;
+    --cni-marino-medio: #0e3a6b;
+    --cni-azul: #1660ee;
+    --cni-turquesa: #2495b6;
+    --cni-turquesa-claro: #55acc8;
+    --cni-celeste: #eaf4ff;
+    --cni-fondo: #f4f8fc;
+    --cni-fondo-campo: #f7fafe;
+    --cni-fondo-sutil: #eef3fa;
+    --cni-blanco: #fff;
+    --cni-borde: #e1e8f2;
+    --cni-texto: #122439;
+    --cni-texto-etiqueta: #44587a;
+    --cni-texto-secundario: #5a6b82;
+    --cni-texto-tenue: #98a6b8;
+    --cni-oscuro-texto: #c8d9ee;
+    --cni-oscuro-tenue: #8da4c2;
+    --cni-dorado: #e3a922;
+    --cni-dorado-suave: #fdf4dc;
+    --cni-dorado-texto: #8a6410;
+    --cni-fuente: Inter, "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.portal {
+    margin: 0;
+    display: flex;
+    min-height: 100vh;
+    background: var(--cni-fondo);
+    color: var(--cni-texto);
+    font-family: var(--cni-fuente);
+    line-height: normal;
+}
+
+.portal p { margin: 0; }
+.portal a { color: inherit; text-decoration: none; }
+.portal button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+.portal a:focus-visible,
+.portal button:focus-visible,
+.portal input:focus-visible { outline: 3px solid #55a5ef; outline-offset: 2px; }
+
+/* ---------- Barra lateral ---------- */
+.portal-lateral {
+    position: sticky;
+    top: 0;
+    flex: 0 0 240px;
+    width: 240px;
+    height: 100vh;
+    min-height: 640px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 28px 16px 24px;
+    background: var(--cni-marino);
+    overflow-y: auto;
+}
+
+.portal-lateral__principal { display: flex; flex-direction: column; gap: 32px; }
+
+.portal-identidad { display: flex; align-items: center; gap: 10px; height: 92px; padding: 4px; }
+.portal-identidad__escudo { width: 106px; height: 92px; object-fit: contain; flex-shrink: 0; }
+.portal-identidad__nombre { display: flex; flex-direction: column; gap: 3px; font-weight: 700; white-space: nowrap; }
+.portal-identidad__nombre strong { font-size: 18px; color: var(--cni-blanco); }
+.portal-identidad__nombre small { font-size: 10px; color: var(--cni-oscuro-tenue); }
+
+.portal-menu { display: flex; flex-direction: column; gap: 4px; }
+.portal-menu__titulo { font-size: 9px; font-weight: 700; color: var(--cni-oscuro-tenue); }
+.portal-menu__enlace {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 44px;
+    padding: 0 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .05);
+    color: var(--cni-oscuro-texto) !important;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.portal-menu__enlace img { flex-shrink: 0; }
+.portal-menu__enlace:hover { background: rgba(255, 255, 255, .1); }
+.portal-menu__enlace.is-activo {
+    background: linear-gradient(90deg, var(--cni-azul), var(--cni-turquesa));
+    color: var(--cni-blanco) !important;
+}
+
+.portal-lateral__pie { display: flex; flex-direction: column; gap: 16px; }
+
+.portal-ayuda {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 16px;
+    background: var(--cni-marino-medio);
+}
+.portal-ayuda__icono { position: relative; width: 20px; height: 20px; }
+.portal-ayuda__icono img { position: absolute; top: 0; left: 0; }
+.portal-ayuda strong { font-size: 12px; color: var(--cni-blanco); }
+.portal-ayuda p { font-size: 10px; font-weight: 600; line-height: 1.6; color: var(--cni-oscuro-tenue); }
+.portal-ayuda a { font-size: 11px; font-weight: 700; color: var(--cni-turquesa-claro) !important; }
+
+.portal-lateral__separador { width: 100%; height: 1px; margin: 0; border: 0; background: rgba(255, 255, 255, .08); }
+
+.portal-sesion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, .05);
+}
+.portal-sesion__usuario { display: flex; flex-direction: column; gap: 3px; min-width: 0; white-space: nowrap; }
+.portal-sesion__usuario strong { font-size: 12px; color: var(--cni-blanco); overflow: hidden; text-overflow: ellipsis; }
+.portal-sesion__usuario small { font-size: 10px; font-weight: 600; color: var(--cni-oscuro-tenue); }
+
+.portal-salir { display: flex; align-items: center; gap: 6px; font-size: 12px !important; font-weight: 700; color: var(--cni-oscuro-tenue) !important; }
+.portal-salir__icono { position: relative; width: 14px; height: 14px; flex-shrink: 0; }
+.portal-salir__icono img { position: absolute; top: -.85px; left: -.85px; }
+
+/* Avatar con iniciales (el diseño usa una foto de ejemplo). */
+.portal-avatar {
+    display: grid;
+    place-items: center;
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+    border-radius: 100px;
+    background: linear-gradient(135deg, var(--cni-azul), var(--cni-turquesa));
+    color: var(--cni-blanco);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .02em;
+}
+
+/* ---------- Área principal ---------- */
+.portal-area {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100vh;
+}
+
+.portal-barra {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    height: 68px;
+    padding: 0 32px;
+    background: var(--cni-blanco);
+    border-bottom: 1px solid var(--cni-borde);
+}
+
+.portal-migas { display: flex; flex-wrap: wrap; gap: 0 8px; font-size: 12px; color: var(--cni-texto-tenue); }
+.portal-migas a:hover { color: var(--cni-texto-secundario); }
+
+.portal-cuenta { display: flex; align-items: center; gap: 16px; }
+.portal-cuenta__ayuda { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--cni-texto-secundario) !important; }
+.portal-cuenta__separador { width: 1px; height: 20px; background: var(--cni-borde); }
+.portal-cuenta__nombre { font-size: 12px; font-weight: 500; color: var(--cni-texto); white-space: nowrap; }
+
+.portal-contenido { padding: 28px 32px 24px; }
+
+.portal-pie {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 24px 32px;
+    font-size: 11px;
+    color: var(--cni-texto-tenue);
+}
+.portal-pie__enlaces { display: flex; gap: 20px; }
+.portal-pie__enlaces a:hover { color: var(--cni-texto-secundario); }
+
+/* ---------- Pantallas angostas ---------- */
+@media (max-width: 900px) {
+    .portal { flex-direction: column; }
+    .portal-lateral {
+        position: static;
+        width: 100%;
+        flex-basis: auto;
+        height: auto;
+        min-height: 0;
+        padding: 16px;
+        gap: 16px;
+    }
+    .portal-lateral__principal { gap: 16px; }
+    .portal-identidad { height: 56px; }
+    .portal-identidad__escudo { width: 60px; height: 52px; }
+    .portal-menu { flex-direction: row; flex-wrap: wrap; }
+    .portal-menu__titulo { flex-basis: 100%; }
+    .portal-menu__enlace { height: 38px; }
+    .portal-ayuda, .portal-lateral__separador { display: none; }
+    .portal-lateral__pie { flex-direction: row; align-items: center; justify-content: space-between; }
+    .portal-barra, .portal-contenido, .portal-pie { padding-left: 16px; padding-right: 16px; }
+    .portal-cuenta__nombre, .portal-cuenta__separador { display: none; }
+}
