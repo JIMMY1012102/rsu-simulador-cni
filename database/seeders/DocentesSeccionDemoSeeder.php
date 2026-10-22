@@ -11,6 +11,10 @@ class DocentesSeccionDemoSeeder extends Seeder
 {
     public function run(): void
     {
+        if (! app()->environment(['local', 'testing'])) {
+            throw new \RuntimeException('Las cuentas demo están prohibidas fuera de local/testing.');
+        }
+
         foreach (['A', 'B', 'C', 'D'] as $letra) {
             $seccionId = DB::table('secciones')
                 ->where('grado', '5to')
