@@ -78,3 +78,23 @@ Los cambios se proponen mediante Pull Request a `develop`; no se modifica `main`
 `php artisan test --filter=RecorridoSimulacroTest` comprueba el recorrido usando SQLite en memoria. El inicio asigna preguntas, la finalización califica y los resultados se consultan con la misma sesión web. No requiere nuevas migraciones ni seeders.
 
 El cierre de intentos vencidos está definido cada minuto en Laravel Scheduler; al desplegar hay que activar el scheduler. En desarrollo puede mantenerse `php artisan schedule:work` en otra terminal. Las preguntas y configuraciones ya usadas no se editan; se crean nuevas versiones para proteger los intentos existentes.
+
+## Nuevo flujo del estudiante: despliegue seguro (PR #18)
+
+El flujo de primera elección de cinco áreas, panel personalizado y exámenes por área ya está integrado en el código, pero **permanece apagado por defecto** al integrarse en `develop`:
+
+```dotenv
+CNI_ALUMNO_AREAS_ENABLED=false
+```
+
+Así, las instalaciones que todavía utilizan el esquema o catálogo anterior mantienen el login y `/panel` clásicos. Las rutas nuevas devuelven 404 mientras esté desactivado. No se han cambiado las reglas de login del docente.
+
+Antes de activar, **en copia de desarrollo con respaldo**:
+
+1. `php artisan migrate:status` y `php artisan cni:auditar-areas`; si hay códigos distintos de A-E, detenerse y acordar la migración de datos. El catálogo legado de cuatro áreas NO debe transformarse automáticamente.
+2. Una vez corregido el catálogo sin pérdida de relaciones históricas, aplicar la nueva migración `usuarios.area_postulacion_id` con `php artisan migrate --force`. Si la base se creó desde un SQL importado, sincronizar cuidadosamente el historial de migraciones antes de usar `migrate` (ver advertencia anterior).
+3. Cargar y aprobar los exámenes reales con asociaciones en `area_postulacion_simulacro` y cuotas de preguntas en `simulacro_area`. Los cinco exámenes demo no son oficiales.
+4. Validar en navegador el ingreso de alumno nuevo, selección única, panel, examen, resultados y un segundo inicio de sesión. Probar docentes y administradores también.
+5. **Solo entonces** modificar la configuración local de esa instalación a `CNI_ALUMNO_AREAS_ENABLED=true` y aplicar `php artisan config:clear` (o regenerar config cache según despliegue). Si se detecta un problema, regresar a `false` y limpiar caché: no cambia ni elimina registros por sí solo.
+
+GitHub Actions ejecuta la suite completa tanto en SQLite como en MariaDB 11.4 **temporales**. Una CI verde prueba el código, no el estado de la MariaDB del equipo. Consultar `docs/validacion-mariadb-areas.md`.

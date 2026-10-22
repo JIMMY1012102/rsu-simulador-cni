@@ -27,8 +27,18 @@ class SessionController extends Controller
 
         $request->session()->regenerate();
 
-        if (Auth::guard('web')->user()?->rol === 'docente') {
+        $usuario = Auth::guard('web')->user();
+        if ($usuario?->rol === 'admin' && config('cni.administracion_academica_enabled')) {
+            return redirect()->route('admin.inicio');
+        }
+        if ($usuario?->rol === 'docente') {
             return redirect()->route('docente.panel');
+        }
+        if ($usuario?->rol === 'estudiante' && config('cni.alumno_areas_enabled')) {
+            // Solo la primera vez se muestra la selección de las cinco áreas.
+            return $usuario->area_postulacion_id === null && $usuario->carrera_id === null
+                ? redirect()->route('alumno.elegir-area')
+                : redirect()->route('alumno.panel');
         }
 
         return redirect()->intended(route('panel'));
@@ -39,7 +49,6 @@ class SessionController extends Controller
         $auth->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('login');
     }
 }
