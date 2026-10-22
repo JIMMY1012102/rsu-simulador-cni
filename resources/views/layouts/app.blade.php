@@ -15,7 +15,7 @@
             <a href="{{ route('inicio') }}" class="brand">Simulador CNI</a>
             @auth('web')
                 <nav aria-label="Navegación principal">
-                    <a href="{{ route(auth('web')->user()->rol === 'admin' ? 'admin.inicio' : (auth('web')->user()->rol === 'docente' ? 'docente.panel' : ((config('cni.alumno_areas_enabled') && auth('web')->user()->rol === 'estudiante') ? 'alumno.panel' : 'panel'))) }}">Mi panel</a>
+                    <a href="{{ route((auth('web')->user()->rol === 'admin' && config('cni.administracion_academica_enabled')) ? 'admin.inicio' : (auth('web')->user()->rol === 'docente' ? 'docente.panel' : ((config('cni.alumno_areas_enabled') && auth('web')->user()->rol === 'estudiante') ? 'alumno.panel' : 'panel'))) }}">Mi panel</a>
                     <span>{{ auth('web')->user()->nombres }} · {{ auth('web')->user()->rol }}</span>
                     <form method="POST" action="{{ route('logout') }}">@csrf<button>Salir</button></form>
                 </nav>

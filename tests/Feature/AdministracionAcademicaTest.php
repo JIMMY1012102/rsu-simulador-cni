@@ -71,6 +71,17 @@ class AdministracionAcademicaTest extends TestCase
         $this->post(route('admin.simulacros.store'), [])->assertForbidden();
     }
 
+
+    public function test_con_panel_academico_apagado_el_admin_conserva_su_login_original(): void
+    {
+        config(['cni.administracion_academica_enabled' => false]);
+        $admin = $this->usuario('admin');
+        $this->post('/login', ['usuario' => $admin->usuario, 'password' => 'ClaveCNI2026!'])
+            ->assertRedirect(route('panel'));
+        $this->get(route('panel'))->assertOk();
+        $this->get(route('admin.inicio'))->assertNotFound();
+    }
+
     public function test_admin_crea_carrera_asignatura_y_tema_desde_la_interfaz(): void
     {
         $this->actingAs($this->usuario('admin'), 'web');

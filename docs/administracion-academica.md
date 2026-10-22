@@ -11,6 +11,10 @@
 - La pantalla del alumno filtra los exámenes por área y carrera; el servicio backend también rechaza intentos de carreras no autorizadas. `intentos.carrera_id` conserva el perfil de carrera cuando se inicia.
 - El flag `CNI_ALUMNO_AREAS_ENABLED=false` sigue protegiendo la experiencia del estudiante hasta activar el recorrido en la instancia.
 
+## Activación protegida
+
+El panel nuevo **permanece desactivado por defecto** al fusionar el PR: `CNI_ADMIN_ACADEMICO_ENABLED=false`. El login del administrador sigue enviando al panel anterior. Cuando se aplique la migración y se compruebe el banco en una copia de desarrollo, configurar `CNI_ADMIN_ACADEMICO_ENABLED=true` y ejecutar `php artisan config:cache`. Esto habilita `/administracion` y la redirección desde el login para el rol `admin`. Para revertir, dejarlo en `false` y limpiar o recompilar la configuración.
+
 ## Preparación para instancia Ubuntu (con respaldo)
 1. Integrar a `develop` solamente después de aprobar las pruebas y la revisión del equipo.
 2. En servidor con repo limpio, `git pull --ff-only origin develop` y `composer install --no-dev --prefer-dist --optimize-autoloader`.
@@ -23,7 +27,7 @@
    php artisan view:cache
    ```
 4. Verificar que `public/storage` sea un enlace simbólico correcto y que PHP tenga permisos de escritura en `storage/app/public/preguntas`.
-5. Entrar con un usuario **real de rol `admin`**, no ejecutar `UsuarioSeeder` en producción (contiene contraseñas demo).
+5. Después de comprobar la migración, activar `CNI_ADMIN_ACADEMICO_ENABLED=true` y ejecutar `php artisan config:cache`. Entrar con un usuario **real de rol `admin`**, no ejecutar `UsuarioSeeder` en producción (contiene contraseñas demo).
 6. Registrar carreras, asignaturas y temas. Registrar y revisar preguntas con imágenes. Crear perfiles generales por área o especializados por carrera usando cuotas válidas.
 7. Probar un alumno de ingeniería y otro de humanidades, ambos con carrera seleccionada. **Solo luego de validar la experiencia completa**, cambiar `CNI_ALUMNO_AREAS_ENABLED=true` en el `.env` de la instancia y ejecutar `php artisan config:cache`.
 
