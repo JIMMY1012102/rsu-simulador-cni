@@ -29,12 +29,12 @@ class AuthModuleTest extends TestCase
         $anterior = session()->getId();
 
         $this->post('/login', ['usuario' => 'ana.prueba', 'password' => 'secreto123'])
-            ->assertRedirect('/panel');
+            ->assertRedirect('/alumno/elegir-area');
 
         $this->assertAuthenticatedAs($usuario, 'web');
         $this->assertNotSame($anterior, session()->getId());
         $this->assertDatabaseCount('personal_access_tokens', 0);
-        $this->get('/panel')->assertOk()->assertSee('Bienvenido, Ana');
+        $this->get('/alumno/elegir-area')->assertOk()->assertSee('¿En qué área deseas prepararte?');
     }
 
     public function test_login_json_usa_la_misma_sesion_sin_emitir_tokens(): void

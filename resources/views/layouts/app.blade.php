@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Simulador CNI</title>
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @stack('styles')
     @livewireStyles
 </head>
 <body class="{{ request()->routeIs('login') ? 'login-screen' : '' }}">
@@ -14,7 +15,7 @@
             <a href="{{ route('inicio') }}" class="brand">Simulador CNI</a>
             @auth('web')
                 <nav aria-label="Navegación principal">
-                    <a href="{{ route(auth('web')->user()->rol === 'docente' ? 'docente.panel' : 'panel') }}">Mi panel</a>
+                    <a href="{{ route(auth('web')->user()->rol === 'docente' ? 'docente.panel' : (auth('web')->user()->rol === 'estudiante' ? 'alumno.panel' : 'panel')) }}">Mi panel</a>
                     <span>{{ auth('web')->user()->nombres }} · {{ auth('web')->user()->rol }}</span>
                     <form method="POST" action="{{ route('logout') }}">@csrf<button>Salir</button></form>
                 </nav>

@@ -1,11 +1,12 @@
 <?php
 
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\Alumno\OrientacionController;
 use App\Http\Middleware\EnsureActiveUser;
 use App\Livewire\Panel;
-use Illuminate\Support\Facades\Route;
 use App\Livewire\Docente\PanelDocente;
 use App\Livewire\Docente\CalificacionesSalon;
+use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('inicio');
 
@@ -21,15 +22,21 @@ Route::post('/logout', [SessionController::class, 'destroy'])
 Route::get('/panel', Panel::class)
     ->middleware(['auth:web', EnsureActiveUser::class])->name('panel');
 
+Route::middleware(['auth:web', EnsureActiveUser::class])
+    ->prefix('alumno')->name('alumno.')->group(function () {
+        Route::get('/elegir-area', [OrientacionController::class, 'elegirArea'])->name('elegir-area');
+        Route::post('/elegir-area', [OrientacionController::class, 'guardarArea'])->name('area.guardar');
+        Route::get('/panel', [OrientacionController::class, 'panel'])->name('panel');
+        Route::post('/carrera', [OrientacionController::class, 'guardarCarrera'])->name('carrera.guardar');
+        Route::get('/resultados/{intento}', [OrientacionController::class, 'resultados'])
+            ->whereNumber('intento')->name('resultados');
+    });
+
 // Compatibilidad con los módulos existentes: JSON con sesión y CSRF.
-// Se cargan dentro de web; no existe un segundo sistema de autenticación.
 Route::prefix('api')->group(base_path('routes/api.php'));
 
-// Panel exclusivo para docentes
 Route::get('/docente', PanelDocente::class)
-    ->middleware(['auth:web', EnsureActiveUser::class])
-    ->name('docente.panel');
-    // Calificaciones de mi salón
+    ->middleware(['auth:web', EnsureActiveUser::class])->name('docente.panel');
+
 Route::get('/docente/calificaciones', CalificacionesSalon::class)
-    ->middleware(['auth:web', EnsureActiveUser::class])
-    ->name('docente.calificaciones');
+    ->middleware(['auth:web', EnsureActiveUser::class])->name('docente.calificaciones');
