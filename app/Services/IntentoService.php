@@ -29,13 +29,32 @@ class IntentoService
                 $areasPermitidas = DB::table('area_postulacion_simulacro')
                     ->where('simulacro_id', $simulacro->id)->pluck('area_postulacion_id');
                 $perfil = DB::table('usuarios')->where('id', $usuarioId)->first();
+                // Un alumno que ya eligió área solo puede iniciar simulacros publicados
+                // y asociados expresamente a un área. Sin asociación no hay autorización.
+                // Cuentas de prueba antiguas sin área guardada mantienen compatibilidad API.
+                if ($perfil->rol === 'estudiante' && $perfil->area_postulacion_id !== null
+                    && $areasPermitidas->isEmpty()) {
+                    throw ValidationException::withMessages([
+                        'simulacro_id' => 'El simulacro no tiene un área de postulación habilitada.',
+                    ]);
+                }
                 if ($perfil->rol === 'estudiante' && $areasPermitidas->isNotEmpty()) {
-                    $habilitado = DB::table('carreras as c')
-                        ->join('areas_postulacion as ap', 'ap.id', '=', 'c.area_postulacion_id')
-                        ->where('c.id', $perfil->carrera_id)->where('c.activo', true)->where('ap.activo', true)
-                        ->whereIn('ap.id', $areasPermitidas)->exists();
+                    // Selección primaria por área; la carrera es opcional.
+                    $areaId = $perfil->area_postulacion_id;
+                    if ($perfil->carrera_id !== null) {
+                        $carrera = DB::table('carreras')->where('id', $perfil->carrera_id)
+                            ->where('activo', true)->first();
+                        if (! $carrera || ($areaId !== null && (int) $carrera->area_postulacion_id !== (int) $areaId)) {
+                            throw ValidationException::withMessages(['carrera_id' => 'La carrera no pertenece a tu área de preparación.']);
+                        }
+                        $areaId ??= $carrera->area_postulacion_id;
+                    }
+                    $habilitado = $areaId !== null
+                        && DB::table('areas_postulacion')->where('id', $areaId)
+                            ->where('activo', true)->exists()
+                        && $areasPermitidas->contains($areaId);
                     if (! $habilitado) {
-                        throw ValidationException::withMessages(['carrera_id' => 'Tu carrera no está habilitada para este simulacro.']);
+                        throw ValidationException::withMessages(['carrera_id' => 'Tu área no está habilitada para este simulacro.']);
                     }
                 }
                 $preguntas = $this->sortearPreguntas($simulacro);
@@ -113,13 +132,32 @@ class IntentoService
         });
     }
 
+    /** Intento en curso del simulacro para reanudarlo; si ya venció se cierra y devuelve null. */
+    public function enCurso(int $usuarioId, int $simulacroId): ?object
+    {
+        return DB::transaction(function () use ($usuarioId, $simulacroId) {
+            $intento = DB::table('intentos')->where('usuario_id', $usuarioId)->where('simulacro_id', $simulacroId)
+                ->where('estado', 'en_curso')->orderByDesc('id')->lockForUpdate()->first();
+            if ($intento && $this->vencido($intento)) {
+                $this->cerrar($intento);
+
+                return null;
+            }
+
+            return $intento;
+        });
+    }
+
     /** Enunciados y alternativas del examen propio, sin solución ni clave correcta. */
     public function preguntas(int $intentoId): Collection
     {
         $preguntas = DB::table('respuestas_estudiante as r')
             ->join('preguntas as p', 'p.id', '=', 'r.pregunta_id')
+            ->join('temas as t', 't.id', '=', 'p.tema_id')
+            ->join('areas as a', 'a.id', '=', 't.area_id')
             ->where('r.intento_id', $intentoId)->orderBy('r.orden')
-            ->get(['p.id', 'p.enunciado', 'p.imagen', 'p.nivel', 'r.orden']);
+            ->get(['p.id', 'p.enunciado', 'p.imagen', 'p.nivel', 'r.orden',
+                't.nombre as tema', 'a.nombre as area', 'a.bloque']);
         $alternativas = DB::table('alternativas')->whereIn('pregunta_id', $preguntas->pluck('id'))
             ->orderBy('letra')->get(['id', 'pregunta_id', 'letra', 'texto'])->groupBy('pregunta_id');
 
@@ -128,6 +166,13 @@ class IntentoService
 
             return $pregunta;
         });
+    }
+
+    /** Respuestas guardadas del intento, en el orden del examen. */
+    public function respuestas(int $intentoId): Collection
+    {
+        return DB::table('respuestas_estudiante')->where('intento_id', $intentoId)->orderBy('orden')
+            ->get(['id', 'pregunta_id', 'orden', 'alternativa_id', 'respondida_en']);
     }
 
     public function guardarRespuesta(int $intentoId, int $usuarioId, array $datos): object

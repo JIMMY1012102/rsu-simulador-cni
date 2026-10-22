@@ -8,6 +8,7 @@ permissions:
   contents: read
 jobs:
   tests:
+    name: SQLite - pruebas de Laravel
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,3 +24,51 @@ jobs:
       - run: php artisan route:list
       - run: php artisan view:cache
       - run: php artisan test
+
+  mariadb:
+    name: MariaDB - integración de Laravel
+    runs-on: ubuntu-latest
+    services:
+      database:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root_ci_only
+          MARIADB_DATABASE: cni_test
+          MARIADB_USER: cni_test
+          MARIADB_PASSWORD: test_ci_only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_DATABASE: cni_test
+      DB_USERNAME: cni_test
+      DB_PASSWORD: test_ci_only
+      DB_URL: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, pdo_mysql
+          coverage: none
+      - run: composer validate --strict
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - name: Confirma la conexión y crea las tablas en la base temporal
+        run: |
+          php artisan migrate:fresh --force
+          php artisan db:seed --class=AreaPostulacionSeeder --force
+          php artisan db:seed --class=SimulacrosCincoAreasDemoSeeder --force
+      - run: php artisan route:list
+      - run: php artisan view:cache
+      - name: Pruebas de integración con MariaDB (no afecta bases externas)
+        run: php artisan test

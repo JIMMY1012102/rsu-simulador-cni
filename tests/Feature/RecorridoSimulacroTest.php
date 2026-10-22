@@ -69,7 +69,7 @@ class RecorridoSimulacroTest extends TestCase
     private function ingresar(string $usuario): void
     {
         $this->post('/login', ['usuario' => $usuario, 'password' => 'PruebaIntegracion123!'])
-            ->assertRedirect($usuario === 'docente' ? '/docente' : '/panel');
+            ->assertRedirect($usuario === 'docente' ? '/docente' : '/alumno/elegir-area');
     }
 
     private function iniciar(): int
