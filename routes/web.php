@@ -4,6 +4,8 @@ use App\Http\Controllers\SessionController;
 use App\Http\Middleware\EnsureActiveUser;
 use App\Livewire\Panel;
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Docente\PanelDocente;
+use App\Livewire\Docente\CalificacionesSalon;
 
 Route::view('/', 'welcome')->name('inicio');
 
@@ -22,3 +24,12 @@ Route::get('/panel', Panel::class)
 // Compatibilidad con los módulos existentes: JSON con sesión y CSRF.
 // Se cargan dentro de web; no existe un segundo sistema de autenticación.
 Route::prefix('api')->group(base_path('routes/api.php'));
+
+// Panel exclusivo para docentes
+Route::get('/docente', PanelDocente::class)
+    ->middleware(['auth:web', EnsureActiveUser::class])
+    ->name('docente.panel');
+    // Calificaciones de mi salón
+Route::get('/docente/calificaciones', CalificacionesSalon::class)
+    ->middleware(['auth:web', EnsureActiveUser::class])
+    ->name('docente.calificaciones');

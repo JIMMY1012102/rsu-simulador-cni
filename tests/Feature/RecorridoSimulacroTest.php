@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Seccion;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -30,11 +31,13 @@ class RecorridoSimulacroTest extends TestCase
     {
         parent::setUp();
         $this->travelTo(Carbon::parse('2026-10-20 10:00:00'));
+        $seccion = Seccion::create(['nombre' => 'A', 'grado' => '5to', 'activo' => true]);
         foreach (['docente', 'estudiante', 'otro'] as $nombre) {
             $this->$nombre = Usuario::create([
                 'nombres' => $nombre, 'apellidos' => 'Integración', 'usuario' => $nombre,
                 'password' => 'PruebaIntegracion123!', 'rol' => $nombre === 'docente' ? 'docente' : 'estudiante',
                 'activo' => true,
+                'seccion_id' => $seccion->id,
             ]);
         }
         $this->area = DB::table('areas')->insertGetId([
@@ -66,7 +69,7 @@ class RecorridoSimulacroTest extends TestCase
     private function ingresar(string $usuario): void
     {
         $this->post('/login', ['usuario' => $usuario, 'password' => 'PruebaIntegracion123!'])
-            ->assertRedirect('/panel');
+            ->assertRedirect($usuario === 'docente' ? '/docente' : '/panel');
     }
 
     private function iniciar(): int

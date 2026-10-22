@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Services\AuthService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class SessionController extends Controller
@@ -25,6 +26,10 @@ class SessionController extends Controller
         }
 
         $request->session()->regenerate();
+
+        if (Auth::guard('web')->user()?->rol === 'docente') {
+            return redirect()->route('docente.panel');
+        }
 
         return redirect()->intended(route('panel'));
     }

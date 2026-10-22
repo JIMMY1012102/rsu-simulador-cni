@@ -1,0 +1,327 @@
+
+        .docente-inicio {
+            font-family: Arial, sans-serif;
+            color: #102d4e;
+        }
+
+        .docente-bienvenida {
+    background:
+        radial-gradient(
+            circle at 85% 20%,
+            rgba(255, 255, 255, 0.15),
+            transparent 35%
+        ),
+        linear-gradient(120deg, #086986, #103f59);
+
+    color: white;
+    text-align: left;
+    padding: 48px 45px;
+    border-radius: 20px;
+    border-bottom: 5px solid #e6bd59;
+    box-shadow: 0 8px 24px rgba(16, 63, 89, 0.18);
+}
+
+        .docente-bienvenida h1 {
+            color: white;
+            font-size: 32px;
+            margin: 0;
+        }
+
+        .docente-bienvenida p {
+            color: #fff1ba;
+            margin-bottom: 0;
+        }
+
+        .docente-intro {
+            margin: 28px 0 18px;
+        }
+
+        .docente-intro h2 {
+            margin-bottom: 5px;
+        }
+
+        .docente-tarjetas {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .docente-tarjeta {
+    background: white;
+    border: 1px solid #e0e8f0;
+    border-radius: 18px;
+    padding: 28px;
+    min-width: 0;
+    box-shadow: 0 6px 20px rgba(16, 45, 78, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.docente-tarjeta:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(16, 45, 78, 0.15);
+}
+          
+        .docente-tarjeta h3 {
+            font-size: 17px;
+            margin: 14px 0 8px;
+        }
+
+        .docente-tarjeta p {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .docente-destacada {
+            background: #187c99;
+            color: white;
+        }
+
+        .docente-destacada p {
+            color: #e1f3f7;
+        }
+
+        .docente-secundarias {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .docente-enlace {
+            display: inline-block;
+            margin-top: 12px;
+            color: #2065a5;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .docente-destacada .docente-enlace {
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .docente-tarjetas,
+            .docente-secundarias {
+                grid-template-columns: 1fr;
+            }
+
+            .docente-bienvenida h1 {
+                font-size: 25px;
+            }
+
+
+        }
+        .docente-tarjetas .docente-tarjeta {
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+}
+
+.docente-tarjetas .docente-enlace {
+    margin-top: auto;
+    padding-top: 20px;
+}
+/* BIENVENIDA CON ESCUDO CNI */
+.docente-bienvenida {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+}
+
+.docente-bienvenida-contenido {
+    flex: 1;
+    min-width: 0;
+}
+
+/* ESCUDO INSTITUCIONAL */
+.docente-escudo {
+    width: 150px;
+    max-width: 30%;
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .docente-escudo {
+        width: 95px;
+    }
+}
+/* TIPOGRAFÍA DEL PANEL DOCENTE */
+
+.docente-inicio {
+    font-family: 'DM Sans', sans-serif;
+    color: #17324f;
+}
+
+.docente-inicio h1,
+.docente-inicio h2,
+.docente-inicio h3 {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+.docente-bienvenida h1 {
+    font-size: 36px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.docente-intro h2 {
+    font-size: 27px;
+}
+
+.docente-tarjeta h3 {
+    font-size: 20px;
+}
+
+.docente-inicio p {
+    line-height: 1.7;
+}
+/* TÍTULOS DE LAS TARJETAS INFERIORES */
+.docente-secundarias .docente-tarjeta h3 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #123d5a;
+    margin-bottom: 12px;
+}
+
+/* DESCRIPCIONES DE LAS TARJETAS */
+.docente-secundarias .docente-tarjeta p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #667d91;
+    line-height: 1.7;
+}
+
+/* TEXTOS DE LOS ENLACES PRINCIPALES */
+.docente-enlace {
+    font-family: 'Outfit', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+/* EFECTO INTERACTIVO EN LAS TARJETAS */
+
+.docente-inicio .docente-tarjeta {
+    transition: all 0.3s ease;
+}
+
+.docente-inicio .docente-tarjeta:hover {
+    background: linear-gradient(135deg, #103f59, #087f9b);
+    border-color: #087f9b;
+    color: white;
+    transform: translateY(-6px);
+    box-shadow: 0 14px 30px rgba(8, 79, 120, 0.25);
+}
+
+/* LETRAS BLANCAS AL PASAR EL MOUSE */
+
+.docente-inicio .docente-tarjeta:hover h3,
+.docente-inicio .docente-tarjeta:hover p,
+.docente-inicio .docente-tarjeta:hover span,
+.docente-inicio .docente-tarjeta:hover .docente-enlace {
+    color: white;
+}
+
+/* PANTALLA: CALIFICACIONES DE MI SALÓN */
+
+.docente-calificaciones {
+    font-family: 'DM Sans', sans-serif;
+    color: #17324f;
+}
+
+.calificaciones-encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    padding: 38px 45px;
+    border-radius: 20px;
+    border-bottom: 5px solid #e6bd59;
+    background: linear-gradient(120deg, #0a3856, #087e99);
+    box-shadow: 0 10px 25px rgba(16, 63, 89, 0.15);
+}
+
+.calificaciones-encabezado h1 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px;
+    color: white;
+    margin: 18px 0 10px;
+}
+
+.calificaciones-encabezado p {
+    color: #e4f3f8;
+    line-height: 1.7;
+    max-width: 550px;
+}
+
+.calificaciones-volver {
+    color: #ffda85;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.calificaciones-volver:hover {
+    text-decoration: underline;
+}
+
+.calificaciones-escudo {
+    width: 125px;
+    height: auto;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .calificaciones-encabezado {
+        padding: 25px;
+        gap: 15px;
+    }
+
+    .calificaciones-escudo {
+        width: 75px;
+    }
+
+    .calificaciones-encabezado h1 {
+        font-size: 24px;
+    }
+}
+
+
+/* Calificaciones: un mismo diseño para las secciones A-D */
+.calificaciones-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 22px 0;
+}
+.calificaciones-indicador, .calificaciones-listado, .calificaciones-aviso {
+    background: #fff;
+    border: 1px solid #dce7ef;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(16,45,78,.06);
+}
+.calificaciones-indicador span { font-weight: 700; }
+.calificaciones-indicador h2 { font-size: 30px; color: #0a647f; margin: 12px 0; }
+.calificaciones-indicador p { font-size: 13px; margin: 0; }
+.calificaciones-listado h2 { font-size: 21px; margin-top: 0; }
+.calificaciones-tabla-scroll { overflow-x: auto; }
+.calificaciones-tabla { width: 100%; border-collapse: collapse; min-width: 520px; }
+.calificaciones-tabla th, .calificaciones-tabla td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #e7edf2;
+    text-align: left;
+    vertical-align: top;
+}
+.calificaciones-tabla th { background: #eff7fa; font-weight: 700; }
+.calificaciones-aviso { margin-top: 22px; }
+@media (max-width: 700px) {
+    .calificaciones-resumen { grid-template-columns: 1fr; }
+}
