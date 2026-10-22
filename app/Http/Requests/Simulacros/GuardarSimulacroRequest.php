@@ -40,6 +40,7 @@ class GuardarSimulacroRequest extends FormRequest
             'areas.*.nivel' => ['sometimes', Rule::in(self::NIVELES)],
             'areas.*.cantidad_preguntas' => ['required', 'integer', 'min:1'],
 
+            'carrera_id' => ['nullable', 'integer', 'exists:carreras,id'],
             'areas_postulacion' => ['sometimes', 'array'],
             'areas_postulacion.*' => ['integer', 'distinct', 'exists:areas_postulacion,id'],
         ];
