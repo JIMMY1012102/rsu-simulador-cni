@@ -21,6 +21,16 @@ class CincoAreasMariaDBTest extends TestCase
         $this->seed(SimulacrosCincoAreasDemoSeeder::class);
     }
 
+    public function test_usa_mariadb_real_cuando_ci_lo_exige(): void
+    {
+        if (env('CNI_EXPECT_DB_DRIVER') === 'mysql') {
+            $this->assertSame('mysql', DB::connection()->getDriverName());
+            $this->assertSame('cni_test', DB::connection()->getDatabaseName());
+        } else {
+            $this->assertNotEmpty(DB::connection()->getDatabaseName());
+        }
+    }
+
     public function test_los_cinco_simulacros_tienen_cuotas_distintas_y_una_sola_area_asignada(): void
     {
         $this->assertSame(5, DB::table('simulacros')
