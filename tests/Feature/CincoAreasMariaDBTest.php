@@ -114,9 +114,9 @@ class CincoAreasMariaDBTest extends TestCase
         ]);
 
         $simulacro = DB::table('simulacros')
-            ->where('nombre', \\Database\\Seeders\\ExamenDemoSeeder::SIMULACRO)->value('id');
+            ->where('nombre', \Database\Seeders\ExamenDemoSeeder::SIMULACRO)->value('id');
         $this->actingAs($alumno, 'web')
-            ->get(route('alumno.panel'))->assertDontSee(\\Database\\Seeders\\ExamenDemoSeeder::SIMULACRO);
+            ->get(route('alumno.panel'))->assertDontSee(\Database\Seeders\ExamenDemoSeeder::SIMULACRO);
         $this->post(route('examen.iniciar', $simulacro))
             ->assertSessionHasErrors('simulacro_id');
         $this->assertSame(0, DB::table('intentos')->where('usuario_id', $alumno->id)->count());
