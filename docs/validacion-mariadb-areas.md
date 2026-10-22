@@ -38,3 +38,19 @@ Los cinco exámenes demostrativos contienen **20 preguntas** cada uno y usan un 
 - El catálogo legado se detecta sin cambiar códigos ni IDs silenciosamente.
 
 **No fusionar en un entorno compartido con MariaDB poblada hasta completar la auditoría local y aprobar la migración de datos heredados.**
+
+## Integración segura a develop mediante bandera (feature flag)
+
+La integración de código puede fusionarse a `develop` aunque la base compartida aún no haya sido auditada, **porque el flujo nuevo está desactivado por defecto**:
+
+```dotenv
+CNI_ALUMNO_AREAS_ENABLED=false
+```
+
+- Con `false`, el login del estudiante, su ruta `/panel` y los accesos docentes antiguos siguen como antes; las rutas del nuevo flujo responden 404.
+- Con `true`, el login redirige a `/alumno/elegir-area` para quienes no hayan elegido todavía y luego a `/alumno/panel`, tras aplicar la nueva columna en la BD.
+- **No activar en una instalación con catálogo incompatible o sin la columna**; primero respaldar, auditar y resolver el remapeo de códigos heredados.
+- Para activar o desactivar, configurar la variable en `.env` de ese entorno y limpiar/recrear la caché de configuración, conforme al despliegue.
+- El PR #13 de perfil sigue separado y requiere coordinación antes de fusionarse con este diseño.
+
+Esta bandera protege el comportamiento de las sesiones existentes **sin tocar datos reales**; no sustituye las pruebas manuales ni crea automáticamente los catálogos correctos.

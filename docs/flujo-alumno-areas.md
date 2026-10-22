@@ -1,5 +1,7 @@
 # Flujo personalizado del alumno: primera selección de área → panel → examen → resultados
 
+**Estado de entrega:** integrado al código, apagado por defecto mediante `CNI_ALUMNO_AREAS_ENABLED=false` hasta auditar y migrar la base del equipo.
+
 **Cambio solicitado:** seleccionar **una de cinco áreas** solo la primera vez que se ingresa. Mostrar cinco tarjetas verticales en escritorio y adaptarlas a tablet/móvil. **No exigir carrera para comenzar el simulador.**
 
 ## Flujo implementado
