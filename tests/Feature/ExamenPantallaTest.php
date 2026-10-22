@@ -6,6 +6,8 @@ use App\Livewire\Examen;
 use App\Models\Usuario;
 use App\Services\IntentoService;
 use Database\Seeders\ExamenDemoSeeder;
+use Database\Seeders\AreaPostulacionSeeder;
+use Database\Seeders\CarreraSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +26,8 @@ class ExamenPantallaTest extends TestCase
     {
         parent::setUp();
         $this->travelTo(Carbon::parse('2026-10-21 09:00:00'));
+        $this->seed(AreaPostulacionSeeder::class);
+        $this->seed(CarreraSeeder::class);
         $this->seed(ExamenDemoSeeder::class);
         $this->alumno = $this->crearAlumno('alumno');
         $this->simulacro = DB::table('simulacros')->where('nombre', ExamenDemoSeeder::SIMULACRO)->value('id');
@@ -34,6 +38,7 @@ class ExamenPantallaTest extends TestCase
         return Usuario::create([
             'nombres' => 'Juan Carlos', 'apellidos' => 'Pérez', 'usuario' => $usuario,
             'password' => 'PruebaExamen123!', 'rol' => 'estudiante', 'activo' => true,
+            'carrera_id' => DB::table('carreras')->where('nombre', 'Ingeniería de Sistemas')->value('id'),
         ]);
     }
 

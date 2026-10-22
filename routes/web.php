@@ -4,6 +4,7 @@ use App\Http\Controllers\SessionController;
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\Alumno\OrientacionController;
 use App\Http\Middleware\EnsureActiveUser;
+use App\Http\Middleware\RedirigirPanelEstudiante;
 use App\Livewire\Panel;
 use App\Livewire\Examen;
 use App\Livewire\Docente\PanelDocente;
@@ -22,7 +23,7 @@ Route::post('/logout', [SessionController::class, 'destroy'])
     ->middleware('auth:web')->name('logout');
 
 Route::get('/panel', Panel::class)
-    ->middleware(['auth:web', EnsureActiveUser::class])->name('panel');
+    ->middleware(['auth:web', EnsureActiveUser::class, RedirigirPanelEstudiante::class])->name('panel');
 
 Route::middleware(['auth:web', EnsureActiveUser::class])
     ->prefix('alumno')->name('alumno.')->group(function () {

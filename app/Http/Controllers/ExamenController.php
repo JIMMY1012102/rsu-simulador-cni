@@ -11,7 +11,7 @@ class ExamenController extends Controller
     /** Reanuda el intento en curso del simulacro o inicia uno nuevo, y abre el examen. */
     public function iniciar(Request $request, int $simulacro, IntentoService $intentos): RedirectResponse
     {
-        abort_unless($request->user('web')?->rol === 'estudiante', 403);
+        abort_unless($request->user('web')?->rol === 'estudiante' && $request->user('web')?->carrera_id !== null, 403);
         $usuarioId = (int) $request->user('web')->getAuthIdentifier();
         $intento = $intentos->enCurso($usuarioId, $simulacro)
             ?? $intentos->iniciar($usuarioId, ['tipo' => 'simulacro', 'simulacro_id' => $simulacro]);
