@@ -37,7 +37,7 @@ class Examen extends Component
     {
         $usuario = Auth::guard('web')->user();
         abort_unless($usuario && $usuario->activo && $usuario->rol === 'estudiante', 403);
-        if ($usuario->carrera_id === null) {
+        if ($usuario->area_postulacion_id === null && $usuario->carrera_id === null) {
             throw new HttpResponseException(new RedirectResponse(route('alumno.elegir-area')));
         }
         $registro = $this->servicio()->obtenerPropio($intento, $this->usuarioId());

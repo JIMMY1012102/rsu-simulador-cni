@@ -30,12 +30,22 @@ class IntentoService
                     ->where('simulacro_id', $simulacro->id)->pluck('area_postulacion_id');
                 $perfil = DB::table('usuarios')->where('id', $usuarioId)->first();
                 if ($perfil->rol === 'estudiante' && $areasPermitidas->isNotEmpty()) {
-                    $habilitado = DB::table('carreras as c')
-                        ->join('areas_postulacion as ap', 'ap.id', '=', 'c.area_postulacion_id')
-                        ->where('c.id', $perfil->carrera_id)->where('c.activo', true)->where('ap.activo', true)
-                        ->whereIn('ap.id', $areasPermitidas)->exists();
+                    // Selección primaria por área; la carrera es opcional.
+                    $areaId = $perfil->area_postulacion_id;
+                    if ($perfil->carrera_id !== null) {
+                        $carrera = DB::table('carreras')->where('id', $perfil->carrera_id)
+                            ->where('activo', true)->first();
+                        if (! $carrera || ($areaId !== null && (int) $carrera->area_postulacion_id !== (int) $areaId)) {
+                            throw ValidationException::withMessages(['carrera_id' => 'La carrera no pertenece a tu área de preparación.']);
+                        }
+                        $areaId ??= $carrera->area_postulacion_id;
+                    }
+                    $habilitado = $areaId !== null
+                        && DB::table('areas_postulacion')->where('id', $areaId)
+                            ->where('activo', true)->exists()
+                        && $areasPermitidas->contains($areaId);
                     if (! $habilitado) {
-                        throw ValidationException::withMessages(['carrera_id' => 'Tu carrera no está habilitada para este simulacro.']);
+                        throw ValidationException::withMessages(['carrera_id' => 'Tu área no está habilitada para este simulacro.']);
                     }
                 }
                 $preguntas = $this->sortearPreguntas($simulacro);

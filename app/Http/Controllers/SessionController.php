@@ -32,8 +32,8 @@ class SessionController extends Controller
             return redirect()->route('docente.panel');
         }
         if ($usuario?->rol === 'estudiante') {
-            // Solo en el primer acceso se solicita área/carrera.
-            return $usuario->carrera_id === null
+            // Solo la primera vez se muestra la selección de las cinco áreas.
+            return $usuario->area_postulacion_id === null && $usuario->carrera_id === null
                 ? redirect()->route('alumno.elegir-area')
                 : redirect()->route('alumno.panel');
         }

@@ -3,36 +3,24 @@
 <link rel="stylesheet" href="{{ asset('css/orientacion.css') }}">
 @endpush
 @section('content')
-<section class="orientacion">
+<section class="orientacion panel-personalizado">
     <p class="eyebrow">TU ESPACIO DE PREPARACIÓN · ÁREA {{ $area->codigo }}</p>
-    <h1>¡Hola, {{ $usuario->nombres }}! 👋</h1>
-    <p>Estás en el panel de <strong>{{ $area->nombre }}</strong>.</p>
+    <h1>¡Bienvenido, {{ $usuario->nombres }}! 👋</h1>
+    <p>Tu área elegida es <strong>{{ $area->nombre }}</strong>.</p>
     @if(session('status')) <p class="mensaje-ok" role="status">{{ session('status') }}</p> @endif
-    @unless ($carrera)
-    <section class="bloque-orientacion">
-        <h2>Elige tu carrera profesional</h2>
-        <p>Tu elección determina los simulacros a los que tendrás acceso. Se conservará al volver a iniciar sesión.</p>
-        <form method="POST" action="{{ route('alumno.carrera.guardar') }}">
-            @csrf
-            <label for="carrera_id">Carrera dentro de {{ $area->nombre }}</label>
-            <select id="carrera_id" name="carrera_id" required>
-                <option value="">Selecciona una carrera</option>
-                @foreach($carreras as $opcion)
-                    <option value="{{ $opcion->id }}" @selected(old('carrera_id') == $opcion->id)>{{ $opcion->nombre }}</option>
-                @endforeach
-            </select>
-            @error('carrera_id')<p class="error" role="alert">{{ $message }}</p>@enderror
-            <button type="submit" @disabled($carreras->isEmpty())>Confirmar carrera</button>
-        </form>
-        <p><a href="{{ route('alumno.elegir-area') }}">← Cambiar de área</a></p>
+
+    <section class="bloque-orientacion panel-destacado">
+        <span class="area-letra" aria-hidden="true">{{ $area->codigo }}</span>
+        <div>
+            <p class="eyebrow">PANEL PERSONAL DEL ALUMNO</p>
+            <h2>{{ $area->nombre }}</h2>
+            <p>{{ $carrera ? 'Carrera: '.$carrera->nombre : 'Ya puedes comenzar a practicar en los simulacros de tu área.' }}</p>
+            <a class="boton-examen" href="#simulacros">Dar examen simulador →</a>
+        </div>
     </section>
-    @else
-    <section class="bloque-orientacion">
-        <h2>Tu preparación: {{ $carrera->nombre }}</h2>
-        <p>Área {{ $area->codigo }} · {{ $area->nombre }}. Los exámenes disponibles están configurados para tu área de postulación.</p>
-    </section>
-    <section class="bloque-orientacion">
-        <h2>Simulacros disponibles</h2>
+
+    <section class="bloque-orientacion" id="simulacros">
+        <h2>Exámenes de tu área</h2>
         @forelse($simulacros as $simulacro)
             <article class="simulacro-fila">
                 <div>
@@ -41,13 +29,33 @@
                 </div>
                 <form method="POST" action="{{ route('examen.iniciar', ['simulacro' => $simulacro['id']]) }}">
                     @csrf
-                    <button type="submit">Rendir examen</button>
+                    <button type="submit">Iniciar examen →</button>
                 </form>
             </article>
         @empty
-            <p>Aún no hay exámenes vigentes para tu área. Un docente debe configurar y publicar uno.</p>
+            <p>Aún no hay simulacros publicados para esta área. Cuando un docente habilite uno, podrás iniciarlo desde aquí.</p>
         @endforelse
     </section>
+
+    @unless($carrera)
+    <section class="bloque-orientacion">
+        <h2>Carrera de interés (opcional)</h2>
+        <p>Puedes indicar tu carrera dentro de {{ $area->nombre }}. No es necesario para rendir el examen de tu área.</p>
+        <form method="POST" action="{{ route('alumno.carrera.guardar') }}">
+            @csrf
+            <label for="carrera_id">Carrera</label>
+            <select id="carrera_id" name="carrera_id" required>
+                <option value="">Selecciona una carrera</option>
+                @foreach($carreras as $opcion)
+                    <option value="{{ $opcion->id }}" @selected(old('carrera_id') == $opcion->id)>{{ $opcion->nombre }}</option>
+                @endforeach
+            </select>
+            @error('carrera_id')<p class="error" role="alert">{{ $message }}</p>@enderror
+            <button type="submit" @disabled($carreras->isEmpty())>Guardar carrera</button>
+        </form>
+    </section>
+    @endunless
+
     <section class="bloque-orientacion">
         <h2>Mis últimos resultados</h2>
         @forelse($intentos as $intento)
@@ -58,6 +66,5 @@
         @empty <p>Todavía no has rendido un examen.</p>
         @endforelse
     </section>
-    @endunless
 </section>
 @endsection
