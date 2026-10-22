@@ -4,17 +4,39 @@
    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
     <!-- BIENVENIDA -->
     <!-- BIENVENIDA -->
-<section class="docente-bienvenida">
-    <div class="docente-bienvenida-contenido">
-        <h1>BIENVENIDO DOCENTE</h1>
-        <p>Hoy será un gran día</p>
-    </div>
 
+<!-- BIENVENIDA INSTITUCIONAL -->
+<section class="docente-bienvenida">
+
+    <!-- ESCUDO DEL COLEGIO -->
     <img
         src="{{ asset('img/escudo-cni.png') }}"
-        alt="Escudo del Colegio Nacional de Imperial"
+        alt="Escudo del CNI"
         class="docente-escudo"
     >
+
+    <!-- MENSAJE DE BIENVENIDA -->
+    <div class="docente-bienvenida-contenido">
+        <span class="docente-etiqueta">
+            COLEGIO NACIONAL DE IMPERIAL
+        </span>
+
+        <h1>¡Bienvenido, docente!</h1>
+
+        <p>
+            Un espacio para acompañar el progreso
+            académico de tus estudiantes.
+        </p>
+    </div>
+
+    <!-- FOTOGRAFÍA DEL PERSONAL -->
+    <div class="docente-bienvenida-foto">
+        <img
+            src="{{ asset('img/foto-personal-cni.png') }}"
+            alt="Personal del Colegio Nacional de Imperial"
+        >
+    </div>
+
 </section>
     <!-- MENÚ PRINCIPAL -->
     <section class="docente-intro">
@@ -25,7 +47,6 @@
     <section class="docente-tarjetas">
 
         <article class="docente-tarjeta docente-destacada">
-            <span>👥 Calificaciones</span>
             <h3>Calificaciones de mi salón</h3>
             <p>
                 Consulta las notas de tus alumnos,
@@ -44,7 +65,6 @@
         </article>
 
         <article class="docente-tarjeta">
-            <span>📋 Simulacros</span>
             <h3>Simulacros</h3>
             @if(isset($simulacros))
     @forelse($simulacros as $simulacro)
@@ -65,7 +85,7 @@
         </article>
 
         <article class="docente-tarjeta">
-            <span>📚 Preguntas</span>
+            
             <h3>Banco de preguntas</h3>
             <p>
                 Explora las preguntas organizadas
@@ -82,17 +102,13 @@
     <section class="docente-secundarias">
 
         <article class="docente-tarjeta">
-            <h3>📖 Guía y ayuda</h3>
+            <h3>Guía y ayuda</h3>
             <p>Instrucciones del portal docente.</p>
         </article>
 
+        
         <article class="docente-tarjeta">
-            <h3>📥 Exportar reporte</h3>
-            <p>Descarga los reportes cuando estén disponibles.</p>
-        </article>
-
-        <article class="docente-tarjeta">
-            <h3>ℹ️ Información</h3>
+            <h3> Información</h3>
             <p>
                 Los resultados se mostrarán
                 al conectar los servicios del sistema.
