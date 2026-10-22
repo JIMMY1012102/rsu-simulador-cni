@@ -29,6 +29,15 @@ class IntentoService
                 $areasPermitidas = DB::table('area_postulacion_simulacro')
                     ->where('simulacro_id', $simulacro->id)->pluck('area_postulacion_id');
                 $perfil = DB::table('usuarios')->where('id', $usuarioId)->first();
+                // Un alumno que ya eligió área solo puede iniciar simulacros publicados
+                // y asociados expresamente a un área. Sin asociación no hay autorización.
+                // Cuentas de prueba antiguas sin área guardada mantienen compatibilidad API.
+                if ($perfil->rol === 'estudiante' && $perfil->area_postulacion_id !== null
+                    && $areasPermitidas->isEmpty()) {
+                    throw ValidationException::withMessages([
+                        'simulacro_id' => 'El simulacro no tiene un área de postulación habilitada.',
+                    ]);
+                }
                 if ($perfil->rol === 'estudiante' && $areasPermitidas->isNotEmpty()) {
                     // Selección primaria por área; la carrera es opcional.
                     $areaId = $perfil->area_postulacion_id;

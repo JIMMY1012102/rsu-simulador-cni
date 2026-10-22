@@ -104,6 +104,24 @@ class CincoAreasMariaDBTest extends TestCase
         $this->get(route('alumno.panel'))->assertOk()->assertSee($nombre);
     }
 
+    public function test_un_area_ya_elegida_no_ve_ni_inicia_simulacros_genericos_sin_asignacion(): void
+    {
+        $alumno = Usuario::create([
+            'nombres' => 'Estudiante', 'apellidos' => 'Test',
+            'usuario' => 'alumno_area', 'password' => 'ClaveCNI2026!',
+            'rol' => 'estudiante', 'activo' => true,
+            'area_postulacion_id' => DB::table('areas_postulacion')->where('codigo', 'C')->value('id'),
+        ]);
+
+        $simulacro = DB::table('simulacros')
+            ->where('nombre', \\Database\\Seeders\\ExamenDemoSeeder::SIMULACRO)->value('id');
+        $this->actingAs($alumno, 'web')
+            ->get(route('alumno.panel'))->assertDontSee(\\Database\\Seeders\\ExamenDemoSeeder::SIMULACRO);
+        $this->post(route('examen.iniciar', $simulacro))
+            ->assertSessionHasErrors('simulacro_id');
+        $this->assertSame(0, DB::table('intentos')->where('usuario_id', $alumno->id)->count());
+    }
+
     public function test_el_servidor_rechaza_iniciar_examen_de_otra_area(): void
     {
         $alumno = Usuario::create([
