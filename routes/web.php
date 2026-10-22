@@ -33,15 +33,3 @@ Route::get('/docente', PanelDocente::class)
 Route::get('/docente/calificaciones', CalificacionesSalon::class)
     ->middleware(['auth:web', EnsureActiveUser::class])
     ->name('docente.calificaciones');
-
-    // Vista previa del panel docente (solo desarrollo local)
-if (app()->environment('local')) {
-
-    Route::view(
-        '/docente-preview',
-        'livewire.docente.panel-docente'
-    );
-     Route::view('/docente/calificaciones-preview',
-        'livewire.docente.calificaciones-salon');
-}
-
