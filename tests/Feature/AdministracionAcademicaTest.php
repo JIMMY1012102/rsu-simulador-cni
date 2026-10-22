@@ -30,10 +30,16 @@ class AdministracionAcademicaTest extends TestCase
 
     private function catalogo(): int
     {
-        $id = DB::table('areas')->insertGetId([
-            'nombre' => 'Matemática', 'bloque' => 'habilidad_logico_matematica', 'activo' => true,
-        ]);
-        return DB::table('temas')->insertGetId(['area_id' => $id, 'nombre' => 'Álgebra', 'activo' => true]);
+        DB::table('areas')->updateOrInsert(
+            ['nombre' => 'Matemática'],
+            ['bloque' => 'habilidad_logico_matematica', 'activo' => true]
+        );
+        $id = DB::table('areas')->where('nombre', 'Matemática')->value('id');
+        DB::table('temas')->updateOrInsert(
+            ['area_id' => $id, 'nombre' => 'Álgebra'],
+            ['activo' => true]
+        );
+        return DB::table('temas')->where('area_id', $id)->where('nombre', 'Álgebra')->value('id');
     }
 
     private function datosPregunta(array $extra = []): array
