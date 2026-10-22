@@ -113,13 +113,32 @@ class IntentoService
         });
     }
 
+    /** Intento en curso del simulacro para reanudarlo; si ya venció se cierra y devuelve null. */
+    public function enCurso(int $usuarioId, int $simulacroId): ?object
+    {
+        return DB::transaction(function () use ($usuarioId, $simulacroId) {
+            $intento = DB::table('intentos')->where('usuario_id', $usuarioId)->where('simulacro_id', $simulacroId)
+                ->where('estado', 'en_curso')->orderByDesc('id')->lockForUpdate()->first();
+            if ($intento && $this->vencido($intento)) {
+                $this->cerrar($intento);
+
+                return null;
+            }
+
+            return $intento;
+        });
+    }
+
     /** Enunciados y alternativas del examen propio, sin solución ni clave correcta. */
     public function preguntas(int $intentoId): Collection
     {
         $preguntas = DB::table('respuestas_estudiante as r')
             ->join('preguntas as p', 'p.id', '=', 'r.pregunta_id')
+            ->join('temas as t', 't.id', '=', 'p.tema_id')
+            ->join('areas as a', 'a.id', '=', 't.area_id')
             ->where('r.intento_id', $intentoId)->orderBy('r.orden')
-            ->get(['p.id', 'p.enunciado', 'p.imagen', 'p.nivel', 'r.orden']);
+            ->get(['p.id', 'p.enunciado', 'p.imagen', 'p.nivel', 'r.orden',
+                't.nombre as tema', 'a.nombre as area', 'a.bloque']);
         $alternativas = DB::table('alternativas')->whereIn('pregunta_id', $preguntas->pluck('id'))
             ->orderBy('letra')->get(['id', 'pregunta_id', 'letra', 'texto'])->groupBy('pregunta_id');
 
@@ -128,6 +147,13 @@ class IntentoService
 
             return $pregunta;
         });
+    }
+
+    /** Respuestas guardadas del intento, en el orden del examen. */
+    public function respuestas(int $intentoId): Collection
+    {
+        return DB::table('respuestas_estudiante')->where('intento_id', $intentoId)->orderBy('orden')
+            ->get(['id', 'pregunta_id', 'orden', 'alternativa_id', 'respondida_en']);
     }
 
     public function guardarRespuesta(int $intentoId, int $usuarioId, array $datos): object
