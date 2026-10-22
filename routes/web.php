@@ -74,3 +74,24 @@ Route::get('/docente', PanelDocente::class)
 
 Route::get('/docente/calificaciones', CalificacionesSalon::class)
     ->middleware(['auth:web', EnsureActiveUser::class])->name('docente.calificaciones');
+
+// Exportación de calificaciones limitada a la sección del docente autenticado.
+Route::get('/docente/exportar', \App\Http\Controllers\Docente\ExportarCalificacionesController::class)
+    ->middleware(['auth:web', EnsureActiveUser::class])
+    ->name('docente.exportar');
+
+// Vistas previas de diseño sin autenticación: exclusivas del entorno local.
+if (app()->environment('local')) {
+    Route::view('/docente-preview', 'livewire.docente.panel-docente');
+    Route::redirect('/preview-docente', '/docente-preview');
+
+    Route::get('/docente/calificaciones-preview', function () {
+        return view('livewire.docente.calificaciones-salon', [
+            'seccion' => null,
+            'totalEstudiantes' => 0,
+            'totalEvaluaciones' => 0,
+            'promedioSeccion' => null,
+            'alumnos' => collect(),
+        ]);
+    });
+}

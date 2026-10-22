@@ -1,104 +1,201 @@
+<div class="cni-notas" id="cni-notas">
+    <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=35">
+    @php
+        $esPreview = app()->environment('local') && (request()->is('docente-preview') || request()->is('preview-docente'));
+        $seccionActual = isset($seccion) && $seccion && $seccion->activo ? '5.º '.$seccion->nombre : 'Sin sección';
+        $nombreDocente = isset($docente) && $docente ? $docente->nombres : 'Vista previa docente';
 
-<div class="docente-inicio">
-   <link rel="stylesheet" href="/css/docente.css?v=2">
-   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-    <!-- BIENVENIDA -->
-    <!-- BIENVENIDA -->
-<section class="docente-bienvenida">
-    <div class="docente-bienvenida-contenido">
-        <h1>BIENVENIDO DOCENTE</h1>
-        <p>Hoy será un gran día · {{ $seccion && $seccion->activo ? '5.º '.$seccion->nombre : 'Sin sección asignada' }}</p>
+        if ($esPreview) {
+            // Vista previa: NO crear alumnos ni puntajes ficticios.
+            // Estos nombres son solo encabezados visuales; las notas reales
+            // vendran de la base de datos al conectar el panel docente.
+            $seccionActual = 'Sin sección asignada (vista previa)';
+            $nombreDocente = 'Vista previa docente';
+            $areasDisponibles = collect(['Matemática', 'Comunicación', 'C. Sociales', 'C. Naturales']);
+            $alumnos = collect();
+            $totalEstudiantes = 0;
+            $totalEvaluaciones = 0;
+            $totalSimulacros = 0;
+            $promedioSeccion = null;
+        }
+
+        $alumnos = collect($alumnos ?? []);
+        $areasDisponibles = collect($areasDisponibles ?? []);
+        $pendientes = $alumnos->filter(fn ($a) => $a->puntaje_total === null)->count();
+        $simulacrosDisponibles = $alumnos->pluck('simulacro')->filter()->unique()->values();
+        $numColumnas = 5 + $areasDisponibles->count();
+    @endphp
+
+    <header class="cni-notas-header">
+        <img class="cni-notas-foto" src="{{ asset('images/foto-personal-cni.png') }}" alt="Personal docente del Colegio Nacional de Imperial">
+        <div class="cni-notas-brand">
+            <img src="{{ asset('img/escudo-cni.png') }}" alt="Escudo del Colegio Nacional de Imperial">
+            <div>
+                <span class="cni-notas-school">COLEGIO NACIONAL DE IMPERIAL</span>
+                <h1>Calificaciones del salón</h1>
+                <p>{{ $seccionActual }} · Resultados académicos de tus estudiantes</p>
+            </div>
+        </div>
+        <div class="cni-notas-docente">
+            <span class="cni-notas-docente-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></span>
+            <span><strong>{{ $nombreDocente }}</strong><small>Docente · {{ $seccionActual }}</small></span>
+            @unless($esPreview)
+                <form action="{{ route('logout') }}" method="POST">@csrf<button type="submit" class="cni-notas-exit" title="Cerrar sesión">Salir</button></form>
+            @endunless
+        </div>
+    </header>
+
+    <div class="cni-notas-body">
+        @if($esPreview)
+            <div class="cni-notas-demo" role="status">Vista previa de diseño: sin estudiantes ni calificaciones de ejemplo. Los datos reales aparecerán al ingresar con una cuenta docente.</div>
+        @elseif(!isset($seccion) || !$seccion || !$seccion->activo)
+            <div class="cni-notas-demo" role="status">Tu cuenta no tiene una sección activa asignada. Solicita la asignación al administrador.</div>
+        @endif
+
+        <section class="cni-notas-resumen" aria-label="Resumen de calificaciones">
+            <article class="cni-notas-kpi">
+                <span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="9" cy="7" r="4"/><path d="M3 21v-2a6 6 0 0 1 12 0v2M17 4a4 4 0 0 1 0 8M18 15a5 5 0 0 1 3 5v1"/></svg></span>
+                <div><strong>{{ $totalEstudiantes ?? 0 }}</strong><h2>Estudiantes</h2><p>de mi salón</p></div>
+            </article>
+            <article class="cni-notas-kpi">
+                <span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></span>
+                <div><strong>{{ $totalSimulacros ?? 0 }}</strong><h2>Simulacros</h2><p>con resultados calificados</p></div>
+            </article>
+            <article class="cni-notas-kpi">
+                <span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M5 20v-6M12 20V9M19 20V4M3 20h18"/></svg></span>
+                <div><strong>{{ isset($promedioSeccion) && $promedioSeccion !== null ? number_format((float) $promedioSeccion, 2) : '—' }}</strong><h2>Promedio general</h2><p>puntaje de evaluaciones</p></div>
+            </article>
+            <article class="cni-notas-kpi">
+                <span class="kpi-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 17h.01"/></svg></span>
+                <div><strong>{{ $pendientes ?? 0 }}</strong><h2>Sin calificación</h2><p>sin simulacro calificado</p></div>
+            </article>
+        </section>
+
+        <section class="cni-notas-card" aria-label="Listado de calificaciones">
+            <div class="cni-notas-card-head">
+                <div class="cni-notas-card-title"><span class="cni-notas-title-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 10h16M10 4v16M4 15h16"/></svg></span><div><h2>Calificaciones de los alumnos</h2><p>Busca estudiantes y consulta sus últimos resultados por área.</p></div></div>
+                @if(!$esPreview && isset($seccion) && $seccion && $seccion->activo && $alumnos->isNotEmpty())
+                    <a class="cni-notas-export" href="{{ route('docente.exportar') }}" title="Descargar archivo CSV compatible con Excel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></svg> Exportar Excel (.csv)</a>
+                @else
+                    <button class="cni-notas-export cni-notas-export-disabled" type="button" title="No hay registros para exportar" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></svg> Exportar Excel (.csv)</button>
+                @endif
+            </div>
+            <div class="cni-notas-filtros">
+                <label><span>Buscar estudiante</span><div class="cni-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="cni-buscar" type="search" autocomplete="off" placeholder="Ingresa nombre o apellido..."></div></label>
+                <label><span>Simulacro</span><select id="cni-simulacro"><option value="">Todos</option>@foreach($simulacrosDisponibles as $sim)<option value="{{ $sim }}">{{ $sim }}</option>@endforeach</select></label>
+                <label><span>Estado</span><select id="cni-estado"><option value="">Todos</option><option value="calificado">Calificados</option><option value="pendiente">Sin calificación</option></select></label>
+                <button type="button" id="cni-limpiar" class="cni-notas-clear"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg><span>Limpiar filtros</span></button>
+            </div>
+
+            <div class="cni-notas-table-wrap">
+                <table class="cni-notas-table" id="cni-tabla">
+                    <thead><tr><th scope="col">N.º</th><th scope="col">Estudiante</th><th scope="col">Último simulacro</th>@foreach($areasDisponibles as $area)<th scope="col">{{ $area }}</th>@endforeach<th scope="col">Total</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
+                    <tbody>
+                        @forelse($alumnos as $indice => $alumno)
+                            @php($calificado = $alumno->puntaje_total !== null)
+                            <tr class="cni-fila" data-nombre="{{ mb_strtolower($alumno->apellidos.' '.$alumno->nombres) }}" data-simulacro="{{ $alumno->simulacro ?? '' }}" data-estado="{{ $calificado ? 'calificado' : 'pendiente' }}">
+                                <td>{{ $indice + 1 }}</td>
+                                <td class="cni-notas-alumno">{{ $alumno->apellidos }}, {{ $alumno->nombres }}</td>
+                                <td>{{ $alumno->simulacro ?? 'Sin simulacro' }}</td>
+                                @foreach($areasDisponibles as $area)
+                                    <td>@if(isset($alumno->notas_area[$area]))<span class="cni-notas-puntaje-area">{{ number_format((float) $alumno->notas_area[$area], 2) }}</span>@else<span class="cni-notas-dash">—</span>@endif</td>
+                                @endforeach
+                                <td><strong class="cni-notas-total">{{ $calificado ? number_format((float) $alumno->puntaje_total, 2) : '—' }}</strong></td>
+                                <td><span class="cni-notas-estado {{ $calificado ? 'es-calificado' : 'es-pendiente' }}">{{ $calificado ? 'Calificado' : 'Pendiente' }}</span></td>
+                                <td><button class="cni-notas-ver" type="button" aria-label="Ver detalles de {{ $alumno->nombres }} {{ $alumno->apellidos }}" data-alumno="{{ $alumno->apellidos }}, {{ $alumno->nombres }}" data-simulacro="{{ $alumno->simulacro ?? 'Sin simulacro' }}" data-notas="{{ json_encode($alumno->notas_area ?? [], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) }}" data-puntaje="{{ $calificado ? number_format((float) $alumno->puntaje_total, 2) : 'Sin nota' }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"/><circle cx="12" cy="12" r="2.5"/></svg></button></td>
+                            </tr>
+                        @empty
+                            <tr class="cni-empty-db"><td colspan="{{ $numColumnas + 1 }}">Todavía no hay estudiantes registrados en esta sección.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div id="cni-sin-coincidencias" class="cni-notas-noresults" hidden>No hay estudiantes que coincidan con los filtros.</div>
+            <footer class="cni-notas-footer"><span id="cni-contador">{{ $alumnos->count() }} estudiantes</span><nav id="cni-paginacion" aria-label="Páginas de estudiantes"></nav></footer>
+        </section>
     </div>
 
-    <img
-        src="{{ asset('img/escudo-cni.png') }}"
-        alt="Escudo del Colegio Nacional de Imperial"
-        class="docente-escudo"
-    >
-</section>
-    <!-- MENÚ PRINCIPAL -->
-    <section class="docente-intro">
-        <h2>¿Qué deseas hacer hoy?</h2>
-        <p>Accede rápidamente a las herramientas del portal docente.</p>
-    </section>
+    <dialog id="cni-detalle" class="cni-notas-dialog" aria-labelledby="cni-detalle-titulo">
+        <div class="cni-notas-dialog-head"><h2 id="cni-detalle-titulo">Detalle de calificaciones</h2><button type="button" id="cni-cerrar-dialogo" aria-label="Cerrar">×</button></div>
+        <p id="cni-detalle-simulacro"></p><div id="cni-detalle-areas"></div><strong id="cni-detalle-total"></strong>
+    </dialog>
 
-    <section class="docente-tarjetas">
+    <script>
+        (function () {
+            const init = () => {
+                const root = document.getElementById('cni-notas');
+                if (!root || root.dataset.iniciado === 'si') return;
+                root.dataset.iniciado = 'si';
+                const filas = [...root.querySelectorAll('tr.cni-fila')];
+                const buscar = root.querySelector('#cni-buscar');
+                const simulacro = root.querySelector('#cni-simulacro');
+                const estado = root.querySelector('#cni-estado');
+                const contador = root.querySelector('#cni-contador');
+                const paginas = root.querySelector('#cni-paginacion');
+                const aviso = root.querySelector('#cni-sin-coincidencias');
+                const dialogo = root.querySelector('#cni-detalle');
+                const limite = 8;
+                let pagina = 1;
 
-        <article class="docente-tarjeta docente-destacada">
-            <span>👥 Calificaciones</span>
-            <h3>Calificaciones de mi salón</h3>
-            <p>
-                Consulta las notas de tus alumnos,
-                observa su evolución e identifica
-                quiénes necesitan refuerzo.
-            </p>
-          <a href="{{ route('docente.calificaciones') }}"
-   class="docente-enlace">
-    Ver calificaciones →
-</a>
-        
-        
-        
-        </article>
+                const dibujar = () => {
+                    const termino = buscar.value.trim().toLocaleLowerCase('es');
+                    const filtradas = filas.filter(f =>
+                        f.dataset.nombre.includes(termino) &&
+                        (!simulacro.value || f.dataset.simulacro === simulacro.value) &&
+                        (!estado.value || f.dataset.estado === estado.value)
+                    );
+                    const totalPaginas = Math.max(1, Math.ceil(filtradas.length / limite));
+                    pagina = Math.min(pagina, totalPaginas);
+                    filas.forEach(f => { f.hidden = true; });
+                    filtradas.slice((pagina - 1) * limite, pagina * limite).forEach(f => { f.hidden = false; });
+                    aviso.hidden = filtradas.length !== 0 || filas.length === 0;
+                    const inicio = filtradas.length ? (pagina - 1) * limite + 1 : 0;
+                    const fin = Math.min(pagina * limite, filtradas.length);
+                    contador.textContent = `Mostrando ${inicio}–${fin} de ${filtradas.length} estudiantes`;
+                    paginas.replaceChildren();
+                    if (totalPaginas <= 1) return;
+                    const agregar = (etiqueta, destino, activo, deshabilitado) => {
+                        const b = document.createElement('button');
+                        b.type = 'button'; b.textContent = etiqueta;
+                        b.className = 'cni-pagina' + (activo ? ' seleccionada' : '');
+                        b.disabled = deshabilitado;
+                        if (activo) b.setAttribute('aria-current', 'page');
+                        b.addEventListener('click', () => { pagina = destino; dibujar(); });
+                        paginas.append(b);
+                    };
+                    agregar('‹', Math.max(1, pagina - 1), false, pagina === 1);
+                    for (let p = 1; p <= totalPaginas; p++) agregar(String(p), p, p === pagina, false);
+                    agregar('›', Math.min(totalPaginas, pagina + 1), false, pagina === totalPaginas);
+                };
+                [buscar, simulacro, estado].forEach(c => c.addEventListener('input', () => { pagina = 1; dibujar(); }));
+                root.querySelector('#cni-limpiar').addEventListener('click', () => {
+                    buscar.value = ''; simulacro.value = ''; estado.value = ''; pagina = 1; dibujar();
+                });
+                root.querySelectorAll('.cni-notas-ver').forEach(b => b.addEventListener('click', () => {
+                    root.querySelector('#cni-detalle-titulo').textContent = b.dataset.alumno;
+                    root.querySelector('#cni-detalle-simulacro').textContent = b.dataset.simulacro;
+                    root.querySelector('#cni-detalle-total').textContent = 'Puntaje total: ' + b.dataset.puntaje;
+                    const areaDiv = root.querySelector('#cni-detalle-areas');
+                    areaDiv.replaceChildren();
+                    let notas = {};
+                    try { notas = JSON.parse(b.dataset.notas || '{}'); } catch (e) { notas = {}; }
+                    for (const [area, valor] of Object.entries(notas)) {
+                        const fila = document.createElement('div'); fila.className = 'cni-detalle-fila';
+                        const n = document.createElement('span'); n.textContent = area;
+                        const v = document.createElement('strong'); v.textContent = String(valor);
+                        fila.append(n, v); areaDiv.append(fila);
+                    }
+                    if (!Object.keys(notas).length) areaDiv.textContent = 'No hay puntajes por área registrados.';
+                    if (typeof dialogo.showModal === 'function') dialogo.showModal();
+                }));
+                root.querySelector('#cni-cerrar-dialogo').addEventListener('click', () => dialogo.close());
+                dialogo.addEventListener('click', e => { if (e.target === dialogo) dialogo.close(); });
+                dibujar();
 
-        <article class="docente-tarjeta">
-            <span>📋 Simulacros</span>
-            <h3>Simulacros</h3>
-            @if(isset($simulacros))
-    @forelse($simulacros as $simulacro)
-        <p>📘 {{ $simulacro['nombre'] }}</p>
-    @empty
-        <p>No hay simulacros registrados.</p>
-    @endforelse
-@else
-    <p>Los simulacros aparecerán en el panel docente real.</p>
-@endif
-            <p>
-                Revisa los simulacros disponibles
-                para los estudiantes.
-            </p>
-            <span class="docente-enlace">
-                Ir a simulacros →
-            </span>
-        </article>
-
-        <article class="docente-tarjeta">
-            <span>📚 Preguntas</span>
-            <h3>Banco de preguntas</h3>
-            <p>
-                Explora las preguntas organizadas
-                por áreas académicas.
-            </p>
-            <span class="docente-enlace">
-                Ver preguntas →
-            </span>
-        </article>
-
-    </section>
-
-    <!-- OPCIONES ADICIONALES -->
-    <section class="docente-secundarias">
-
-        <article class="docente-tarjeta">
-            <h3>📖 Guía y ayuda</h3>
-            <p>Instrucciones del portal docente.</p>
-        </article>
-
-        <article class="docente-tarjeta">
-            <h3>📥 Exportar reporte</h3>
-            <p>Descarga los reportes cuando estén disponibles.</p>
-        </article>
-
-        <article class="docente-tarjeta">
-            <h3>ℹ️ Información</h3>
-            <p>
-                Los resultados se mostrarán
-                al conectar los servicios del sistema.
-            </p>
-        </article>
-
-    </section>
-
+            };
+            if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+            else init();
+            document.addEventListener('livewire:navigated', init);
+        })();
+    </script>
 </div>
-
-
