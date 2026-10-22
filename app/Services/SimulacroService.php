@@ -26,6 +26,7 @@ class SimulacroService
         'fecha_inicio',
         'fecha_fin',
         'activo',
+        'carrera_id',
     ];
 
     /**
@@ -53,6 +54,7 @@ class SimulacroService
 
     public function crear(array $datos, Usuario $usuario): array
     {
+        $this->validarCarreraYArea($datos);
         $simulacro = DB::transaction(function () use ($datos, $usuario) {
             $simulacro = Simulacro::create(
                 Arr::only($datos, self::CAMPOS_SIMULACRO) + ['creado_por' => $usuario->id]
@@ -74,6 +76,7 @@ class SimulacroService
             return null;
         }
 
+        $this->validarCarreraYArea($datos);
         DB::transaction(function () use ($simulacro, $datos, $id) {
             // El inicio también bloquea esta fila: no se cambia la configuración de exámenes ya usados.
             $simulacro->newQuery()->whereKey($simulacro->id)->lockForUpdate()->firstOrFail();
@@ -109,6 +112,22 @@ class SimulacroService
         }
     }
 
+    /** Un perfil por carrera no puede apuntar a otra área ni quedar sin área asignada. */
+    private function validarCarreraYArea(array $datos): void
+    {
+        $carreraId = $datos['carrera_id'] ?? null;
+        if ($carreraId === null) {
+            return;
+        }
+        $carrera = DB::table('carreras')->where('id', $carreraId)->where('activo', true)->first();
+        if (! $carrera || ! in_array((int) $carrera->area_postulacion_id,
+            array_map('intval', $datos['areas_postulacion'] ?? []), true)) {
+            throw ValidationException::withMessages([
+                'carrera_id' => 'La carrera del simulacro debe pertenecer a su área de postulación.',
+            ]);
+        }
+    }
+
     public function puedeGestionar(Usuario $usuario): bool
     {
         return in_array($usuario->rol, ['admin', 'docente'], true);
@@ -122,6 +141,7 @@ class SimulacroService
         return [
             'id' => $simulacro->id,
             'nombre' => $simulacro->nombre,
+            'carrera_id' => $simulacro->carrera_id,
             'tiempo_limite' => $simulacro->tiempo_limite,
             'total_preguntas' => $simulacro->total_preguntas,
             'cantidad_alternativas' => $simulacro->cantidad_alternativas,

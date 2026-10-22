@@ -80,12 +80,15 @@ class OrientacionController extends Controller
         }
 
         // No hace falta elegir carrera: el área guardada determina qué examen se ofrece.
-        $simulacros = $servicio->listar($usuario)->filter(function (array $s) use ($area) {
+        $simulacros = $servicio->listar($usuario)->filter(function (array $s) use ($area, $carrera) {
             $habilitado = collect($s['areas_postulacion'])->contains(
                 fn (array $asociada) => (int) $asociada['id'] === (int) $area->id
             );
 
-            return $habilitado && $s['activo'] && $s['fecha_inicio'] && $s['fecha_fin']
+            $carreraPermitida = $s['carrera_id'] === null
+                || ($carrera !== null && (int) $carrera->id === (int) $s['carrera_id']);
+
+            return $habilitado && $carreraPermitida && $s['activo'] && $s['fecha_inicio'] && $s['fecha_fin']
                 && now()->gte($s['fecha_inicio']) && now()->lt($s['fecha_fin']);
         })->values();
 

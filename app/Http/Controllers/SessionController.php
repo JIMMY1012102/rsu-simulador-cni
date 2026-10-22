@@ -28,6 +28,9 @@ class SessionController extends Controller
         $request->session()->regenerate();
 
         $usuario = Auth::guard('web')->user();
+        if ($usuario?->rol === 'admin' && config('cni.administracion_academica_enabled')) {
+            return redirect()->route('admin.inicio');
+        }
         if ($usuario?->rol === 'docente') {
             return redirect()->route('docente.panel');
         }
