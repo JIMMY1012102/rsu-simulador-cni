@@ -26,6 +26,12 @@ class IntentoService
                         'simulacro_id' => 'El simulacro no está disponible en este momento.',
                     ]);
                 }
+                $perfilCarreraId = DB::table('usuarios')->where('id', $usuarioId)->value('carrera_id');
+                if ($simulacro->carrera_id !== null && (int) $simulacro->carrera_id !== (int) $perfilCarreraId) {
+                    throw ValidationException::withMessages([
+                        'carrera_id' => 'Este simulacro está reservado para la carrera configurada.',
+                    ]);
+                }
                 $areasPermitidas = DB::table('area_postulacion_simulacro')
                     ->where('simulacro_id', $simulacro->id)->pluck('area_postulacion_id');
                 $perfil = DB::table('usuarios')->where('id', $usuarioId)->first();
