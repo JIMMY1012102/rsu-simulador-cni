@@ -292,3 +292,36 @@
         font-size: 24px;
     }
 }
+
+
+/* Calificaciones: un mismo diseño para las secciones A-D */
+.calificaciones-resumen {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+    margin: 22px 0;
+}
+.calificaciones-indicador, .calificaciones-listado, .calificaciones-aviso {
+    background: #fff;
+    border: 1px solid #dce7ef;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(16,45,78,.06);
+}
+.calificaciones-indicador span { font-weight: 700; }
+.calificaciones-indicador h2 { font-size: 30px; color: #0a647f; margin: 12px 0; }
+.calificaciones-indicador p { font-size: 13px; margin: 0; }
+.calificaciones-listado h2 { font-size: 21px; margin-top: 0; }
+.calificaciones-tabla-scroll { overflow-x: auto; }
+.calificaciones-tabla { width: 100%; border-collapse: collapse; min-width: 520px; }
+.calificaciones-tabla th, .calificaciones-tabla td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #e7edf2;
+    text-align: left;
+    vertical-align: top;
+}
+.calificaciones-tabla th { background: #eff7fa; font-weight: 700; }
+.calificaciones-aviso { margin-top: 22px; }
+@media (max-width: 700px) {
+    .calificaciones-resumen { grid-template-columns: 1fr; }
+}
