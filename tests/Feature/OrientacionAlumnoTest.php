@@ -79,6 +79,8 @@ class OrientacionAlumnoTest extends TestCase
             ->assertSessionHasErrors('carrera_id');
         $this->assertDatabaseHas('usuarios', ['usuario' => 'valida', 'carrera_id' => null]);
 
+        // Una segunda cuenta aún no ha elegido área; se validan entradas inválidas.
+        $this->actingAs($this->alumno('sin_area_todavia'), 'web');
         DB::table('areas_postulacion')->where('codigo', 'A')->update(['activo' => false]);
         $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('A')])
             ->assertSessionHasErrors('area_id');
