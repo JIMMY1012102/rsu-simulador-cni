@@ -145,6 +145,57 @@ class OrientacionAlumnoTest extends TestCase
         $this->post(route('examen.iniciar', $simulacroId))->assertForbidden();
     }
 
+    public function test_elegir_area_una_vez_muestra_panel_y_recuerda_eleccion_sin_carrera(): void
+    {
+        $estudiante = $this->alumno('primer_ingreso');
+        $this->post('/login', ['usuario' => 'primer_ingreso', 'password' => 'ClaveCNI2026!'])
+            ->assertRedirect(route('alumno.elegir-area'));
+        $this->get(route('alumno.elegir-area'))->assertOk()
+            ->assertSee('areas-grid')->assertSee('area-tarjeta');
+
+        $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('C')])
+            ->assertRedirect(route('alumno.panel'));
+        $this->assertDatabaseHas('usuarios', [
+            'id' => $estudiante->id, 'area_postulacion_id' => $this->area('C'), 'carrera_id' => null,
+        ]);
+        $this->get(route('alumno.panel'))->assertOk()->assertSee('Ingenierías')
+            ->assertSee('Dar examen simulador')->assertSee('Exámenes de tu área');
+        $this->get(route('alumno.elegir-area'))->assertRedirect(route('alumno.panel'));
+        $this->post('/logout')->assertRedirect('/login');
+
+        $this->post('/login', ['usuario' => 'primer_ingreso', 'password' => 'ClaveCNI2026!'])
+            ->assertRedirect(route('alumno.panel'));
+        $this->get(route('alumno.panel'))->assertOk()->assertSee('Ingenierías')
+            ->assertSee('Dar examen simulador');
+        $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('E')])->assertForbidden();
+    }
+
+    public function test_alumno_sin_carrera_rinde_simulacro_exclusivo_de_su_area(): void
+    {
+        $this->seed(ExamenDemoSeeder::class);
+        $simulacro = DB::table('simulacros')->where('nombre', ExamenDemoSeeder::SIMULACRO)->value('id');
+        DB::table('area_postulacion_simulacro')->insert([
+            'area_postulacion_id' => $this->area('C'), 'simulacro_id' => $simulacro,
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+        $this->actingAs($this->alumno('sistemas'), 'web');
+        $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('C')]);
+        $this->get(route('alumno.panel'))->assertOk()->assertSee(ExamenDemoSeeder::SIMULACRO)
+            ->assertSee('Iniciar examen');
+        $respuesta = $this->post(route('examen.iniciar', $simulacro));
+        $intento = DB::table('intentos')->where('usuario_id', auth('web')->id())->first();
+        $this->assertNotNull($intento);
+        $respuesta->assertRedirect(route('examen', $intento->id));
+        $this->assertNull($intento->carrera_id);
+        $this->get(route('examen', $intento->id))->assertOk()->assertSee('Simulador de examen');
+
+        $otra = $this->alumno('humanidades');
+        $this->actingAs($otra, 'web');
+        $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('E')]);
+        $this->get(route('alumno.panel'))->assertDontSee(ExamenDemoSeeder::SIMULACRO);
+        $this->post(route('examen.iniciar', $simulacro))->assertSessionHasErrors('carrera_id');
+    }
+
     public function test_seeder_no_reasigna_codigos_legados_sin_migracion(): void
     {
         DB::table('areas_postulacion')->where('codigo', 'B')->update(['nombre' => 'Ingenierías (catálogo legado)']);
