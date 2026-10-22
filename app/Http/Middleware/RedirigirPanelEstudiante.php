@@ -10,7 +10,7 @@ class RedirigirPanelEstudiante
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if ($request->user('web')?->rol === 'estudiante') {
+        if (config('cni.alumno_areas_enabled') && $request->user('web')?->rol === 'estudiante') {
             return redirect()->route('alumno.panel');
         }
         return $next($request);

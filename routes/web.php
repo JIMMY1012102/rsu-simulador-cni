@@ -5,6 +5,7 @@ use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\Alumno\OrientacionController;
 use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\RedirigirPanelEstudiante;
+use App\Http\Middleware\FeatureAlumnoAreas;
 use App\Livewire\Panel;
 use App\Livewire\Examen;
 use App\Livewire\Docente\PanelDocente;
@@ -25,7 +26,7 @@ Route::post('/logout', [SessionController::class, 'destroy'])
 Route::get('/panel', Panel::class)
     ->middleware(['auth:web', EnsureActiveUser::class, RedirigirPanelEstudiante::class])->name('panel');
 
-Route::middleware(['auth:web', EnsureActiveUser::class])
+Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::class])
     ->prefix('alumno')->name('alumno.')->group(function () {
         Route::get('/elegir-area', [OrientacionController::class, 'elegirArea'])->name('elegir-area');
         Route::post('/elegir-area', [OrientacionController::class, 'guardarArea'])->name('area.guardar');
@@ -36,7 +37,7 @@ Route::middleware(['auth:web', EnsureActiveUser::class])
     });
 
 // Pantalla de examen del alumno; reanuda intentos propios y valida tiempo en el servidor.
-Route::middleware(['auth:web', EnsureActiveUser::class])->group(function () {
+Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::class])->group(function () {
     Route::post('/simulacros/{simulacro}/iniciar', [ExamenController::class, 'iniciar'])
         ->whereNumber('simulacro')->name('examen.iniciar');
     Route::get('/intentos/{intento}/examen', Examen::class)

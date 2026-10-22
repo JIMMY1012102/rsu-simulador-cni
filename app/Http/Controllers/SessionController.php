@@ -31,7 +31,7 @@ class SessionController extends Controller
         if ($usuario?->rol === 'docente') {
             return redirect()->route('docente.panel');
         }
-        if ($usuario?->rol === 'estudiante') {
+        if ($usuario?->rol === 'estudiante' && config('cni.alumno_areas_enabled')) {
             // Solo la primera vez se muestra la selección de las cinco áreas.
             return $usuario->area_postulacion_id === null && $usuario->carrera_id === null
                 ? redirect()->route('alumno.elegir-area')
