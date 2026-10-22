@@ -20,7 +20,7 @@ class CalificacionesSalon extends Component
 
         return view('livewire.docente.calificaciones-salon', array_merge(
             $resultados->resumen($docente),
-            ['calificaciones' => $resultados->resultados($docente, 200)]
+            ['alumnos' => $resultados->alumnos($docente)]
         ))->layout('layouts.app');
     }
 }

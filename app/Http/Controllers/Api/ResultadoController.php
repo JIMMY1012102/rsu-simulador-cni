@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Resultados\CalificarIntentoRequest;
 use App\Services\ResultadoService;
+use App\Services\Docente\ResultadosSeccionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -12,7 +13,8 @@ use Illuminate\Support\Facades\DB;
 class ResultadoController extends Controller
 {
     public function __construct(
-        private readonly ResultadoService $resultadoService
+        private readonly ResultadoService $resultadoService,
+        private readonly ResultadosSeccionService $resultadosSeccion
     ) {
     }
 
@@ -68,33 +70,32 @@ class ResultadoController extends Controller
         abort_unless($usuario, 401);
 
         $consulta = DB::table('intentos')
-            ->whereNotNull('puntaje_total')
-            ->orderByDesc('fecha_inicio');
+            ->whereNotNull('intentos.puntaje_total')
+            ->orderByDesc('intentos.fecha_inicio');
 
         if ($usuario->rol === 'estudiante') {
-            $consulta->where(
-                'usuario_id',
-                $usuario->id
-            );
-        } elseif (!in_array(
-            $usuario->rol,
-            ['admin', 'docente'],
-            true
-        )) {
+            $consulta->where('intentos.usuario_id', $usuario->id);
+        } elseif ($usuario->rol === 'docente') {
+            abort_unless($this->resultadosSeccion->tieneSeccionActiva($usuario), 403);
+            $consulta->join('usuarios as alumno', 'alumno.id', '=', 'intentos.usuario_id')
+                ->where('alumno.rol', 'estudiante')
+                ->where('alumno.activo', true)
+                ->where('alumno.seccion_id', $usuario->seccion_id);
+        } elseif ($usuario->rol !== 'admin') {
             abort(403, 'No autorizado.');
         }
 
         $resultados = $consulta->select(
-            'id',
-            'usuario_id',
-            'simulacro_id',
-            'fecha_inicio',
-            'fecha_fin',
-            'puntaje_total',
-            'correctas',
-            'incorrectas',
-            'en_blanco',
-            'doble_marca'
+            'intentos.id',
+            'intentos.usuario_id',
+            'intentos.simulacro_id',
+            'intentos.fecha_inicio',
+            'intentos.fecha_fin',
+            'intentos.puntaje_total',
+            'intentos.correctas',
+            'intentos.incorrectas',
+            'intentos.en_blanco',
+            'intentos.doble_marca'
         )->paginate(15);
 
         return response()->json([
@@ -112,11 +113,21 @@ class ResultadoController extends Controller
 
         abort_unless($usuario, 401);
 
-        if (in_array(
-            $usuario->rol,
-            ['admin', 'docente'],
-            true
-        )) {
+        if ($usuario->rol === 'admin') {
+            return;
+        }
+
+        if ($usuario->rol === 'docente') {
+            abort_unless($this->resultadosSeccion->tieneSeccionActiva($usuario), 403);
+
+            $pertenece = DB::table('usuarios')
+                ->where('id', $intento->usuario_id)
+                ->where('rol', 'estudiante')
+                ->where('activo', true)
+                ->where('seccion_id', $usuario->seccion_id)
+                ->exists();
+
+            abort_unless($pertenece, 403, 'El alumno no pertenece a su sección.');
             return;
         }
 

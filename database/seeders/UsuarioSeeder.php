@@ -23,7 +23,7 @@ class UsuarioSeeder extends Seeder
                 'apellidos' => 'Prueba',
                 'usuario' => 'docente_demo',
                 'rol' => 'docente',
-                'seccion' => null,
+                'seccion' => 'A',
             ],
             [
                 'nombres' => 'Estudiante',

@@ -293,319 +293,35 @@
     }
 }
 
-/* RESULTADOS DE ESTUDIANTES */
 
-.docente-calificaciones .calificaciones-resultados {
-    margin-top: 30px;
-    padding: 30px;
-    background: #ffffff;
-    border: 1px solid #e3eaf2;
-    border-radius: 20px;
-    box-shadow: 0 8px 28px rgba(16, 45, 78, 0.08);
-}
-
-/* ENCABEZADO */
-.docente-calificaciones .resultados-etiqueta {
-    color: #087e99;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-}
-
-.docente-calificaciones .resultados-cabecera h2 {
-    font-family: 'Outfit', sans-serif;
-    color: #103f59;
-    font-size: 27px;
-    margin: 8px 0;
-}
-
-.docente-calificaciones .resultados-cabecera p {
-    color: #718096;
-    font-size: 14px;
-}
-
-/* BUSCADOR Y FILTROS */
-.docente-calificaciones .resultados-filtros {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 15px;
-    margin: 25px 0;
-}
-
-.docente-calificaciones .resultados-filtros input,
-.docente-calificaciones .resultados-filtros select {
-    min-width: 0;
-    padding: 14px;
-    border: 1px solid #dce6ef;
-    border-radius: 12px;
-    background: #f8fafc;
-    color: #51677d;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-}
-
-/* TABLA DE CALIFICACIONES */
-.docente-calificaciones .resultados-tabla-contenedor {
-    overflow-x: auto;
-    border: 1px solid #e2eaf1;
-    border-radius: 14px;
-}
-
-.docente-calificaciones .resultados-tabla {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
-    font-family: 'DM Sans', sans-serif;
-}
-
-.docente-calificaciones .resultados-tabla th {
-    padding: 18px;
-    background: #103f59;
-    color: white;
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.docente-calificaciones .resultados-tabla td {
-    padding: 20px 18px;
-    border-bottom: 1px solid #e9eef4;
-    color: #314962;
-    font-size: 14px;
-}
-
-.docente-calificaciones .resultados-tabla tbody tr:hover {
-    background: #edf8fc;
-}
-
-/* MENSAJE SIN RESULTADOS */
-.docente-calificaciones .resultados-vacio {
-    padding: 50px 20px !important;
-    text-align: center;
-    color: #8292a3 !important;
-}
-
-/* ADAPTACIÓN A CELULARES */
-@media (max-width: 768px) {
-    .docente-calificaciones .calificaciones-resultados {
-        padding: 18px;
-    }
-
-    .docente-calificaciones .resultados-filtros {
-        grid-template-columns: 1fr;
-    }
-
-    .docente-calificaciones .resultados-tabla {
-        min-width: 550px;
-    }
-}
-
-/* TARJETAS DE ESTADÍSTICAS */
-
-.docente-calificaciones .calificaciones-resumen {
+/* Calificaciones: un mismo diseño para las secciones A-D */
+.calificaciones-resumen {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 18px;
-    margin: 28px 0;
-}
-
-.docente-calificaciones .calificaciones-indicador {
-    background: #ffffff;
-    border: 1px solid #dce8f2;
-    border-top: 4px solid #e6bd59;
-    border-radius: 18px;
-    padding: 24px;
-    box-shadow: 0 6px 20px rgba(16, 63, 89, 0.08);
-    transition: all 0.3s ease;
-}
-
-.docente-calificaciones .calificaciones-indicador span {
-    font-size: 14px;
-    font-weight: 700;
-    color: #296381;
-}
-
-.docente-calificaciones .calificaciones-indicador h2 {
-    font-family: 'Outfit', sans-serif;
-    font-size: 35px;
-    margin: 12px 0 6px;
-    color: #103f59;
-}
-
-.docente-calificaciones .calificaciones-indicador p {
-    font-size: 13px;
-    color: #718096;
-    margin: 0;
-}
-
-.docente-calificaciones .calificaciones-indicador:hover {
-    transform: translateY(-5px);
-    background: #103f59;
-    border-color: #103f59;
-    border-top-color: #e6bd59;
-}
-
-.docente-calificaciones .calificaciones-indicador:hover span,
-.docente-calificaciones .calificaciones-indicador:hover h2,
-.docente-calificaciones .calificaciones-indicador:hover p {
-    color: white;
-}
-
-@media (max-width: 700px) {
-    .docente-calificaciones .calificaciones-resumen {
-        grid-template-columns: 1fr;
-    }
-}
-/* ORGANIZACIÓN DEL RESUMEN ACADÉMICO */
-
-.docente-calificaciones .calificaciones-resumen {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
+    margin: 22px 0;
 }
-
-.docente-calificaciones .calificaciones-indicador {
-    padding: 18px;
-    min-height: 120px;
+.calificaciones-indicador, .calificaciones-listado, .calificaciones-aviso {
+    background: #fff;
+    border: 1px solid #dce7ef;
+    border-radius: 14px;
+    padding: 22px;
+    box-shadow: 0 4px 14px rgba(16,45,78,.06);
 }
-
-@media (max-width: 1100px) {
-    .docente-calificaciones .calificaciones-resumen {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+.calificaciones-indicador span { font-weight: 700; }
+.calificaciones-indicador h2 { font-size: 30px; color: #0a647f; margin: 12px 0; }
+.calificaciones-indicador p { font-size: 13px; margin: 0; }
+.calificaciones-listado h2 { font-size: 21px; margin-top: 0; }
+.calificaciones-tabla-scroll { overflow-x: auto; }
+.calificaciones-tabla { width: 100%; border-collapse: collapse; min-width: 520px; }
+.calificaciones-tabla th, .calificaciones-tabla td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #e7edf2;
+    text-align: left;
+    vertical-align: top;
 }
-
-@media (max-width: 480px) {
-    .docente-calificaciones .calificaciones-resumen {
-        grid-template-columns: 1fr;
-    }
+.calificaciones-tabla th { background: #eff7fa; font-weight: 700; }
+.calificaciones-aviso { margin-top: 22px; }
+@media (max-width: 700px) {
+    .calificaciones-resumen { grid-template-columns: 1fr; }
 }
-
-/* BANNER INSTITUCIONAL CNI */
-
-.docente-inicio .docente-bienvenida {
-    display: grid;
-    grid-template-columns: 110px minmax(0, 1fr) 38%;
-    align-items: center;
-    gap: 25px;
-    padding: 0 0 0 35px;
-    min-height: 250px;
-    overflow: hidden;
-    background: linear-gradient(110deg, #103b59, #126d89);
-}
-
-.docente-inicio .docente-escudo {
-    width: 110px;
-    max-width: 100%;
-    height: auto;
-    position: relative;
-    z-index: 1;
-}
-
-.docente-inicio .docente-bienvenida-contenido {
-    position: relative;
-    z-index: 1;
-}
-
-.docente-etiqueta {
-    display: block;
-    color: #e9c46a;
-    font-size: 11px;
-    letter-spacing: 2px;
-    font-weight: 700;
-    margin-bottom: 15px;
-}
-
-.docente-inicio .docente-bienvenida-foto {
-    width: 100%;
-    height: 250px;
-    position: relative;
-    overflow: hidden;
-}
-
-.docente-bienvenida-foto img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
-.docente-bienvenida-foto::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        90deg,
-        #126d89 0%,
-        rgba(18, 109, 137, 0) 50%
-    );
-    pointer-events: none;
-}
-
-@media (max-width: 850px) {
-    .docente-inicio .docente-bienvenida {
-        grid-template-columns: 75px minmax(0, 1fr);
-        padding: 25px;
-    }
-
-    .docente-inicio .docente-escudo {
-        width: 75px;
-    }
-
-    .docente-inicio .docente-bienvenida-foto {
-        grid-column: 1 / -1;
-        height: 180px;
-        border-radius: 12px;
-    }
-}
-
-/* BANNER CNI - ACABADO INSTITUCIONAL */
-
-.docente-inicio .docente-bienvenida {
-    background:
-        radial-gradient(
-            circle at 65% 25%,
-            rgba(36, 174, 211, 0.25),
-            transparent 45%
-        ),
-        linear-gradient(110deg, #103b59, #086b8b);
-}
-
-/* DIFUMINADO ENTRE FOTO Y FONDO */
-.docente-inicio .docente-bienvenida-foto {
-    -webkit-mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        rgba(0, 0, 0, 0.5) 30%,
-        black 70%
-    );
-
-    mask-image: linear-gradient(
-        to right,
-        transparent 0%,
-        rgba(0, 0, 0, 0.5) 30%,
-        black 70%
-    );
-}
-
-/* MEJORAR LA FOTOGRAFÍA */
-.docente-inicio .docente-bienvenida-foto img {
-    filter: saturate(1.12) contrast(1.06);
-}
-
-/* TONO AZUL SUAVE SOBRE LA FOTO */
-.docente-inicio .docente-bienvenida-foto::after {
-    background: linear-gradient(
-        90deg,
-        rgba(10, 91, 122, 0.35),
-        rgba(10, 91, 122, 0.05)
-    );
-}
-
-@media (max-width: 850px) {
-    .docente-inicio .docente-bienvenida-foto {
-        -webkit-mask-image: none;
-        mask-image: none;
-    }
-}
-
-
