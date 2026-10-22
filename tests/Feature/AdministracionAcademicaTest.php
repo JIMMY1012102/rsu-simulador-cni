@@ -96,7 +96,7 @@ class AdministracionAcademicaTest extends TestCase
         Storage::disk('public')->assertExists(substr($pregunta->imagen, strlen('storage/')));
         $this->assertDatabaseHas('alternativas', ['pregunta_id' => $pregunta->id, 'letra' => 'C', 'es_correcta' => true]);
         $this->assertSame(4, DB::table('alternativas')->where('pregunta_id', $pregunta->id)->count());
-        $this->get(route('admin.preguntas.edit', $pregunta->id))->assertOk()->assertSee('figura', false);
+        $this->get(route('admin.preguntas.edit', $pregunta->id))->assertOk()->assertSee('Imagen actual');
     }
 
     public function test_archivos_peligrosos_y_alternativas_incompletas_se_rechazan(): void
