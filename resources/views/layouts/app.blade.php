@@ -8,17 +8,19 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @livewireStyles
 </head>
-<body>
-    <header>
-        <a href="{{ route('inicio') }}" class="brand">Simulador CNI</a>
-        @auth('web')
-            <nav aria-label="Navegación principal">
-                <a href="{{ route(auth('web')->user()->rol === 'docente' ? 'docente.panel' : 'panel') }}">Mi panel</a>
-                <span>{{ auth('web')->user()->nombres }} · {{ auth('web')->user()->rol }}</span>
-                <form method="POST" action="{{ route('logout') }}">@csrf<button>Salir</button></form>
-            </nav>
-        @endauth
-    </header>
+<body class="{{ request()->routeIs('login') ? 'login-screen' : '' }}">
+    @unless (request()->routeIs('login'))
+        <header>
+            <a href="{{ route('inicio') }}" class="brand">Simulador CNI</a>
+            @auth('web')
+                <nav aria-label="Navegación principal">
+                    <a href="{{ route(auth('web')->user()->rol === 'docente' ? 'docente.panel' : 'panel') }}">Mi panel</a>
+                    <span>{{ auth('web')->user()->nombres }} · {{ auth('web')->user()->rol }}</span>
+                    <form method="POST" action="{{ route('logout') }}">@csrf<button>Salir</button></form>
+                </nav>
+            @endauth
+        </header>
+    @endunless
     <main>
         @if ($errors->any())
             <div class="alert" role="alert"><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
