@@ -45,3 +45,20 @@ if (app()->environment('local')) {
         'livewire.docente.calificaciones-salon');
 }
 
+// Vista previa del panel docente, solo para desarrollo local
+if (app()->environment('local')) {
+    Route::get('/preview-docente', function () {
+        return view('livewire.docente.panel-docente', [
+            'seccion' => (object) [
+                'nombre' => 'A',
+                'activo' => true,
+            ],
+            'simulacros' => [],
+            'calificaciones' => collect([]),
+            'totalEstudiantes' => 30,
+            'totalEvaluaciones' => 0,
+            'totalSimulacros' => 0,
+            'promedioSeccion' => null,
+        ]);
+    });
+}
