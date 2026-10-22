@@ -55,6 +55,39 @@ class ResultadosSeccionService
         ];
     }
 
+
+    /**
+     * Incluye alumnos sin exámenes y la última nota calificada de cada uno.
+     * Usa una sola consulta reutilizable para los cuatro salones.
+     */
+    public function alumnos(Usuario $docente): Collection
+    {
+        if (! $this->tieneSeccionActiva($docente)) {
+            return collect();
+        }
+
+        $ultimos = DB::table('intentos')
+            ->select('usuario_id')
+            ->selectRaw('MAX(id) as intento_id')
+            ->where('tipo', 'simulacro')
+            ->whereIn('estado', ['finalizado', 'enviado_auto'])
+            ->whereNotNull('puntaje_total')
+            ->groupBy('usuario_id');
+
+        return DB::table('usuarios as u')
+            ->leftJoinSub($ultimos, 'ultimos', function ($join) {
+                $join->on('ultimos.usuario_id', '=', 'u.id');
+            })
+            ->leftJoin('intentos as i', 'i.id', '=', 'ultimos.intento_id')
+            ->leftJoin('simulacros as s', 's.id', '=', 'i.simulacro_id')
+            ->where('u.rol', 'estudiante')
+            ->where('u.activo', true)
+            ->where('u.seccion_id', $docente->seccion_id)
+            ->select('u.id as estudiante_id', 'u.nombres', 'u.apellidos',
+                's.nombre as simulacro', 'i.puntaje_total', 'i.fecha_inicio')
+            ->orderBy('u.apellidos')->orderBy('u.nombres')->get();
+    }
+
     public function resultados(Usuario $docente, int $limite = 50): Collection
     {
         if (! $this->tieneSeccionActiva($docente)) {
@@ -78,7 +111,7 @@ class ResultadosSeccionService
             ->get();
     }
 
-    private function tieneSeccionActiva(Usuario $docente): bool
+    public function tieneSeccionActiva(Usuario $docente): bool
     {
         $docente->loadMissing('seccion');
 
