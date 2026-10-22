@@ -132,6 +132,19 @@ class OrientacionAlumnoTest extends TestCase
         $this->actingAs($docente, 'web')->get(route('alumno.panel'))->assertForbidden();
     }
 
+    public function test_url_del_examen_no_permite_saltarse_la_eleccion_de_carrera(): void
+    {
+        $this->seed(ExamenDemoSeeder::class);
+        $alumno = $this->alumno('sin_carrera');
+        $simulacroId = DB::table('simulacros')->where('nombre', ExamenDemoSeeder::SIMULACRO)->value('id');
+        // API histórica admite pruebas genéricas, pero su interfaz web exige la elección previa.
+        $intento = app(\App\Services\IntentoService::class)
+            ->iniciar($alumno->id, ['tipo' => 'simulacro', 'simulacro_id' => $simulacroId]);
+        $this->actingAs($alumno, 'web')->get(route('examen', $intento->id))
+            ->assertRedirect(route('alumno.elegir-area'));
+        $this->post(route('examen.iniciar', $simulacroId))->assertForbidden();
+    }
+
     public function test_seeder_no_reasigna_codigos_legados_sin_migracion(): void
     {
         DB::table('areas_postulacion')->where('codigo', 'B')->update(['nombre' => 'Ingenierías (catálogo legado)']);
