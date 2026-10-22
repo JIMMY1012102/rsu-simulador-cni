@@ -62,3 +62,8 @@ if (app()->environment('local')) {
         ]);
     });
 }
+
+// Exportacion de calificaciones de la seccion del docente autenticado (CSV para Excel).
+Route::get('/docente/exportar', \App\Http\Controllers\Docente\ExportarCalificacionesController::class)
+    ->middleware(['auth:web', \App\Http\Middleware\EnsureActiveUser::class])
+    ->name('docente.exportar');

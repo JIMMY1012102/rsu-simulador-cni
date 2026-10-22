@@ -2,8 +2,8 @@
 
 namespace App\Livewire\Docente;
 
+use App\Services\Docente\PanelCalificacionesData;
 use App\Services\Docente\ResultadosSeccionService;
-use App\Services\SimulacroService;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -11,7 +11,6 @@ class PanelDocente extends Component
 {
     public function render()
     {
-        $resultados = app(ResultadosSeccionService::class);
         $docente = Auth::guard('web')->user();
 
         abort_unless(
@@ -19,12 +18,12 @@ class PanelDocente extends Component
             403
         );
 
+        $resumen = app(ResultadosSeccionService::class)->resumen($docente);
+        $calificaciones = app(PanelCalificacionesData::class)->obtener($docente);
+
         return view('livewire.docente.panel-docente', array_merge(
-            $resultados->resumen($docente),
-            [
-                'calificaciones' => $resultados->resultados($docente, 5),
-                'simulacros' => app(SimulacroService::class)->listar($docente),
-            ]
+            $resumen,
+            $calificaciones
         ))->layout('layouts.app');
     }
 }
