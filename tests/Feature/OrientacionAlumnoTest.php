@@ -134,7 +134,7 @@ class OrientacionAlumnoTest extends TestCase
 
     public function test_seeder_no_reasigna_codigos_legados_sin_migracion(): void
     {
-        DB::table('areas_postulacion')->where('codigo', 'B')->update(['nombre' => 'Ingenierías']);
+        DB::table('areas_postulacion')->where('codigo', 'B')->update(['nombre' => 'Ingenierías (catálogo legado)']);
         $this->expectException(\RuntimeException::class);
         $this->seed(AreaPostulacionSeeder::class);
     }

@@ -106,6 +106,8 @@ class OrientacionController extends Controller
         $actualizadas = Usuario::query()->whereKey($usuario->id)->whereNull('carrera_id')
             ->update(['carrera_id' => $carrera->id]);
         abort_unless($actualizadas === 1, 409, 'La carrera ya fue asignada en otra sesión.');
+        // Actualizar también el usuario autenticado de esta petición.
+        $usuario->refresh();
         $request->session()->forget('alumno.area_id');
         return redirect()->route('alumno.panel')->with('status', 'Carrera guardada correctamente.');
     }
