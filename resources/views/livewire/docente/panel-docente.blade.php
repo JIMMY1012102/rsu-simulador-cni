@@ -7,7 +7,7 @@
 <section class="docente-bienvenida">
     <div class="docente-bienvenida-contenido">
         <h1>BIENVENIDO DOCENTE</h1>
-        <p>Hoy será un gran día</p>
+        <p>Hoy será un gran día · {{ $seccion && $seccion->activo ? '5.º '.$seccion->nombre : 'Sin sección asignada' }}</p>
     </div>
 
     <img
@@ -32,9 +32,7 @@
                 observa su evolución e identifica
                 quiénes necesitan refuerzo.
             </p>
-          <a href="{{ request()->is('docente-preview')
-    ? url('/docente/calificaciones-preview')
-    : route('docente.calificaciones') }}"
+          <a href="{{ route('docente.calificaciones') }}"
    class="docente-enlace">
     Ver calificaciones →
 </a>
