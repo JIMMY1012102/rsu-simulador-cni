@@ -1,0 +1,100 @@
+/* Portal docente RSU-CNI — estilos encapsulados para no modificar el login ni otros roles. */
+.cni-workspace{--cni-navy:#102d4e;--cni-blue:#14618b;--cni-light:#f4f7fb;--cni-border:#e2e9f1;--cni-muted:#64758c;--cni-gold:#e8b94c;display:flex;min-height:calc(100vh - 100px);background:var(--cni-light);color:#142d47;font-family:'Segoe UI',Inter,system-ui,sans-serif}
+body:has(.cni-workspace)>header{display:none}
+body:has(.cni-workspace)>main{padding:0;margin:0;max-width:none}
+.cni-workspace *{box-sizing:border-box}
+.cni-workspace a{text-decoration:none}
+.cni-sidebar{position:sticky;top:0;display:flex;flex-direction:column;width:250px;flex:0 0 250px;height:100vh;background:#102b4b;color:#d4e3f2;padding:30px 18px 22px}
+.cni-brand{display:flex;align-items:center;gap:12px;color:#fff;padding:0 10px 32px;border-bottom:1px solid #ffffff21}
+.cni-brand-logo{width:42px;height:46px;object-fit:contain}
+.cni-brand strong{display:block;font-size:14px;letter-spacing:.075em}
+.cni-brand small{display:block;color:#aac3d8;font-size:11px;margin-top:4px}
+.cni-sidebar-caption{color:#8eabc4;font-size:10px;font-weight:800;letter-spacing:.14em;margin:34px 12px 15px}
+.cni-menu{display:grid;gap:8px}
+.cni-nav-link{display:flex;align-items:center;gap:12px;padding:13px 14px;color:#d6e4f0;border-radius:10px;font-size:13px;font-weight:650;transition:background .16s,color .16s}
+.cni-nav-link>span:first-child{font-size:21px;line-height:1;width:21px;text-align:center}
+.cni-nav-link.is-active{color:#fff;background:#226a95;box-shadow:inset 3px 0 0 var(--cni-gold)}
+.cni-nav-link:not(.is-disabled):hover{background:#1a466c;color:#fff}
+.cni-nav-link.is-disabled{opacity:.52;cursor:not-allowed;flex-wrap:wrap}
+.cni-nav-link small{font-size:10px;font-weight:400;margin-left:30px}
+.cni-sidebar-bottom{margin-top:auto;border-top:1px solid #ffffff20;padding:20px 8px 0}
+.cni-section-pill{display:flex;align-items:center;gap:11px;background:#ffffff10;border:1px solid #ffffff15;border-radius:11px;padding:13px}
+.cni-section-pill span:nth-child(2){font-size:11px;color:#b9cde0}
+.cni-section-pill strong{display:block;margin-top:4px;color:#fff;font-size:14px}
+.cni-section-dot{width:9px;height:9px;border-radius:50%;background:#6cd7af;flex:0 0 9px}
+.cni-logout{margin:16px 0 0;width:100%;padding:12px 10px;text-align:left;color:#c8d9e9;background:none;border:0;font-weight:600;cursor:pointer}
+.cni-logout:hover{color:white;background:#ffffff14}
+.cni-main{flex:1;min-width:0}
+.cni-topline{min-height:68px;border-bottom:1px solid var(--cni-border);background:#fff;display:flex;align-items:center;justify-content:space-between;gap:15px;padding:14px clamp(20px,3vw,50px);color:var(--cni-muted);font-size:13px}
+.cni-topline span span{padding:0 10px;color:#b4c2d0}
+.cni-role{border:1px solid #dce7f0;border-radius:50px;padding:9px 13px;color:#315575;font-size:12px}
+.cni-content{max-width:1320px;margin:0 auto;padding:35px clamp(20px,3vw,50px) 70px}
+.cni-hero{background:linear-gradient(117deg,#113c63,#0d7190);color:#fff;border-radius:20px;display:flex;align-items:center;justify-content:space-between;gap:22px;min-height:238px;padding:34px clamp(24px,3.5vw,54px);box-shadow:0 14px 30px #0d41631c;position:relative;overflow:hidden}
+.cni-hero:after{content:"";position:absolute;width:260px;height:260px;border-radius:50%;right:4%;top:-125px;background:#ffffff0b;pointer-events:none}
+.cni-hero h1{font-size:clamp(25px,2.6vw,37px);line-height:1.18;max-width:600px;margin:13px 0 12px;letter-spacing:-.03em;color:#fff}
+.cni-hero p{margin:0 0 24px;color:#d6e9f4;font-size:14px}
+.cni-hero img{width:132px;max-width:23%;max-height:155px;object-fit:contain;position:relative;z-index:1}
+.cni-eyebrow{font-size:10px;font-weight:800;letter-spacing:.17em;color:#2a83a5}
+.cni-hero .cni-eyebrow{color:#f7ce78}
+.cni-hero-action{display:inline-flex;align-items:center;gap:20px;background:#fff;color:#11476b;padding:11px 17px;border-radius:9px;font-weight:750;font-size:13px}
+.cni-hero-action:hover{background:#f5e4b9}
+.cni-section-heading{display:flex;justify-content:space-between;align-items:end;gap:18px;margin:36px 0 17px}
+.cni-section-heading h2{margin:6px 0 0;font-size:23px;letter-spacing:-.025em;color:#14324f}
+.cni-caption{font-size:12px;color:var(--cni-muted)}
+.cni-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.cni-metrics-three{grid-template-columns:repeat(3,minmax(0,1fr));margin:25px 0}
+.cni-metric{min-width:0;background:#fff;border:1px solid var(--cni-border);border-radius:15px;padding:22px;box-shadow:0 6px 20px #163c5908}
+.cni-metric-symbol{width:41px;height:41px;display:grid;place-items:center;background:#eaf5f9;border-radius:11px;margin-bottom:17px;font-size:20px}
+.cni-metric>span,.cni-metric>small{display:block;color:var(--cni-muted);font-size:12px}
+.cni-metric>strong{display:block;font-size:clamp(25px,2.2vw,32px);font-weight:800;line-height:1.5;color:#133c5c;font-variant-numeric:tabular-nums}
+.cni-metric>small{font-size:11px}
+.cni-section-heading-second{margin-top:40px}
+.cni-text-link,.cni-back{font-weight:700;font-size:12px;color:#15678f}
+.cni-text-link:hover,.cni-back:hover{text-decoration:underline}
+.cni-dashboard-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:17px}
+.cni-surface{min-width:0;background:#fff;border:1px solid var(--cni-border);border-radius:16px;padding:24px;box-shadow:0 6px 20px #163c5908}
+.cni-surface-head{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:17px}
+.cni-surface-head h3,.cni-surface-head h2{margin:0;color:#153653;font-size:17px}
+.cni-tag{font-size:11px;font-weight:700;border-radius:30px;padding:7px 11px;background:#ebf5fa;color:#166787;white-space:nowrap}
+.cni-tag.muted{background:#f1f4f7;color:#718297}
+.cni-result-item{display:flex;gap:12px;align-items:center;border-top:1px solid #ecf0f5;padding:15px 0}
+.cni-avatar,.cni-student-icon{width:36px;height:36px;flex:0 0 36px;border-radius:11px;display:grid;place-items:center;background:#e9f2f8;color:#286b90;font-weight:800}
+.cni-result-body{min-width:0;flex:1}
+.cni-result-body strong,.cni-result-body small{display:block}
+.cni-result-body strong{font-size:13px}.cni-result-body small{margin-top:4px;color:var(--cni-muted);font-size:11px}
+.cni-score{font-size:15px;font-weight:800;color:#0b6889;font-variant-numeric:tabular-nums}
+.cni-empty{text-align:center;padding:34px 18px;color:var(--cni-muted)}
+.cni-empty-icon{font-size:31px;margin-bottom:12px}
+.cni-empty strong{display:block;font-size:14px;color:#1d405d}
+.cni-empty p{max-width:350px;margin:8px auto 0;font-size:12px;line-height:1.6}
+.cni-tool{display:flex;align-items:center;gap:13px;padding:16px 0;border-top:1px solid #edf1f6;color:#23425d}
+.cni-tool:not(.is-pending):hover{color:#0878a4}
+.cni-tool-icon{display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;border-radius:11px;background:#eaf3f7;font-size:22px;color:#176c8d}
+.cni-tool>span:nth-child(2){flex:1;min-width:0}
+.cni-tool strong,.cni-tool small{display:block}
+.cni-tool strong{font-size:13px}.cni-tool small{margin-top:5px;font-size:11px;color:var(--cni-muted)}
+.cni-tool.is-pending{opacity:.65}
+.cni-pending{font-size:10px;color:#64758c;white-space:nowrap}
+.cni-page-heading{display:flex;align-items:center;justify-content:space-between;gap:22px}
+.cni-back{display:inline-block;margin-bottom:26px}
+.cni-page-heading h1{font-size:clamp(25px,2.6vw,34px);letter-spacing:-.03em;margin:7px 0;color:#14324f}
+.cni-page-heading p{color:var(--cni-muted);font-size:13px;margin:0}
+.cni-section-label{border-radius:12px;background:#eaf3f8;color:#17638a;font-weight:800;font-size:14px;padding:13px 19px;white-space:nowrap}
+.cni-student-panel{padding:0;overflow:hidden;margin-top:25px}
+.cni-student-panel .cni-surface-head{padding:24px 27px;margin:0}
+.cni-student-panel .cni-surface-head h2{font-size:20px;margin:6px 0 5px}
+.cni-student-panel .cni-surface-head p{color:var(--cni-muted);font-size:12px;margin:0}
+.cni-table-wrap{overflow:auto}
+.cni-table{width:100%;border-collapse:collapse;min-width:620px}
+.cni-table th{background:#f5f8fb;color:#5f7389;font-size:11px;text-align:left;font-weight:750;letter-spacing:.035em}
+.cni-table th,.cni-table td{padding:16px 22px;border-top:1px solid #ebeff4}
+.cni-table td{font-size:12px;color:#455b71}
+.cni-table tbody tr:hover{background:#f9fbfd}
+.cni-student-name{display:flex;align-items:center;gap:11px;color:#21415d}
+.cni-student-name strong{font-size:12px}
+.cni-student-icon{width:33px;height:33px;flex-basis:33px}
+.cni-grade{font-weight:800;color:#116d8e;font-variant-numeric:tabular-nums}
+.cni-notice{padding:16px 20px;border:1px solid #eadab8;background:#fffaf0;color:#805d27;border-radius:12px;margin-top:22px;font-size:13px}
+@media(max-width:1130px){.cni-sidebar{width:218px;flex-basis:218px;padding-left:12px;padding-right:12px}.cni-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){.cni-workspace{display:block}.cni-sidebar{position:relative;width:auto;height:auto;padding:17px 18px;display:block}.cni-brand{padding:0 0 12px;border:0}.cni-sidebar-caption{display:none}.cni-menu{display:flex;gap:7px;overflow-x:auto;margin-top:15px;padding-bottom:5px}.cni-nav-link{flex:0 0 auto;padding:11px 12px}.cni-nav-link.is-disabled{display:none}.cni-sidebar-bottom{display:none}.cni-topline{padding:12px 20px}.cni-content{padding:22px 18px 50px}.cni-hero{min-height:210px;padding:27px 25px}.cni-hero img{width:80px}.cni-dashboard-grid{grid-template-columns:1fr}.cni-section-heading{align-items:flex-start}.cni-caption{display:none}}
+@media(max-width:490px){.cni-metrics,.cni-metrics-three{grid-template-columns:1fr 1fr;gap:10px}.cni-metric{padding:15px}.cni-metric>strong{font-size:25px}.cni-metric-symbol{margin-bottom:11px}.cni-hero img{display:none}.cni-hero h1{font-size:25px}.cni-role{font-size:10px}.cni-page-heading{align-items:flex-start}.cni-section-label{font-size:11px;padding:9px}.cni-surface{padding:17px}.cni-student-panel{padding:0}.cni-student-panel .cni-surface-head{padding:18px;align-items:flex-start;flex-wrap:wrap}}
