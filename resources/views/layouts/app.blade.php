@@ -9,8 +9,8 @@
     @stack('styles')
     @livewireStyles
 </head>
-<body class="{{ request()->routeIs('login') ? 'login-screen' : '' }}">
-    @unless (request()->routeIs('login'))
+<body class="{{ request()->routeIs('login') ? 'login-screen' : (request()->routeIs('admin.*') ? 'admin-shell-page' : '') }}">
+    @unless (request()->routeIs('login') || request()->routeIs('admin.*'))
         <header>
             <a href="{{ route('inicio') }}" class="brand">Simulador CNI</a>
             @auth('web')
