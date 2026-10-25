@@ -34,17 +34,26 @@
     @livewireStyles
 </head>
 <body class="portal">
-    <aside class="portal-lateral">
+    <aside class="portal-lateral" x-data="{ abierto: false }" :class="{ 'is-abierto': abierto }"
+        @keydown.escape.window="abierto = false">
         <div class="portal-lateral__principal">
-            <a class="portal-identidad" href="{{ route('panel') }}">
-                <img class="portal-identidad__escudo" src="{{ asset('img/examen/escudo-cni.png') }}" alt="Escudo institucional CNI">
-                <span class="portal-identidad__nombre">
-                    <strong>CNI</strong>
-                    <small>Portal del alumno</small>
-                </span>
-            </a>
+            <div class="portal-lateral__cabecera">
+                <a class="portal-identidad" href="{{ route('panel') }}">
+                    <img class="portal-identidad__escudo" src="{{ asset('img/examen/escudo-cni.png') }}" alt="Escudo institucional CNI">
+                    <span class="portal-identidad__nombre">
+                        <strong>CNI</strong>
+                        <small>Portal del alumno</small>
+                    </span>
+                </a>
+                {{-- Solo visible en celular (< 768 px): despliega el menú y la sesión. --}}
+                <button type="button" class="portal-menu-boton" aria-controls="portal-menu portal-lateral-pie"
+                    aria-expanded="false" :aria-expanded="abierto ? 'true' : 'false'" @click="abierto = !abierto">
+                    <span class="portal-menu-boton__icono" aria-hidden="true"><span></span><span></span><span></span></span>
+                    <span x-text="abierto ? 'Cerrar' : 'Menú'">Menú</span>
+                </button>
+            </div>
 
-            <nav class="portal-menu" aria-label="Mi portal">
+            <nav class="portal-menu" id="portal-menu" aria-label="Mi portal">
                 <p class="portal-menu__titulo">MI PORTAL</p>
                 @foreach ($menu as $clave => [$texto, $icono, $enlace])
                     {{-- Las rutas con "#" aún no existen en el proyecto. --}}
@@ -57,7 +66,7 @@
             </nav>
         </div>
 
-        <div class="portal-lateral__pie">
+        <div class="portal-lateral__pie" id="portal-lateral-pie">
             <div class="portal-ayuda">
                 <span class="portal-ayuda__icono"><img src="{{ asset('img/examen/ayuda-tarjeta.svg') }}" width="14" height="12.9986" alt=""></span>
                 <strong>Estamos para ayudarte</strong>

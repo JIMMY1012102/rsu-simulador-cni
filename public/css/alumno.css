@@ -460,7 +460,7 @@
     .examen-mapa__preguntas { grid-template-columns: repeat(auto-fill, 44px); }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
     .examen-encabezado { flex-direction: column; align-items: flex-start; }
     .examen-resumen { flex-wrap: wrap; gap: 16px; }
     .examen-resumen__ficha, .examen-tiempo, .examen-progreso { flex: 1 1 100%; }
@@ -470,26 +470,52 @@
     .examen-navegacion { flex-wrap: wrap; }
 }
 
-/* ---------- Pantallas angostas ---------- */
-@media (max-width: 900px) {
+/* ---------- Celular (< 768 px): la barra lateral se vuelve un menú desplegable ---------- */
+.portal-lateral__cabecera { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.portal-menu-boton { display: none; }
+
+@media (max-width: 767px) {
     .portal { flex-direction: column; }
     .portal-lateral {
-        position: static;
+        position: sticky;
+        top: 0;
+        z-index: 40;
         width: 100%;
         flex-basis: auto;
         height: auto;
         min-height: 0;
-        padding: 16px;
-        gap: 16px;
+        max-height: 100vh;
+        justify-content: flex-start;
+        padding: 10px 16px;
     }
-    .portal-lateral__principal { gap: 16px; }
-    .portal-identidad { height: 56px; }
-    .portal-identidad__escudo { width: 60px; height: 52px; }
-    .portal-menu { flex-direction: row; flex-wrap: wrap; }
-    .portal-menu__titulo { flex-basis: 100%; }
-    .portal-menu__enlace { height: 38px; }
+    .portal-lateral__principal { gap: 0; }
+    .portal-identidad { height: 52px; padding: 0; }
+    .portal-identidad__escudo { width: 58px; height: 52px; }
+
+    .portal-menu-boton {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        height: 40px;
+        padding: 0 14px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, .08);
+        color: var(--cni-blanco);
+        font-size: 13px;
+        font-weight: 700;
+    }
+    .portal-menu-boton__icono { display: flex; flex-direction: column; gap: 4px; width: 18px; }
+    .portal-menu-boton__icono span { display: block; height: 2px; border-radius: 2px; background: currentColor; transition: transform .2s, opacity .2s; }
+    .is-abierto .portal-menu-boton__icono span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+    .is-abierto .portal-menu-boton__icono span:nth-child(2) { opacity: 0; }
+    .is-abierto .portal-menu-boton__icono span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+    .portal-menu, .portal-lateral__pie { display: none; }
+    .portal-lateral.is-abierto { padding-bottom: 16px; }
+    .portal-lateral.is-abierto .portal-menu { display: flex; margin-top: 12px; }
+    .portal-lateral.is-abierto .portal-lateral__pie { display: flex; margin-top: 16px; }
     .portal-ayuda, .portal-lateral__separador { display: none; }
-    .portal-lateral__pie { flex-direction: row; align-items: center; justify-content: space-between; }
+
     .portal-barra, .portal-contenido, .portal-pie { padding-left: 16px; padding-right: 16px; }
     .portal-cuenta__nombre, .portal-cuenta__separador { display: none; }
 }

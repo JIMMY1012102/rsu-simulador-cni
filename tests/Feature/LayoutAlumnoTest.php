@@ -26,6 +26,9 @@ class LayoutAlumnoTest extends TestCase
         $this->assertStringContainsString('action="'.route('logout').'"', $html);
         $this->assertStringContainsString('img/examen/escudo-cni.png', $html);
         $this->assertStringContainsString('css/alumno.css', $html);
+        $this->assertStringContainsString('class="portal-menu-boton" aria-controls="portal-menu portal-lateral-pie"', $html);
+        $this->assertStringContainsString('id="portal-menu"', $html);
+        $this->assertStringContainsString('id="portal-lateral-pie"', $html);
         $this->assertStringNotContainsString('figma.com', $html);
         $this->assertStringNotContainsString('css/app.css', $html);
     }
