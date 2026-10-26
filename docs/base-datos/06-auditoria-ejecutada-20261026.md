@@ -23,7 +23,7 @@
 
 ## Hallazgos preventivos y riesgo para el backend
 
-Los tres casos de incoherencia de carrera↔área, alternativa↔pregunta y suma de cuotas **ya tienen validaciones en los servicios Laravel**; no se detectaron filas de estudiantes reales corruptas. El [PR #23](https://github.com/JIMMY1012102/rsu-simulador-cni/pull/23) fortalece las validaciones de simulacros y corrige fixtures con códigos antiguos.
+Los tres casos de incoherencia de carrera↔área, alternativa↔pregunta y suma de cuotas **ya tienen validaciones en los servicios Laravel**; no se detectaron filas de estudiantes reales corruptas. El [PR #23](https://github.com/JIMMY1012102/rsu-simulador-cni/pull/23) fortalece las validaciones de simulacros y corrige los dos fixtures con códigos antiguos.
 
 1. **Prioridad de prevención — versiones locales podrían divergir.** Si el equipo instaló el SQL antiguo, pueden faltar `personal_access_tokens`, `usuarios.area_postulacion_id` y `simulacros.carrera_id`. La ausencia de la tabla de tokens no afecta el login web actual, pero faltas de las dos columnas sí afectan las funcionalidades nuevas.
 2. **Catálogo A–E: confirmado para la DEMO; prevención de legado.** El seeder exige A=Salud, B=Ciencias Básicas, C=Ingenierías, D=Económicas/Gestión, E=Humanidades. Un catálogo legado con significados diferentes puede provocar selección incorrecta o impedir el despliegue.
