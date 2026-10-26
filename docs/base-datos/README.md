@@ -18,7 +18,7 @@ Se documentan 15 tablas, 138 columnas y 24 FK declaradas en migraciones. **No so
 
 ## Correcciones de consistencia DEMO
 
-El [PR #23](https://github.com/JIMMY1012102/rsu-simulador-cni/pull/23), independiente de este PR documental, corrige una prueba que invertía los códigos antiguos A/B y refuerza validaciones de cuotas y catálogos activos **sin migraciones ni cambios de tablas**. Ese PR debe superar CI y revisarse antes de fusionar.
+El [PR #23](https://github.com/JIMMY1012102/rsu-simulador-cni/pull/23), independiente de este PR documental, corrige dos fixtures de pruebas que conservaban códigos A/B históricos y refuerza validaciones de cuotas y catálogos activos **sin migraciones ni cambios de tablas**. Ese PR debe superar CI y revisarse antes de fusionar.
 
 ## Vista rápida de la arquitectura
 
