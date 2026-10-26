@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [develop, main]
   push:
-    branches: [feature/kiss-sesiones-web]
+    branches: [develop, feature/kiss-sesiones-web]
 permissions:
   contents: read
 jobs:
