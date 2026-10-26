@@ -347,7 +347,9 @@ transform:translateY(80px)}
 font-size:clamp(1.85rem,10vw,2.45rem)}
 .login-mascot-scene{
 bottom:-10px;
-width:130vw;
+/* Mantener la ilustración dentro del contenedor en pantallas pequeñas.
+   El 130vw anterior desbordaba el viewport de 390 px. */
+width:min(100%,440px);
 height:260px}
 .login-mascot{
 width:min(40%,225px)}
