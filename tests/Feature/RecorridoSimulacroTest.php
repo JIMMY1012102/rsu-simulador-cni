@@ -285,7 +285,7 @@ class RecorridoSimulacroTest extends TestCase
 
     public function test_area_de_postulacion_se_comprueba_con_el_perfil_y_no_con_un_id_enviado(): void
     {
-        $area = DB::table('areas_postulacion')->insertGetId(['codigo' => 'A', 'nombre' => 'Ingenierías', 'activo' => true]);
+        $area = DB::table('areas_postulacion')->insertGetId(['codigo' => 'C', 'nombre' => 'Ingenierías', 'activo' => true]);
         $carrera = DB::table('carreras')->insertGetId(['area_postulacion_id' => $area, 'nombre' => 'Sistemas', 'activo' => true]);
         DB::table('area_postulacion_simulacro')->insert(['simulacro_id' => $this->simulacro, 'area_postulacion_id' => $area]);
         $this->postJson('/api/intentos', [
