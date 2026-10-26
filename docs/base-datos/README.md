@@ -11,9 +11,10 @@ Se documentan 15 tablas, 138 columnas y 24 FK declaradas en migraciones. **No so
 3. [FK, cardinalidades, índices, UNIQUE y CHECK](03-integridad.md)
 4. [Auditoría de normalización, seguridad y recomendaciones](04-hallazgos.md)
 5. [Consultas de comprobación SOLO LECTURA para MariaDB](05-auditoria-mariadb.md)
-6. [ER general editable (Mermaid)](diagramas/general.mmd); por módulo: [identidad](diagramas/identidad.mmd), [banco](diagramas/banco.mmd), [simulacros](diagramas/configuracion.mmd), [resultados](diagramas/resultados.mmd), [tabla técnica](diagramas/tecnico.mmd)
-7. [Diagrama coloreado de conexiones entre módulos](diagramas/modulos.mmd)
-8. [Esquema íntegro DBML editable](esquema.dbml)
+6. [Evidencias verificadas del 26/10/2026 y pendientes para la base compartida](06-auditoria-ejecutada-20261026.md)
+7. [ER general editable (Mermaid)](diagramas/general.mmd); por módulo: [identidad](diagramas/identidad.mmd), [banco](diagramas/banco.mmd), [simulacros](diagramas/configuracion.mmd), [resultados](diagramas/resultados.mmd), [tabla técnica](diagramas/tecnico.mmd)
+8. [Diagrama coloreado de conexiones entre módulos](diagramas/modulos.mmd)
+9. [Esquema íntegro DBML editable](esquema.dbml)
 
 ## Vista rápida de la arquitectura
 
