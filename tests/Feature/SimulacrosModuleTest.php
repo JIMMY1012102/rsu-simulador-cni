@@ -2,7 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\AreaPostulacion;
+use App\Services\SimulacroService;
+use Database\Seeders\AreaPostulacionSeeder;
+use Illuminate\Validation\ValidationException;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -39,9 +41,11 @@ class SimulacrosModuleTest extends TestCase
             DB::table('areas')->insertGetId(['nombre' => 'Álgebra', 'bloque' => 'conocimientos', 'activo' => true]),
         ];
 
+        // Siempre utilizar los cinco códigos aprobados; no inventar A/B históricos.
+        $this->seed(AreaPostulacionSeeder::class);
         $this->areasPostulacion = [
-            AreaPostulacion::create(['codigo' => 'A', 'nombre' => 'Ingenierías'])->id,
-            AreaPostulacion::create(['codigo' => 'B', 'nombre' => 'Ciencias de la Salud'])->id,
+            (int) DB::table('areas_postulacion')->where('codigo', 'A')->value('id'),
+            (int) DB::table('areas_postulacion')->where('codigo', 'C')->value('id'),
         ];
     }
 
@@ -192,6 +196,70 @@ class SimulacrosModuleTest extends TestCase
         $this->actingAs($this->docente, 'web')
             ->getJson('/api/simulacros')
             ->assertJsonCount(2, 'data');
+    }
+
+    public function test_catalogo_demo_coincide_con_las_cinco_areas_aprobadas(): void
+    {
+        $this->assertSame([
+            'A' => 'Ciencias de la Salud',
+            'B' => 'Ciencias Básicas',
+            'C' => 'Ingenierías',
+            'D' => 'Ciencias Económicas y de la Gestión',
+            'E' => 'Humanidades y Ciencias Jurídicas y Sociales',
+        ], DB::table('areas_postulacion')->orderBy('codigo')->pluck('nombre', 'codigo')->all());
+    }
+
+    public function test_api_rechaza_asignaturas_y_areas_postulacion_inactivas(): void
+    {
+        $this->actingAs($this->docente, 'web');
+        DB::table('areas')->where('id', $this->areas[0])->update(['activo' => false]);
+
+        $this->postJson('/api/simulacros', $this->datosValidos())
+            ->assertUnprocessable()->assertJsonValidationErrors('areas.0.area_id');
+
+        DB::table('areas')->where('id', $this->areas[0])->update(['activo' => true]);
+        DB::table('areas_postulacion')->where('id', $this->areasPostulacion[1])
+            ->update(['activo' => false]);
+
+        $this->postJson('/api/simulacros', $this->datosValidos())
+            ->assertUnprocessable()->assertJsonValidationErrors('areas_postulacion.1');
+
+        $this->assertDatabaseCount('simulacros', 0);
+        $this->assertDatabaseCount('simulacro_area', 0);
+    }
+
+    public function test_servicio_impide_cuotas_inconsistentes_sin_pasarlas_por_form_request(): void
+    {
+        $datos = $this->datosValidos(['total_preguntas' => 11]);
+
+        try {
+            app(SimulacroService::class)->crear($datos, $this->docente);
+            $this->fail('El servicio no debe permitir distribuciones inconsistentes.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('areas', $exception->errors());
+        }
+
+        $this->assertDatabaseCount('simulacros', 0);
+        $this->assertDatabaseCount('simulacro_area', 0);
+    }
+
+    public function test_servicio_no_permite_repetir_asignatura_y_nivel(): void
+    {
+        $datos = $this->datosValidos([
+            'areas' => [
+                ['area_id' => $this->areas[0], 'nivel' => 'mixto', 'cantidad_preguntas' => 6],
+                ['area_id' => $this->areas[0], 'nivel' => 'mixto', 'cantidad_preguntas' => 4],
+            ],
+        ]);
+
+        try {
+            app(SimulacroService::class)->crear($datos, $this->docente);
+            $this->fail('El servicio no debe duplicar una cuota por asignatura y nivel.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('areas', $exception->errors());
+        }
+
+        $this->assertDatabaseCount('simulacros', 0);
     }
 
     private function crearSimulacro(array $cambios = []): int

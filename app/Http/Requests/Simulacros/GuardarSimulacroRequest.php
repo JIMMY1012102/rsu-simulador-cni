@@ -36,13 +36,13 @@ class GuardarSimulacroRequest extends FormRequest
             'activo' => ['sometimes', 'boolean'],
 
             'areas' => ['required', 'array', 'min:1'],
-            'areas.*.area_id' => ['required', 'integer', 'exists:areas,id'],
+            'areas.*.area_id' => ['required', 'integer', Rule::exists('areas', 'id')->where('activo', true)],
             'areas.*.nivel' => ['sometimes', Rule::in(self::NIVELES)],
             'areas.*.cantidad_preguntas' => ['required', 'integer', 'min:1'],
 
-            'carrera_id' => ['nullable', 'integer', 'exists:carreras,id'],
+            'carrera_id' => ['nullable', 'integer', Rule::exists('carreras', 'id')->where('activo', true)],
             'areas_postulacion' => ['sometimes', 'array'],
-            'areas_postulacion.*' => ['integer', 'distinct', 'exists:areas_postulacion,id'],
+            'areas_postulacion.*' => ['integer', 'distinct', Rule::exists('areas_postulacion', 'id')->where('activo', true)],
         ];
     }
 
