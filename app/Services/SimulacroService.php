@@ -54,6 +54,7 @@ class SimulacroService
 
     public function crear(array $datos, Usuario $usuario): array
     {
+        $this->validarConfiguracion($datos);
         $this->validarCarreraYArea($datos);
         $simulacro = DB::transaction(function () use ($datos, $usuario) {
             $simulacro = Simulacro::create(
@@ -76,7 +77,19 @@ class SimulacroService
             return null;
         }
 
-        $this->validarCarreraYArea($datos);
+        // PUT puede omitir carrera_id o areas_postulacion. Validar también los
+        // valores que conservará el simulacro, no solo los enviados en esta petición.
+        $efectivos = $datos;
+        if (! array_key_exists('carrera_id', $efectivos)) {
+            $efectivos['carrera_id'] = $simulacro->carrera_id;
+        }
+        if (! array_key_exists('areas_postulacion', $efectivos)) {
+            $efectivos['areas_postulacion'] = $simulacro->areasPostulacion()
+                ->pluck('areas_postulacion.id')->all();
+        }
+
+        $this->validarConfiguracion($efectivos);
+        $this->validarCarreraYArea($efectivos);
         DB::transaction(function () use ($simulacro, $datos, $id) {
             // El inicio también bloquea esta fila: no se cambia la configuración de exámenes ya usados.
             $simulacro->newQuery()->whereKey($simulacro->id)->lockForUpdate()->firstOrFail();
@@ -109,6 +122,62 @@ class SimulacroService
 
         if (array_key_exists('areas_postulacion', $datos)) {
             $simulacro->areasPostulacion()->sync($datos['areas_postulacion']);
+        }
+    }
+
+    /**
+     * La distribución también se valida aquí: el servicio puede invocarse
+     * sin un FormRequest (por ejemplo, desde otras partes de Laravel).
+     * Nunca guardar un examen imposible de rendir.
+     */
+    private function validarConfiguracion(array $datos): void
+    {
+        $cuotas = $datos['areas'] ?? [];
+
+        if (! is_array($cuotas) || $cuotas === [] || (int) ($datos['total_preguntas'] ?? 0) < 1) {
+            throw ValidationException::withMessages([
+                'areas' => 'Configura al menos una asignatura y un total válido de preguntas.',
+            ]);
+        }
+
+        $suma = 0;
+        $combinaciones = [];
+
+        foreach ($cuotas as $cuota) {
+            $areaId = (int) ($cuota['area_id'] ?? 0);
+            $nivel = $cuota['nivel'] ?? 'mixto';
+            $cantidad = (int) ($cuota['cantidad_preguntas'] ?? 0);
+            $clave = $areaId.'|'.$nivel;
+
+            if ($cantidad < 1 || ! in_array($nivel, ['basico', 'intermedio', 'avanzado', 'mixto'], true)
+                || ! DB::table('areas')->where('id', $areaId)->where('activo', true)->exists()) {
+                throw ValidationException::withMessages([
+                    'areas' => 'La distribución contiene una asignatura inactiva o una cuota inválida.',
+                ]);
+            }
+
+            if (isset($combinaciones[$clave])) {
+                throw ValidationException::withMessages([
+                    'areas' => 'No se puede repetir la misma asignatura y nivel.',
+                ]);
+            }
+
+            $combinaciones[$clave] = true;
+            $suma += $cantidad;
+        }
+
+        if ($suma !== (int) $datos['total_preguntas']) {
+            throw ValidationException::withMessages([
+                'areas' => 'La suma de cuotas debe coincidir con el total de preguntas.',
+            ]);
+        }
+
+        foreach ($datos['areas_postulacion'] ?? [] as $areaId) {
+            if (! DB::table('areas_postulacion')->where('id', $areaId)->where('activo', true)->exists()) {
+                throw ValidationException::withMessages([
+                    'areas_postulacion' => 'Todas las áreas de postulación deben estar activas.',
+                ]);
+            }
         }
     }
 
