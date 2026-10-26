@@ -83,7 +83,10 @@ jobs:
           php artisan route:list
           php artisan view:cache
       - name: Crear credencial aleatoria solamente en el runner efímero
-        run: echo "CNI_E2E_PASSWORD=$(openssl rand -hex 24)" >> "$GITHUB_ENV"
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          echo "CNI_E2E_PASSWORD=$password" >> "$GITHUB_ENV"
       - name: Preparar cuentas DEMO para Chromium
         run: php tests/e2e/fixture.php prepare
       - name: Instalar navegador de pruebas
