@@ -1,0 +1,83 @@
+erDiagram
+  usuarios {
+    bigint id PK
+    varchar nombres
+    varchar apellidos
+    varchar usuario
+    varchar password
+    enum rol
+    bigint seccion_id FK
+    bigint carrera_id FK
+    boolean activo
+    varchar remember_token
+    bigint area_postulacion_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  carreras {
+    bigint id PK
+    bigint area_postulacion_id FK
+    varchar nombre
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas_postulacion {
+    bigint id PK
+    char codigo
+    varchar nombre
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas {
+    bigint id PK
+    varchar nombre
+    enum bloque
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  simulacros {
+    bigint id PK
+    varchar nombre
+    smallint tiempo_limite
+    smallint total_preguntas
+    smallint cantidad_alternativas
+    decimal puntaje_correcta
+    decimal puntaje_incorrecta
+    decimal puntaje_blanco
+    decimal puntaje_maximo
+    datetime fecha_inicio
+    datetime fecha_fin
+    boolean activo
+    bigint creado_por FK
+    bigint carrera_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  area_postulacion_simulacro {
+    bigint id PK
+    bigint area_postulacion_id FK
+    bigint simulacro_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  simulacro_area {
+    bigint id PK
+    bigint simulacro_id FK
+    bigint area_id FK
+    enum nivel
+    smallint cantidad_preguntas
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas_postulacion ||--o{ carreras : "area_postulacion_id"
+  carreras |o--o{ usuarios : "carrera_id"
+  areas_postulacion |o--o{ usuarios : "area_postulacion_id"
+  usuarios |o--o{ simulacros : "creado_por"
+  carreras |o--o{ simulacros : "carrera_id"
+  areas_postulacion ||--o{ area_postulacion_simulacro : "area_postulacion_id"
+  simulacros ||--o{ area_postulacion_simulacro : "simulacro_id"
+  simulacros ||--o{ simulacro_area : "simulacro_id"
+  areas ||--o{ simulacro_area : "area_id"
