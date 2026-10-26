@@ -11,10 +11,14 @@ Se documentan 15 tablas, 138 columnas y 24 FK declaradas en migraciones. **No so
 3. [FK, cardinalidades, índices, UNIQUE y CHECK](03-integridad.md)
 4. [Auditoría de normalización, seguridad y recomendaciones](04-hallazgos.md)
 5. [Consultas de comprobación SOLO LECTURA para MariaDB](05-auditoria-mariadb.md)
-6. [Evidencias verificadas del 26/10/2026 y pendientes para la base compartida](06-auditoria-ejecutada-20261026.md)
+6. [Evidencias verificadas del 26/10/2026 y alcance DEMO](06-auditoria-ejecutada-20261026.md)
 7. [ER general editable (Mermaid)](diagramas/general.mmd); por módulo: [identidad](diagramas/identidad.mmd), [banco](diagramas/banco.mmd), [simulacros](diagramas/configuracion.mmd), [resultados](diagramas/resultados.mmd), [tabla técnica](diagramas/tecnico.mmd)
 8. [Diagrama coloreado de conexiones entre módulos](diagramas/modulos.mmd)
 9. [Esquema íntegro DBML editable](esquema.dbml)
+
+## Correcciones de consistencia DEMO
+
+El [PR #23](https://github.com/JIMMY1012102/rsu-simulador-cni/pull/23), independiente de este PR documental, corrige una prueba que invertía los códigos antiguos A/B y refuerza validaciones de cuotas y catálogos activos **sin migraciones ni cambios de tablas**. Ese PR debe superar CI y revisarse antes de fusionar.
 
 ## Vista rápida de la arquitectura
 
@@ -46,4 +50,4 @@ flowchart LR
 
 **Autenticación:** guard `web`, sesiones Laravel y roles `admin`, `docente`, `estudiante`; no se instala Spatie. `personal_access_tokens` es una tabla histórica y no debe eliminarse sin análisis. No se infiere que `sessions` o `password_reset_tokens` existan físicamente.
 
-**Pendiente:** inspeccionar `information_schema` de MariaDB real, comprobar código A–E, migraciones aplicadas, vínculos históricos e índices. La CI valida MariaDB temporal, no datos del equipo. **No desplegar ni ejecutar seeders/migraciones sobre bases pobladas hasta contar con respaldo y aprobación.**
+**Estado actual confirmado:** el CNI está únicamente en **DEMO, con cinco áreas A–E y sin una MariaDB compartida ni estudiantes reales**. El esquema ha pasado CI con SQLite y MariaDB temporal; no hay inconsistencias históricas de alumnos reales que reparar. Las consultas de `information_schema` quedan como un protocolo futuro para cada entorno local o para un eventual despliegue. **No desplegar ni ejecutar migraciones destructivas sobre instalaciones con datos sin respaldo y aprobación.**

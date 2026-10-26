@@ -2,7 +2,7 @@
 
 > **Fuente:** `develop` (`eb82cd46c35567c4b7d840a524a339e28c0f18ca`) · **Fecha:** 26/10/2026. **Estado:** esquema esperado en código; MariaDB compartida no consultada en vivo.
 
-Esta auditoría revisó GitHub, **no abrió una conexión a la MariaDB compartida**. Las siguientes consultas son instrucciones reproducibles, no resultados ejecutados. Ejecutar solo tras identificar correctamente el esquema de desarrollo y usar un usuario de lectura. No adjuntar datos personales, hashes ni contraseñas al PR.
+**Situación comunicada por el equipo (26/10/2026):** el sistema sigue en DEMO, ya tiene las cinco áreas A–E y **no existe una MariaDB compartida**. Por lo tanto, esta sección **no es una auditoría incompleta de una base central existente**, sino una guía opcional para una instalación local o futura. GitHub Actions ejecuta las migraciones y pruebas en una MariaDB 11.4 temporal. Las siguientes consultas son instrucciones reproducibles, no resultados ejecutados. Ejecutar solo tras identificar correctamente el esquema de desarrollo y usar un usuario de lectura. No adjuntar datos personales, hashes ni contraseñas al PR.
 
 ## A. Esquema y columnas realmente instalados
 
@@ -68,11 +68,11 @@ FROM simulacros s LEFT JOIN simulacro_area sa ON sa.simulacro_id=s.id
 GROUP BY s.id,s.total_preguntas HAVING cuota<>s.total_preguntas;
 ```
 
-## Estado pendiente de rellenar después de una consulta real
+## Control opcional para futuros entornos locales o despliegues
 
 | Verificación | Objetivo según código | MariaDB del equipo |
 |---|---|---|
-| Tablas de aplicación + histórico tokens | 15 `Schema::create` | Sin comprobar |
+| Tablas de aplicación + histórico tokens | 15 `Schema::create` | No aplica a una base compartida inexistente |
 | Columnas definidas en migraciones | 138 | Sin comprobar |
 | FK declaradas en migraciones | 24 | Sin comprobar |
 | Áreas de postulación | A, B, C, D, E | Sin comprobar |
