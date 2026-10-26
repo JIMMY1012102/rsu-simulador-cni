@@ -14,6 +14,19 @@ on:
       - 'config/**'
       - 'composer.json'
       - 'composer.lock'
+  push:
+    branches: [develop]
+    paths:
+      - '.github/workflows/e2e-browser.yml'
+      - 'tests/e2e/**'
+      - 'app/**'
+      - 'database/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'public/**'
+      - 'config/**'
+      - 'composer.json'
+      - 'composer.lock'
   workflow_dispatch:
 
 permissions:
