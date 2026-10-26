@@ -243,6 +243,32 @@ class SimulacrosModuleTest extends TestCase
         $this->assertDatabaseCount('simulacro_area', 0);
     }
 
+    public function test_actualizacion_no_desvincula_carrera_de_su_area_si_se_omite_carrera_id(): void
+    {
+        $carrera = DB::table('carreras')->insertGetId([
+            'area_postulacion_id' => $this->areasPostulacion[0],
+            'nombre' => 'Carrera CNI Demo',
+            'activo' => true,
+        ]);
+
+        $id = $this->crearSimulacro([
+            'carrera_id' => $carrera,
+            'areas_postulacion' => [$this->areasPostulacion[0]],
+        ]);
+
+        // Se omite carrera_id, pero el simulacro seguirá conservando esa carrera.
+        $this->actingAs($this->docente, 'web')->putJson("/api/simulacros/{$id}", $this->datosValidos([
+            'areas_postulacion' => [$this->areasPostulacion[1]],
+        ]))->assertUnprocessable()->assertJsonValidationErrors('carrera_id');
+
+        $this->assertDatabaseHas('simulacros', ['id' => $id, 'carrera_id' => $carrera]);
+        $this->assertDatabaseHas('area_postulacion_simulacro', [
+            'simulacro_id' => $id,
+            'area_postulacion_id' => $this->areasPostulacion[0],
+        ]);
+        $this->assertDatabaseCount('area_postulacion_simulacro', 1);
+    }
+
     public function test_servicio_no_permite_repetir_asignatura_y_nivel(): void
     {
         $datos = $this->datosValidos([

@@ -77,8 +77,19 @@ class SimulacroService
             return null;
         }
 
-        $this->validarConfiguracion($datos);
-        $this->validarCarreraYArea($datos);
+        // PUT puede omitir carrera_id o areas_postulacion. Validar también los
+        // valores que conservará el simulacro, no solo los enviados en esta petición.
+        $efectivos = $datos;
+        if (! array_key_exists('carrera_id', $efectivos)) {
+            $efectivos['carrera_id'] = $simulacro->carrera_id;
+        }
+        if (! array_key_exists('areas_postulacion', $efectivos)) {
+            $efectivos['areas_postulacion'] = $simulacro->areasPostulacion()
+                ->pluck('areas_postulacion.id')->all();
+        }
+
+        $this->validarConfiguracion($efectivos);
+        $this->validarCarreraYArea($efectivos);
         DB::transaction(function () use ($simulacro, $datos, $id) {
             // El inicio también bloquea esta fila: no se cambia la configuración de exámenes ya usados.
             $simulacro->newQuery()->whereKey($simulacro->id)->lockForUpdate()->firstOrFail();
