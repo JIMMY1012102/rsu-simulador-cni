@@ -2,7 +2,6 @@
 
 use App\Http\Controllers\Alumno\BancoController;
 use App\Http\Controllers\Alumno\HistorialController;
-use App\Http\Controllers\Alumno\InicioController;
 use App\Http\Controllers\Alumno\IntentosController;
 use App\Http\Controllers\Alumno\PerfilController;
 use App\Http\Controllers\Alumno\TemasController;
@@ -11,11 +10,11 @@ use App\Http\Middleware\FeatureAlumnoAreas;
 use App\Http\Middleware\SoloAreaHumanidades;
 use Illuminate\Support\Facades\Route;
 
-// Portal del área E: diseño de Humanidades/Derecho de Dafne.
-// Rutas separadas para no sustituir el selector ni los paneles de otras áreas.
+// URL histórica de Humanidades: Inicio redirige al panel unificado.
+// Las páginas secundarias de Dafne se conservan como módulos opcionales del área E.
 Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::class, SoloAreaHumanidades::class])
     ->prefix('alumno')->name('alumno.')->group(function () {
-        Route::get('/inicio', InicioController::class)->name('inicio');
+        Route::get('/inicio', fn () => redirect()->route('alumno.panel'))->name('inicio');
         Route::get('/intentos', IntentosController::class)->name('intentos');
         Route::get('/preguntas', BancoController::class)->name('preguntas');
         Route::get('/temas', TemasController::class)->name('temas');
