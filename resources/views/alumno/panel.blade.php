@@ -53,7 +53,7 @@
                     <blockquote>“La disciplina de hoy es el resultado de mañana”.</blockquote>
                 </div>
                 @if($esSalud)
-                    <img class="cni-est-hero-mascot" src="{{ asset('images/gatito-cni.png') }}" alt="Mascota del simulador CNI">
+                    <img class="cni-est-hero-mascot" src="{{ asset('images/alumno/pinguino-medicina.webp') }}" alt="Mascota del simulador CNI">
                 @else
                     <div class="cni-est-area-letter" aria-hidden="true">{{ $area->codigo }}</div>
                 @endif

@@ -34,7 +34,7 @@ body:has(.cni-estudiante){background:#f2f6ff}
 .cni-est-hero h2{font-size:19px;font-weight:800;line-height:1.3;margin-top:8px}
 .cni-est-hero-copy>p{max-width:510px;color:#445a78;font-size:16px;margin-top:5px}
 .cni-est-hero blockquote{display:inline-block;margin:17px 0 0;padding:12px 20px;background:#ffffffb5;border-radius:12px;font-weight:650;font-style:italic;font-size:14px;max-width:360px}
-.cni-est-hero-mascot{position:absolute;right:25px;top:17px;height:304px;width:auto;object-fit:contain;max-width:40%;border-radius:23px;opacity:.96;mask-image:radial-gradient(ellipse,#000 52%,transparent 78%)}
+.cni-est-hero-mascot{position:absolute;right:25px;top:17px;height:304px;width:auto;object-fit:contain;max-width:40%;border-radius:0;opacity:1;mask-image:none}
 .cni-est-area-letter{position:absolute;right:10%;top:10px;font-size:215px;font-weight:900;color:#ffffff90}
 .cni-est-progress{position:absolute;z-index:3;bottom:19px;left:35px;width:min(660px,calc(100% - 70px));background:#fffd;border-radius:18px;padding:18px 24px;border:1px solid #e8effb;box-shadow:0 7px 25px #153f6a18}
 .cni-est-progress-line{display:flex;gap:18px;align-items:center}
