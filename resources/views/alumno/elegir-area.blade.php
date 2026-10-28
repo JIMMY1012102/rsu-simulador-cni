@@ -10,6 +10,13 @@
     // Orden de las tarjetas de izquierda a derecha según la referencia.
     $ordenVisual = ['B' => 1, 'A' => 2, 'C' => 3, 'D' => 4, 'E' => 5];
     $areasOrdenadas = $areas->sortBy(fn ($area) => $ordenVisual[$area->codigo] ?? 99);
+    $mascotas = [
+        'B' => 'mascota-basicas.svg',
+        'A' => 'mascota-salud.svg',
+        'C' => 'mascota-ingenierias.svg',
+        'D' => 'mascota-economicas.svg',
+        'E' => 'mascota-humanidades.svg',
+    ];
 
     $presentaciones = [
         'B' => [
@@ -61,11 +68,13 @@
                 @csrf
                 <input type="hidden" name="area_id" value="{{ $area->id }}">
 
-                {{-- Zona deliberadamente libre de imágenes: aquí se insertará cada mascota. --}}
                 <div class="area-opcion__ilustracion" aria-hidden="true">
-                    <div class="area-opcion__mascota">
-                        <span>Espacio para mascota</span>
-                    </div>
+                    @if (isset($mascotas[$area->codigo]))
+                        <div class="area-opcion__mascota">
+                            <img src="{{ asset('images/mascotas/'.$mascotas[$area->codigo]) }}"
+                                 alt="" loading="eager" decoding="async">
+                        </div>
+                    @endif
                 </div>
 
                 <div class="area-opcion__info">
