@@ -45,7 +45,7 @@ async function login(usuario, ruta) {
   console.log('[OK] Sesión ' + usuario + ' → ' + ruta);
 }
 async function logout() {
-  await page.locator('form[action$="/logout"] button').first().click();
+  await page.locator('form[action$="/logout"] button:visible').first().click();
   await page.waitForURL(url => url.pathname === '/login');
 }
 async function verificarCss(fragmento) {
