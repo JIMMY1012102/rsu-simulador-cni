@@ -17,6 +17,7 @@ class AvisosAlumnoService
     {
         $avisos = [];
         $ahora = now();
+        $areaId = $usuario->area_postulacion_id ?? $usuario->carrera?->area_postulacion_id;
 
         $enCurso = DB::table('intentos as i')
             ->leftJoin('simulacros as s', 's.id', '=', 'i.simulacro_id')
@@ -37,6 +38,10 @@ class AvisosAlumnoService
 
         $nuevos = DB::table('simulacros as s')
             ->where('s.activo', true)
+            ->whereExists(fn ($q) => $q->selectRaw('1')->from('area_postulacion_simulacro as aps')
+                ->whereColumn('aps.simulacro_id', 's.id')->where('aps.area_postulacion_id', $areaId))
+            ->where(fn ($q) => $q->whereNull('s.carrera_id')
+                ->orWhere('s.carrera_id', $usuario->carrera_id ?? 0))
             ->where('s.fecha_inicio', '<=', $ahora)->where('s.fecha_fin', '>', $ahora)
             ->whereNotExists(fn ($q) => $q->from('intentos as i')
                 ->whereColumn('i.simulacro_id', 's.id')->where('i.usuario_id', $usuario->id))
