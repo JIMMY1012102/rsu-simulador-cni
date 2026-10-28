@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dashboard-salud.css') }}?v=5">
+<link rel="stylesheet" href="{{ asset('css/panel-alumno.css') }}?v=1">
 <link rel="stylesheet" href="{{ asset('css/alumno-paginas.css') }}?v=1">
 @endpush
 @section('content')

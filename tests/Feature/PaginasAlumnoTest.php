@@ -66,4 +66,35 @@ class PaginasAlumnoTest extends TestCase
         $this->get(route('alumno.historial', ['estado' => 'en_curso']))->assertOk()
             ->assertSee('No se encontraron intentos');
     }
+
+    public function test_las_paginas_comparten_la_plantilla_responsive_con_tres_enlaces_reales(): void
+    {
+        $this->actingAs($this->usuario('coherencia'), 'web');
+        foreach (['alumno.panel', 'alumno.perfil', 'alumno.progreso', 'alumno.historial'] as $ruta) {
+            $html = $this->get(route($ruta))->assertOk()
+                ->assertSee('panel-alumno.css')
+                ->assertSee('data-sidebar-toggle')
+                ->assertSee('id="cni-alumno-sidebar"', false)
+                ->getContent();
+
+            $this->assertSame(1, preg_match('/<nav class="cni-alumno-menu"[^>]*>(.*?)<\/nav>/s', $html, $menu));
+            $this->assertSame(3, preg_match_all('/<a\b/', $menu[1]));
+            foreach (['perfil' => 'Mi perfil', 'progreso' => 'Mi progreso', 'historial' => 'Historial'] as $accion => $nombre) {
+                $this->assertStringContainsString($nombre, $menu[1]);
+                $this->assertStringContainsString('href="'.route('alumno.'.$accion).'"', $menu[1]);
+            }
+            $this->assertStringNotContainsString('href="#perfil"', $menu[1]);
+        }
+    }
+
+    public function test_panel_de_salud_utiliza_pinguino_original_y_texto_por_area(): void
+    {
+        $this->actingAs($this->usuario('salud'), 'web');
+        $this->get(route('alumno.panel'))->assertOk()
+            ->assertSee('images/alumno/pinguino-medicina.webp')
+            ->assertSee(config('panel_alumno.areas.A.descripcion'))
+            ->assertSee('data-area="A"', false);
+
+        $this->assertSame(['A', 'B', 'C', 'D', 'E'], array_keys(config('panel_alumno.areas')));
+    }
 }

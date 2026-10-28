@@ -1,16 +1,19 @@
 @extends('layouts.app')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dashboard-salud.css') }}?v=4">
+<link rel="stylesheet" href="{{ asset('css/panel-alumno.css') }}?v=1">
 @endpush
 @section('content')
+@php
+    $paginaActiva = '';
+    $tituloPagina = 'Detalle de tema';
+    $esVistaPrevia = false;
+@endphp
 <div class="cni-alumno cni-alumno-topic-detail" data-area="{{ $area->codigo }}">
-    <aside class="cni-alumno-sidebar" aria-label="Menú del estudiante">
-        <div><a class="cni-alumno-marca" href="{{ route('alumno.panel') }}"><span class="cni-alumno-marca-icon" aria-hidden="true">✦</span><span><strong>Simulador</strong><small>CNI · Imperial</small></span></a><nav class="cni-alumno-menu"><a href="{{ route('alumno.panel') }}#temas">← Volver al panel</a><a href="{{ route('alumno.panel') }}#simulacros-disponibles">▤ &nbsp; Simulacros</a></nav></div>
-        <form method="POST" action="{{ route('logout') }}">@csrf<button class="cni-alumno-salir" type="submit">↪ &nbsp; Cerrar sesión</button></form>
-    </aside>
+    @include('alumno.partials.sidebar')
     <div class="cni-alumno-workspace">
-        <header class="cni-alumno-topbar"><div class="cni-alumno-top-title"><span class="cni-alumno-topicon" aria-hidden="true">▣</span><strong>Detalle de tema · {{ $area->nombre }}</strong></div><a class="cni-alumno-text-link" href="{{ route('alumno.panel') }}#temas">Volver a temas</a></header>
+        @include('alumno.partials.topbar')
         <main class="cni-alumno-content">
+            <p><a class="cni-alumno-text-link" href="{{ route('alumno.panel') }}#temas">← Volver a temas de estudio</a></p>
             <section class="cni-alumno-detail-card"><span class="cni-alumno-section-kicker">BANCO DE PREGUNTAS · {{ $tema->asignatura }}</span><h1>{{ $tema->nombre }}</h1>
                 <p>Consulta tu avance real en este tema del banco académico CNI.</p>
                 <div class="cni-alumno-detail-stats"><article><strong>{{ $tema->total }}</strong><span>Preguntas disponibles</span></article><article><strong>{{ $tema->realizadas }}</strong><span>Preguntas vistas</span></article><article><strong>{{ $tema->avance }}%</strong><span>Avance del tema</span></article></div>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dashboard-salud.css') }}?v=5">
+<link rel="stylesheet" href="{{ asset('css/panel-alumno.css') }}?v=1">
 @endpush
 @section('content')
 @php
@@ -8,6 +8,12 @@
     $paginaActiva = 'inicio';
     $esVistaPrevia = $esVistaPrevia ?? false;
     $esSalud = $area->codigo === 'A';
+    $temaArea = config('panel_alumno.areas.'.$area->codigo);
+    $rutaMascota = $esSalud
+        ? 'images/alumno/pinguino-medicina.webp'
+        : (is_file(public_path($temaArea['mascota_webp']))
+            ? $temaArea['mascota_webp']
+            : $temaArea['mascota_svg']);
     $nombreCompleto = trim($usuario->nombres.' '.($usuario->apellidos ?? ''));
     $iniciales = mb_strtoupper(mb_substr($usuario->nombres, 0, 1).mb_substr($usuario->apellidos ?? '', 0, 1));
     $primeraPalabra = explode(' ', trim($usuario->nombres))[0];
@@ -29,15 +35,14 @@
                     <span class="cni-alumno-overline">TU ESPACIO DE PREPARACIÓN · ÁREA {{ $area->codigo }}</span>
                     <h1 id="bienvenida-titulo">¡Hola, {{ $primeraPalabra }}!</h1>
                     <h2>Bienvenido a {{ $area->nombre }}</h2>
-                    <p>Practica con preguntas tipo admisión CNI, repasa tus temas y prepárate para alcanzar tu meta.</p>
-                    <blockquote>“La disciplina de hoy es el resultado de mañana”.</blockquote>
+                    <p>{{ $temaArea['descripcion'] }}</p>
+                    <blockquote>“{{ $temaArea['lema'] }}”</blockquote>
                 </div>
                 <div class="cni-alumno-banner-pattern" aria-hidden="true"></div>
-                @if($esSalud)
-                    <img class="cni-alumno-mascota" src="{{ asset('images/alumno/pinguino-medicina.webp') }}" alt="Pingüino médico azul del área Ciencias de la Salud, con estrellas, estetoscopio y tableta">
-                @else
-                    <div class="cni-alumno-grupo" aria-hidden="true">{{ $area->codigo }}</div>
-                @endif
+                <img class="cni-alumno-mascota"
+                     src="{{ asset($rutaMascota) }}"
+                     width="520" height="520"
+                     alt="{{ $esSalud ? 'Pingüino médico azul del área Ciencias de la Salud' : 'Mascota del área de '.$area->nombre }}">
             </section>
 
             <div class="cni-alumno-metric-grid" aria-label="Resumen académico">

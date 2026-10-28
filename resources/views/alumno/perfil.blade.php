@@ -1,11 +1,17 @@
 @extends('layouts.app')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dashboard-salud.css') }}?v=5">
+<link rel="stylesheet" href="{{ asset('css/panel-alumno.css') }}?v=1">
 <link rel="stylesheet" href="{{ asset('css/alumno-paginas.css') }}?v=1">
 @endpush
 @section('content')
 @php
     $esVistaPrevia = $esVistaPrevia ?? false;
+    $temaArea = config('panel_alumno.areas.'.$area->codigo);
+    $rutaMascota = $area->codigo === 'A'
+        ? 'images/alumno/pinguino-medicina.webp'
+        : (is_file(public_path($temaArea['mascota_webp']))
+            ? $temaArea['mascota_webp']
+            : $temaArea['mascota_svg']);
     $nombreCompleto = trim($usuario->nombres.' '.($usuario->apellidos ?? ''));
 @endphp
 <div class="cni-alumno" data-area="{{ $area->codigo }}">
@@ -19,9 +25,7 @@
 <section class="cni-pagina-hero" aria-labelledby="titulo-perfil">
     <div class="cni-pagina-avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr($usuario->nombres, 0, 1).mb_substr($usuario->apellidos ?? '', 0, 1)) }}</div>
     <div class="cni-pagina-hero-copy"><span class="cni-alumno-section-kicker">PORTAL ACADÉMICO · CNI</span><h1 id="titulo-perfil">Mi perfil</h1><p>{{ $nombreCompleto }}</p><span class="cni-pagina-estado">{{ $usuario->activo ? '● Cuenta activa' : '○ Cuenta inactiva' }}</span></div>
-    @if($area->codigo === 'A')
-        <img class="cni-pagina-mascota" src="{{ asset('images/alumno/pinguino-medicina.webp') }}" alt="Pingüino médico del área Ciencias de la Salud">
-    @endif
+    <img class="cni-pagina-mascota" src="{{ asset($rutaMascota) }}" alt="Mascota del área de {{ $area->nombre }}">
 </section>
 <div class="cni-pagina-columns">
     <section class="cni-pagina-card" aria-labelledby="perfil-informacion"><h2 id="perfil-informacion">Información personal</h2>

@@ -31,3 +31,18 @@
 .cni-pagina-paginacion{margin-top:20px;font-size:12px}.cni-pagina-paginacion nav{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.cni-pagina-paginacion svg{height:16px;width:16px}
 @media(max-width:1000px){.cni-pagina-columns{grid-template-columns:1fr}.cni-pagina-hero{min-height:195px}.cni-filtros{grid-template-columns:repeat(2,1fr)}.cni-pagina-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:650px){.cni-paginas{gap:13px}.cni-pagina-head{flex-wrap:wrap}.cni-pagina-hero{padding:17px 20px;min-height:190px;gap:12px}.cni-pagina-avatar{height:66px;width:66px;font-size:22px;border-width:4px}.cni-pagina-hero-copy h1{font-size:26px}.cni-pagina-hero-copy>p{font-size:12px}.cni-pagina-mascota{height:74%;right:-15px;opacity:.38;max-width:50%}.cni-pagina-card{padding:15px}.cni-pagina-datos{grid-template-columns:1fr}.cni-pagina-kpis article{padding:15px}.cni-pagina-kpis strong{font-size:22px}.cni-pagina-highlight{padding:20px;gap:15px}.cni-pagina-donut{width:80px;height:80px}.cni-pagina-donut>span{font-size:18px}.cni-pagina-highlight h2{font-size:19px}.cni-filtros{grid-template-columns:1fr}.cni-pagina-head h2{font-size:18px}}
+
+/* Identidad única de Jimmy (PR #30) también en las pantallas internas. */
+.cni-paginas h1,.cni-paginas h2{color:var(--ink)}
+.cni-paginas .cni-pagina-avatar{background:linear-gradient(140deg,var(--accent),var(--accent-dark));border-color:var(--pale)}
+.cni-paginas .cni-pagina-hero{background:linear-gradient(105deg,#fff 12%,var(--pale) 78%,#fff)!important}
+.cni-paginas .cni-pagina-datos dd{color:var(--ink)}
+.cni-paginas .cni-pagina-preparacion{background:var(--pale)}
+.cni-paginas .cni-pagina-icono{background:#fff;color:var(--accent)}
+.cni-paginas .cni-pagina-kpis strong,.cni-paginas .cni-pagina-outline,.cni-paginas .cni-pagina-donut{color:var(--accent-dark)!important}
+.cni-paginas .cni-pagina-outline{border-color:var(--accent)}
+.cni-paginas .cni-pagina-highlight{background:linear-gradient(115deg,#fff,var(--pale))!important}
+.cni-paginas .cni-pagina-donut{border-color:var(--accent);background:var(--pale)}
+.cni-paginas .cni-pagina-tabla th{background:var(--pale);color:var(--accent-dark)}
+.cni-paginas .cni-linea polyline,.cni-paginas .cni-linea circle{stroke:var(--accent)}
+.cni-paginas .cni-linea circle{fill:var(--accent);stroke:#fff}
