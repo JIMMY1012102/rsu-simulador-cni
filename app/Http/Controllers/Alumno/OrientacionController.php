@@ -8,6 +8,7 @@ use App\Models\Carrera;
 use App\Models\Usuario;
 use App\Services\ResultadoService;
 use App\Services\SimulacroService;
+use App\Services\Alumno\DashboardEstudianteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +59,7 @@ class OrientacionController extends Controller
             ->with('status', 'Área de preparación seleccionada.');
     }
 
-    public function panel(Request $request, SimulacroService $servicio): View|RedirectResponse
+    public function panel(Request $request, SimulacroService $servicio, DashboardEstudianteService $dashboard): View|RedirectResponse
     {
         $usuario = $this->estudiante($request);
         $carrera = $usuario->carrera()->with('areaPostulacion')->first();
@@ -80,17 +81,7 @@ class OrientacionController extends Controller
         }
 
         // No hace falta elegir carrera: el área guardada determina qué examen se ofrece.
-        $simulacros = $servicio->listar($usuario)->filter(function (array $s) use ($area, $carrera) {
-            $habilitado = collect($s['areas_postulacion'])->contains(
-                fn (array $asociada) => (int) $asociada['id'] === (int) $area->id
-            );
-
-            $carreraPermitida = $s['carrera_id'] === null
-                || ($carrera !== null && (int) $carrera->id === (int) $s['carrera_id']);
-
-            return $habilitado && $carreraPermitida && $s['activo'] && $s['fecha_inicio'] && $s['fecha_fin']
-                && now()->gte($s['fecha_inicio']) && now()->lt($s['fecha_fin']);
-        })->values();
+        $simulacros = $this->simulacrosDelArea($usuario, $area, $carrera, $servicio);
 
         $intentos = DB::table('intentos')->where('usuario_id', $usuario->id)
             ->whereNotNull('puntaje_total')->orderByDesc('fecha_inicio')->limit(10)->get();
@@ -103,6 +94,65 @@ class OrientacionController extends Controller
                 ->where('area_postulacion_id', $area->id)->orderBy('nombre')->get(),
             'simulacros' => $simulacros,
             'intentos' => $intentos,
+            'dashboard' => $dashboard->obtener($usuario, $simulacros),
+            'esVistaPrevia' => false,
+        ]);
+    }
+
+
+    /**
+     * Misma autorización de áreas y carreras usada en el panel y en el detalle
+     * del tema. Nunca exponemos contenidos de otras áreas al navegar por URL.
+     */
+    private function simulacrosDelArea(
+        Usuario $usuario,
+        AreaPostulacion $area,
+        ?Carrera $carrera,
+        SimulacroService $servicio
+    ): \Illuminate\Support\Collection {
+        return $servicio->listar($usuario)->filter(function (array $simulacro) use ($area, $carrera) {
+            $incluyeArea = collect($simulacro['areas_postulacion'])->contains(
+                fn (array $asociada) => (int) $asociada['id'] === (int) $area->id
+            );
+            $permiteCarrera = $simulacro['carrera_id'] === null
+                || ($carrera && (int) $carrera->id === (int) $simulacro['carrera_id']);
+
+            return $incluyeArea && $permiteCarrera && $simulacro['activo']
+                && $simulacro['fecha_inicio'] && $simulacro['fecha_fin']
+                && now()->gte($simulacro['fecha_inicio']) && now()->lt($simulacro['fecha_fin']);
+        })->values();
+    }
+
+    /**
+     * Detalle de estudio de un tema real y permitido para la sección académica
+     * que eligió el alumno. Solo muestra agregados, nunca respuestas correctas.
+     */
+    public function tema(
+        Request $request,
+        int $tema,
+        SimulacroService $servicio,
+        DashboardEstudianteService $dashboard
+    ): View|RedirectResponse {
+        $usuario = $this->estudiante($request);
+        $carrera = $usuario->carrera()->with('areaPostulacion')->first();
+        $area = $usuario->areaPostulacion()->first() ?? $carrera?->areaPostulacion;
+
+        if (! $area) {
+            return redirect()->route('alumno.elegir-area');
+        }
+        abort_unless($area->activo, 403);
+        abort_if($carrera && (! $carrera->activo || ! $carrera->areaPostulacion?->activo
+            || (int) $carrera->area_postulacion_id !== (int) $area->id), 403);
+
+        $simulacros = $this->simulacrosDelArea($usuario, $area, $carrera, $servicio);
+        $resumen = $dashboard->obtener($usuario, $simulacros);
+        $temaActual = $resumen['temas']->firstWhere('id', $tema);
+        abort_unless($temaActual, 404);
+
+        return view('alumno.tema', [
+            'usuario' => $usuario,
+            'area' => $area,
+            'tema' => $temaActual,
         ]);
     }
 
