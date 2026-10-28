@@ -16,9 +16,14 @@ class IntentosController extends Controller
     {
         $usuario = auth('web')->user();
         $ahora = now();
+        $areaId = $usuario->area_postulacion_id ?? $usuario->carrera?->area_postulacion_id;
 
         $simulacros = DB::table('simulacros as s')
             ->where('s.activo', true)
+            ->whereExists(fn ($q) => $q->selectRaw('1')->from('area_postulacion_simulacro as aps')
+                ->whereColumn('aps.simulacro_id', 's.id')->where('aps.area_postulacion_id', $areaId))
+            ->where(fn ($q) => $q->whereNull('s.carrera_id')
+                ->orWhere('s.carrera_id', $usuario->carrera_id ?? 0))
             ->where('s.fecha_inicio', '<=', $ahora)->where('s.fecha_fin', '>', $ahora)
             ->orderBy('s.fecha_fin')
             ->select('s.id', 's.nombre', 's.total_preguntas', 's.tiempo_limite', 's.fecha_fin')
@@ -33,10 +38,14 @@ class IntentosController extends Controller
                 ->selectRaw('count(*)'), 'en_curso')
             ->get();
 
-        $proximos = DB::table('simulacros')
-            ->where('activo', true)->where('fecha_inicio', '>', $ahora)
-            ->orderBy('fecha_inicio')->limit(5)
-            ->get(['id', 'nombre', 'total_preguntas', 'tiempo_limite', 'fecha_inicio']);
+        $proximos = DB::table('simulacros as s')
+            ->where('s.activo', true)->where('s.fecha_inicio', '>', $ahora)
+            ->whereExists(fn ($q) => $q->selectRaw('1')->from('area_postulacion_simulacro as aps')
+                ->whereColumn('aps.simulacro_id', 's.id')->where('aps.area_postulacion_id', $areaId))
+            ->where(fn ($q) => $q->whereNull('s.carrera_id')
+                ->orWhere('s.carrera_id', $usuario->carrera_id ?? 0))
+            ->orderBy('s.fecha_inicio')->limit(5)
+            ->get(['s.id', 's.nombre', 's.total_preguntas', 's.tiempo_limite', 's.fecha_inicio']);
 
         return view('alumno.intentos', [
             'simulacros' => $simulacros,
