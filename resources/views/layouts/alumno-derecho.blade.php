@@ -8,7 +8,7 @@
       - $variante: "cni" (por defecto, azul marino; la usa el examen) o "derecho"
         (guinda: menú de config/alumno.php, barra con campana y menú de usuario).
         Las piezas de la variante "derecho" están en layouts/partes/.
-    Usa su propia hoja public/css/alumno.css; no carga app.css para no mezclar estilos globales.
+    Usa su propia hoja public/css/alumno-derecho.css; no carga app.css para no mezclar estilos globales.
 --}}
 @php
     $usuario = auth('web')->user();
@@ -37,7 +37,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Simulador de examen' }} · CNI</title>
     {{-- ?v= con la fecha del archivo: el navegador descarga la hoja nueva después de cada cambio. --}}
-    <link rel="stylesheet" href="{{ asset('css/alumno.css').'?v='.filemtime(public_path('css/alumno.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/alumno-derecho.css').'?v='.filemtime(public_path('css/alumno-derecho.css')) }}">
     @livewireStyles
 </head>
 <body @class(['portal', 'portal--derecho' => $variante === 'derecho'])>
