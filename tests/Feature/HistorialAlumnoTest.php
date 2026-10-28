@@ -7,6 +7,7 @@ use App\Services\Alumno\HistorialAlumnoService;
 use Database\Seeders\AreaPostulacionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 class HistorialAlumnoTest extends TestCase
@@ -113,6 +114,23 @@ class HistorialAlumnoTest extends TestCase
         $this->actingAs($alumno, 'web')->get(route('alumno.panel'))
             ->assertOk()->assertSee('62,5%')->assertSee('Sin nivel')
             ->assertDontSee('Nivel Básico');
+    }
+
+    public function test_historial_admite_esquema_legacy_sin_carrera_id_en_simulacros(): void
+    {
+        $alumno = $this->alumno('HistorialLegacy');
+        $simulacro = $this->simulacro(3);
+        $intento = $this->intento($alumno, $simulacro, 12, 2);
+
+        // Simula una instalación local antigua sin alterar ni borrar su esquema.
+        Schema::shouldReceive('hasColumn')->once()
+            ->with('simulacros', 'carrera_id')->andReturn(false);
+
+        $historial = app(HistorialAlumnoService::class)->obtener($alumno);
+        $this->assertSame(1, $historial['total']);
+        $this->assertSame($intento, $historial['registros'][0]['id']);
+        $this->assertSame('Simulacro general', $historial['registros'][0]['tipo']);
+        $this->assertSame(12.0, $historial['registros'][0]['puntaje']);
     }
 
     public function test_sin_intentos_no_inventa_notas_y_docente_no_puede_entrar(): void
