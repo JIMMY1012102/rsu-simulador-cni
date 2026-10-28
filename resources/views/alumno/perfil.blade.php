@@ -2,7 +2,7 @@
     "Mi perfil": datos del alumno, edición de nombre y apellidos, y cambio de contraseña.
     Datos: App\Http\Controllers\Alumno\PerfilController.
 --}}
-@extends('layouts.alumno', ['variante' => 'derecho', 'title' => 'Mi perfil'])
+@extends('layouts.alumno-derecho', ['variante' => 'derecho', 'title' => 'Mi perfil'])
 
 @section('content')
 <div class="pagina">
