@@ -23,8 +23,8 @@
     min-height: 100vh;
     min-height: 100svh;
     padding: clamp(55px, 7vh, 82px) clamp(18px, 2.7vw, 46px) 38px;
-    overflow: hidden;
-    font-family: "Trebuchet MS", "Segoe UI", system-ui, sans-serif;
+    overflow: visible;
+    font-family: "Lato", "Inter", "Segoe UI", Arial, sans-serif;
     color: #071741;
     background:
         radial-gradient(ellipse 23% 16% at 18% 9%, #ffffffcf 0%, #ffffff00 100%),
@@ -488,5 +488,134 @@
     .area-opcion:hover .area-opcion__mascota img,
     .area-opcion:focus-within .area-opcion__mascota img {
         transform: none;
+    }
+}
+
+
+/* ================================================================
+   REFERENCIA VISUAL 3D (octubre 2026)
+   Las escenas provienen de recortes individuales de la ilustración
+   aprobada. El HTML del título, botón, ID de área y POST sigue vivo.
+   Sin imágenes opcionales, el diseño SVG anterior queda de respaldo.
+   ================================================================ */
+.selector-page--referencia {
+    background-image: var(--selector-paisaje);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.selector-page--referencia::after { opacity: .22; }
+.selector-page--referencia .selector-page__nota { display: none; }
+
+.area-opcion[data-escena="original"] .area-opcion__ilustracion {
+    background-image: var(--escena-original);
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    min-height: 0;
+}
+.area-opcion[data-escena="original"] .area-opcion__ilustracion::before,
+.area-opcion[data-escena="original"] .area-opcion__mascota,
+.area-opcion[data-escena="original"] .area-opcion__icono {
+    display: none;
+}
+.area-opcion[data-escena="original"] .area-opcion__info {
+    min-height: clamp(155px, 21vh, 215px);
+    margin-top: 0;
+    padding: 7px 12px 12px;
+    border-radius: 0;
+}
+.area-opcion[data-escena="original"] .area-opcion__info h2 {
+    min-height: auto;
+    margin-bottom: 7px;
+}
+.area-opcion[data-escena="original"] .area-opcion__descripcion {
+    min-height: auto;
+    margin-bottom: 9px;
+}
+
+@media (min-width: 1180px) {
+    .selector-page {
+        padding-top: clamp(23px, 4.8vh, 56px);
+        padding-bottom: 12px;
+    }
+    .area-opcion {
+        min-height: clamp(398px, 61.5vh, 632px);
+    }
+    .selector-page__encabezado {
+        margin-bottom: clamp(12px, 2.5vh, 29px);
+    }
+    .selector-page__grid {
+        gap: clamp(10px, 1.15vw, 18px);
+    }
+}
+/* Altura de ventana reducida: las cinco tarjetas quedan completas,
+   sin recortar sus botones y sin forzar zoom en Firefox. */
+@media (min-width: 1180px) and (max-height: 760px) {
+    .selector-page {
+        justify-content: flex-start;
+        padding: 16px clamp(15px, 2.7vw, 44px) 10px;
+        min-height: 100svh;
+    }
+    .selector-page__salir { top: 9px; right: 18px; }
+    .selector-page__salir button { font-size: .75rem; padding: 6px 10px; }
+    .selector-page__encabezado { margin-bottom: 13px; }
+    .selector-page__eyebrow {
+        margin-bottom: 21px;
+        font-size: .84rem;
+        line-height: 1.35;
+    }
+    .selector-page__eyebrow::after { bottom: -12px; height: 3px; }
+    .selector-page__encabezado h1 {
+        font-size: clamp(2.3rem, 3.75vw, 3.15rem);
+        line-height: 1.08;
+    }
+    .selector-page__subtitulo {
+        font-size: clamp(.92rem, 1.5vw, 1.23rem);
+        margin-top: 6px;
+    }
+    .area-opcion { min-height: clamp(360px, 64vh, 440px); }
+    .area-opcion__ilustracion { min-height: 160px; }
+    .area-opcion__info { min-height: 170px; padding: 31px 9px 8px; }
+    .area-opcion__icono {
+        width: 56px; height: 56px; top: -28px;
+    }
+    .area-opcion__icono svg { width: 29px; height: 29px; }
+    .area-opcion__info h2 {
+        font-size: clamp(1.05rem, 1.65vw, 1.37rem);
+        min-height: auto;
+        margin-bottom: 4px;
+        line-height: 1.08;
+    }
+    .area-opcion__descripcion {
+        font-size: clamp(.77rem, 1.07vw, .96rem);
+        line-height: 1.14;
+        min-height: auto;
+        margin-bottom: 6px;
+    }
+    .area-opcion__seleccionar { width: 44px; height: 44px; }
+    .area-opcion__seleccionar svg { width: 23px; height: 23px; }
+    .area-opcion[data-escena="original"] .area-opcion__info {
+        min-height: 163px;
+        padding: 4px 9px 8px;
+    }
+    .area-opcion[data-escena="original"] .area-opcion__ilustracion {
+        min-height: 0;
+    }
+    .selector-page__nota { margin-top: 6px; font-size: .7rem; }
+}
+@media (max-width: 1179px) {
+    .selector-page { overflow: visible; }
+    .area-opcion[data-escena="original"] .area-opcion__info {
+        min-height: 205px;
+        padding: 9px 14px 14px;
+    }
+}
+@media (max-width: 480px) {
+    .area-opcion[data-escena="original"] {
+        min-height: 510px;
+    }
+    .area-opcion[data-escena="original"] .area-opcion__info {
+        min-height: 215px;
     }
 }
