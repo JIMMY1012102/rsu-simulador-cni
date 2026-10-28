@@ -126,6 +126,35 @@ class PanelesPorAreaTest extends TestCase
         $this->assertStringContainsString('id="perfil"', $html);
     }
 
+    public function test_mi_perfil_abre_de_entrada_con_solo_portada_y_dos_tarjetas(): void
+    {
+        $this->actingAs($this->estudiante('B'), 'web');
+        $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('id="perfil" data-panel-view="perfil"', $html);
+        $this->assertSame(1, preg_match_all('/class="cni-alumno-banner"/', $html));
+        $this->assertSame(1, preg_match_all('/class="cni-alumno-progress-card"/', $html));
+        $this->assertSame(1, preg_match_all('/class="cni-alumno-streak-card"/', $html));
+        $this->assertStringContainsString('href="#perfil" class="is-active"', $html);
+        $this->assertStringNotContainsString('cni-alumno-topics', $html);
+        $this->assertStringContainsString('id="intentos" data-panel-view="intentos"', $html);
+        $this->assertStringContainsString('id="historial" data-panel-view="historial"', $html);
+        $this->assertMatchesRegularExpression('/id="intentos"[^>]*hidden>/', $html);
+        $this->assertMatchesRegularExpression('/id="historial"[^>]*hidden>/', $html);
+        $this->assertStringContainsString('const mostrarSeccion =', $html);
+    }
+
+    public function test_la_pantalla_de_intentos_conserva_examenes_y_eleccion_de_carrera(): void
+    {
+        $this->actingAs($this->estudiante('E'), 'web');
+        $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Mis intentos · Iniciar Simulador CNI', $html);
+        $this->assertStringContainsString('route(', file_get_contents(resource_path('views/alumno/panel.blade.php')));
+        $this->assertStringContainsString('Carrera de interés', $html);
+        $this->assertStringContainsString('Mi perfil', $html);
+    }
+
     public function test_docente_no_puede_abrir_el_panel_de_alumno(): void
     {
         $docente = Usuario::create([
