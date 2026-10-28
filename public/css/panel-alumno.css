@@ -377,3 +377,34 @@ body:has(.cni-alumno){background:#f8f9fe}
         transition:none!important;
     }
 }
+
+
+/* Tres vistas excluyentes: Perfil muestra sólo la portada y sus dos tarjetas. */
+.cni-alumno .cni-alumno-vista[hidden]{
+    display:none!important;
+}
+.cni-alumno .cni-alumno-vista-perfil{
+    display:block;
+}
+.cni-alumno .cni-alumno-vista-perfil>.cni-alumno-banner{
+    margin-top:0;
+}
+.cni-alumno .cni-alumno-vista-perfil>.cni-alumno-metric-grid{
+    margin-bottom:0;
+}
+.cni-alumno .cni-alumno-vista-perfil>.cni-alumno-metric-grid>.cni-alumno-progress-card,
+.cni-alumno .cni-alumno-vista-perfil>.cni-alumno-metric-grid>.cni-alumno-streak-card{
+    min-width:0;
+}
+.cni-alumno .cni-alumno-vista.cni-alumno-exams,
+.cni-alumno .cni-alumno-vista.cni-alumno-history{
+    margin-top:10px;
+}
+.cni-alumno .cni-alumno-carrera-opcional{
+    margin-top:20px;
+}
+.cni-alumno .cni-alumno-carrera-opcional h3{
+    font-size:16px;
+    font-weight:800;
+    margin:0 0 8px;
+}
