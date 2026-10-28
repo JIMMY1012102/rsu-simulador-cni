@@ -14,6 +14,7 @@ class CarreraSeeder extends Seeder
             ['area' => 'B', 'nombre' => 'Ingeniería Industrial'],
             ['area' => 'C', 'nombre' => 'Administración'],
             ['area' => 'C', 'nombre' => 'Contabilidad'],
+            ['area' => 'D', 'nombre' => 'Derecho'],
         ];
 
         foreach ($carreras as $carrera) {

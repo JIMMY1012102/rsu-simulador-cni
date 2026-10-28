@@ -29,7 +29,7 @@ class AuthModuleTest extends TestCase
         $anterior = session()->getId();
 
         $this->post('/login', ['usuario' => 'ana.prueba', 'password' => 'secreto123'])
-            ->assertRedirect('/panel');
+            ->assertRedirect('/alumno/inicio');
 
         $this->assertAuthenticatedAs($usuario, 'web');
         $this->assertNotSame($anterior, session()->getId());

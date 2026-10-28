@@ -26,7 +26,10 @@ class SessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('panel'));
+        // Los alumnos entran a su inicio; admin y docente siguen yendo al panel.
+        $destino = $request->user('web')->rol === 'estudiante' ? 'alumno.inicio' : 'panel';
+
+        return redirect()->intended(route($destino));
     }
 
     public function destroy(Request $request, AuthService $auth): RedirectResponse

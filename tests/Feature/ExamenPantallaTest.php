@@ -100,13 +100,13 @@ class ExamenPantallaTest extends TestCase
         $this->get(route('examen', $this->iniciar()))->assertRedirect(route('login'));
     }
 
-    public function test_un_intento_cerrado_redirige_al_panel_con_aviso(): void
+    public function test_un_intento_cerrado_redirige_al_historial_con_aviso(): void
     {
         $intento = $this->iniciar();
         app(IntentoService::class)->finalizar($intento, $this->alumno->id);
 
         $this->actingAs($this->alumno, 'web')->get(route('examen', $intento))
-            ->assertRedirect(route('panel'))->assertSessionHas('status')->assertSessionHasNoErrors();
+            ->assertRedirect(route('alumno.historial'))->assertSessionHas('status')->assertSessionHasNoErrors();
     }
 
     public function test_responder_guarda_y_navegar_cambia_de_pregunta(): void
@@ -182,13 +182,13 @@ class ExamenPantallaTest extends TestCase
             ->assertSet('actual', 2)->assertSee('2 de 40 respondidas');
     }
 
-    public function test_finalizar_envia_el_examen_y_vuelve_al_panel(): void
+    public function test_finalizar_envia_el_examen_y_vuelve_al_historial(): void
     {
         $intento = $this->iniciar();
 
         Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
             ->call('finalizar')
-            ->assertRedirect(route('panel'));
+            ->assertRedirect(route('alumno.historial'));
 
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->assertNotNull(DB::table('intentos')->where('id', $intento)->value('puntaje_total'));
@@ -205,7 +205,7 @@ class ExamenPantallaTest extends TestCase
             ->call('ir', 39)
             ->assertSee('Enviar examen')
             ->call('finalizar')
-            ->assertRedirect(route('panel'));
+            ->assertRedirect(route('alumno.historial'));
 
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->get(route('panel'))->assertSee('<div class="alert alert-ok" role="status">', false)
@@ -237,7 +237,7 @@ class ExamenPantallaTest extends TestCase
         $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
 
         $this->travel(61)->minutes();
-        $componente->call('responder', $pregunta->id, $pregunta->alternativas[0]->id)->assertRedirect(route('panel'));
+        $componente->call('responder', $pregunta->id, $pregunta->alternativas[0]->id)->assertRedirect(route('alumno.historial'));
 
         $this->assertSame('enviado_auto', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->assertSame(0, DB::table('respuestas_estudiante')->where('intento_id', $intento)->whereNotNull('alternativa_id')->count());

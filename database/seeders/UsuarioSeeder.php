@@ -17,6 +17,7 @@ class UsuarioSeeder extends Seeder
                 'usuario' => 'admin_demo',
                 'rol' => 'admin',
                 'seccion' => null,
+                'carrera' => null,
             ],
             [
                 'nombres' => 'Docente',
@@ -24,6 +25,7 @@ class UsuarioSeeder extends Seeder
                 'usuario' => 'docente_demo',
                 'rol' => 'docente',
                 'seccion' => null,
+                'carrera' => null,
             ],
             [
                 'nombres' => 'Estudiante',
@@ -31,11 +33,13 @@ class UsuarioSeeder extends Seeder
                 'usuario' => 'estudiante_demo',
                 'rol' => 'estudiante',
                 'seccion' => 'A',
+                'carrera' => 'Derecho',
             ],
         ];
 
         foreach ($usuarios as $usuario) {
             $seccionId = null;
+            $carreraId = null;
 
             if ($usuario['seccion'] !== null) {
                 $seccionId = DB::table('secciones')
@@ -50,6 +54,18 @@ class UsuarioSeeder extends Seeder
                 }
             }
 
+            if ($usuario['carrera'] !== null) {
+                $carreraId = DB::table('carreras')
+                    ->where('nombre', $usuario['carrera'])
+                    ->value('id');
+
+                if ($carreraId === null) {
+                    throw new \RuntimeException(
+                        "No existe la carrera {$usuario['carrera']}"
+                    );
+                }
+            }
+
             DB::table('usuarios')->updateOrInsert(
                 ['usuario' => $usuario['usuario']],
                 [
@@ -58,7 +74,7 @@ class UsuarioSeeder extends Seeder
                     'password' => Hash::make('DemoCNI2026!'),
                     'rol' => $usuario['rol'],
                     'seccion_id' => $seccionId,
-                    'carrera_id' => null,
+                    'carrera_id' => $carreraId,
                     'activo' => true,
                     'created_at' => now(),
                     'updated_at' => now(),

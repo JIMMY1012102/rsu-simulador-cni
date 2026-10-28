@@ -37,7 +37,7 @@ class Examen extends Component
         if ($registro->estado !== 'en_curso') {
             // Livewire reemplaza redirect() durante mount; se responde con una redirección HTTP normal.
             $this->avisar($this->mensajeCierre($registro));
-            throw new HttpResponseException(new RedirectResponse(route('panel')));
+            throw new HttpResponseException(new RedirectResponse(route($this->destino())));
         }
         $this->intentoId = $registro->id;
         $guardadas = $this->servicio()->respuestas($registro->id);
@@ -131,7 +131,7 @@ class Examen extends Component
         ])->layout('layouts.alumno', ['migas' => 'Examen en curso'])->title('Simulador de examen');
     }
 
-    /** Ejecuta una escritura; si el intento ya se cerró (por tiempo u otra pestaña), vuelve al panel. */
+    /** Ejecuta una escritura; si el intento ya se cerró (por tiempo u otra pestaña), sale del examen. */
     private function mientrasSigaEnCurso(callable $accion): bool
     {
         try {
@@ -152,11 +152,17 @@ class Examen extends Component
     private function salir(string $mensaje): void
     {
         $this->avisar($mensaje);
-        $this->redirectRoute('panel');
+        $this->redirectRoute($this->destino());
         $this->skipRender();
     }
 
-    /** Aviso informativo para el panel (layouts/app lo muestra en verde). */
+    /** Al salir del examen: los alumnos van a su Historial; admin y docente, al panel. */
+    private function destino(): string
+    {
+        return Auth::guard('web')->user()?->rol === 'estudiante' ? 'alumno.historial' : 'panel';
+    }
+
+    /** Aviso informativo para el panel o el Historial (ambos layouts lo muestran en verde). */
     private function avisar(string $mensaje): void
     {
         session()->flash('status', $mensaje);
@@ -171,7 +177,9 @@ class Examen extends Component
             : 'Tu examen fue enviado.';
 
         return "{$inicio} Respondiste {$respondidas} de {$intento->total_preguntas} preguntas; "
-            .'revisa tu puntaje en «Mis intentos y resultados».';
+            .($this->destino() === 'alumno.historial'
+                ? 'abajo verás tu puntaje.'
+                : 'revisa tu puntaje en «Mis intentos y resultados».');
     }
 
     private function servicio(): IntentoService

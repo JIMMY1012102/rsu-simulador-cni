@@ -5,6 +5,9 @@
       - $slot / @yield('content'): contenido de la página
       - $migas: último tramo de las migas de pan (por defecto "Examen en curso")
       - $seccionActiva: enlace resaltado del menú (por defecto "simulador")
+      - $variante: "cni" (por defecto, azul marino; la usa el examen) o "derecho"
+        (guinda: menú de config/alumno.php, barra con campana y menú de usuario).
+        Las piezas de la variante "derecho" están en layouts/partes/.
     Usa su propia hoja public/css/alumno.css; no carga app.css para no mezclar estilos globales.
 --}}
 @php
@@ -13,10 +16,14 @@
     $iniciales = \Illuminate\Support\Str::upper(mb_substr($usuario->nombres, 0, 1).mb_substr($usuario->apellidos ?? '', 0, 1));
     $perfil = $usuario->rol === 'estudiante' ? 'Alumno CNI' : ucfirst($usuario->rol);
     $seccionActiva ??= 'simulador';
+    $variante ??= 'cni';
+    // Los alumnos vuelven a su portal (rutas alumno.*); admin y docente, al panel.
+    $esAlumno = $usuario->rol === 'estudiante';
+    $enlaceInicio = $esAlumno ? route('alumno.inicio') : route('panel');
     $menu = [
-        'inicio' => ['Inicio', 'nav-inicio.svg', route('panel')],
-        'perfil' => ['Mi perfil', 'nav-perfil.svg', '#'],
-        'simulador' => ['Simulador', 'nav-simulador.svg', '#'],
+        'inicio' => ['Inicio', 'nav-inicio.svg', $enlaceInicio],
+        'perfil' => ['Mi perfil', 'nav-perfil.svg', $esAlumno ? route('alumno.perfil') : '#'],
+        'simulador' => ['Simulador', 'nav-simulador.svg', $esAlumno ? route('alumno.intentos') : '#'],
         'oferta' => ['Oferta formativa', 'nav-oferta.svg', '#'],
         'recursos' => ['Recursos', 'nav-recursos.svg', '#'],
         'ayuda' => ['Ayuda y contacto', 'nav-ayuda.svg', '#'],
@@ -33,12 +40,15 @@
     <link rel="stylesheet" href="{{ asset('css/alumno.css').'?v='.filemtime(public_path('css/alumno.css')) }}">
     @livewireStyles
 </head>
-<body class="portal">
+<body @class(['portal', 'portal--derecho' => $variante === 'derecho'])>
+    @if ($variante === 'derecho')
+        @include('layouts.partes.lateral-derecho')
+    @else
     <aside class="portal-lateral" x-data="{ abierto: false }" :class="{ 'is-abierto': abierto }"
         @keydown.escape.window="abierto = false">
         <div class="portal-lateral__principal">
             <div class="portal-lateral__cabecera">
-                <a class="portal-identidad" href="{{ route('panel') }}">
+                <a class="portal-identidad" href="{{ $enlaceInicio }}">
                     <img class="portal-identidad__escudo" src="{{ asset('img/examen/escudo-cni.png') }}" alt="Escudo institucional CNI">
                     <span class="portal-identidad__nombre">
                         <strong>CNI</strong>
@@ -90,12 +100,16 @@
             </form>
         </div>
     </aside>
+    @endif
 
     <div class="portal-area">
         <div>
+            @if ($variante === 'derecho')
+                @include('layouts.partes.barra-derecho')
+            @else
             <header class="portal-barra">
                 <nav class="portal-migas" aria-label="Migas de pan">
-                    <a href="{{ route('panel') }}">Portal del alumno</a>
+                    <a href="{{ $enlaceInicio }}">Portal del alumno</a>
                     <span aria-hidden="true">/</span>
                     <span>Simulador</span>
                     <span aria-hidden="true">/</span>
@@ -111,8 +125,14 @@
                     <span class="portal-avatar" aria-hidden="true">{{ $iniciales }}</span>
                 </div>
             </header>
+            @endif
 
             <main class="portal-contenido">
+                @if ($variante === 'derecho' && session('status'))
+                    <p class="derecho-aviso derecho-aviso--exito" role="status">
+                        <x-alumno.icono nombre="check-circulo" :tamano="18" /> {{ session('status') }}
+                    </p>
+                @endif
                 {{ $slot ?? '' }}
                 @yield('content')
             </main>

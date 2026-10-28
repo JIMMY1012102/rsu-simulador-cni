@@ -106,7 +106,7 @@ class ExamenServiceTest extends TestCase
     public function test_el_endpoint_mostrar_conserva_el_formato_de_respuestas(): void
     {
         $intento = $this->iniciar();
-        $this->post('/login', ['usuario' => 'alumno', 'password' => 'PruebaExamen123!'])->assertRedirect('/panel');
+        $this->post('/login', ['usuario' => 'alumno', 'password' => 'PruebaExamen123!'])->assertRedirect('/alumno/inicio');
 
         $this->getJson("/api/intentos/{$intento->id}")->assertOk()
             ->assertJsonCount(40, 'data.respuestas')
