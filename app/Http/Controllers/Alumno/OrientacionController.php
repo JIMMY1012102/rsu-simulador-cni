@@ -80,13 +80,22 @@ class OrientacionController extends Controller
             return redirect()->route('alumno.elegir-area');
         }
 
+        // Los módulos del equipo se eligen por el código REAL guardado en MariaDB.
+        // Ingenierías (C) y Económicas (D) siguen usando el panel general hasta tener panel propio.
+        if ($area->codigo === 'B') {
+            return redirect()->route('alumno.ciencias-basicas');
+        }
+        if ($area->codigo === 'E') {
+            return redirect()->route('alumno.inicio');
+        }
+
         // No hace falta elegir carrera: el área guardada determina qué examen se ofrece.
         $simulacros = $this->simulacrosDelArea($usuario, $area, $carrera, $servicio);
 
         $intentos = DB::table('intentos')->where('usuario_id', $usuario->id)
             ->whereNotNull('puntaje_total')->orderByDesc('fecha_inicio')->limit(10)->get();
 
-        return view('alumno.panel', [
+        return view($area->codigo === 'A' ? 'alumno.salud.panel' : 'alumno.panel', [
             'usuario' => $usuario,
             'area' => $area,
             'carrera' => $carrera,
@@ -140,7 +149,7 @@ class OrientacionController extends Controller
         if (! $area) {
             return redirect()->route('alumno.elegir-area');
         }
-        abort_unless($area->activo, 403);
+        abort_unless($area->activo && $area->codigo === 'A', 404);
         abort_if($carrera && (! $carrera->activo || ! $carrera->areaPostulacion?->activo
             || (int) $carrera->area_postulacion_id !== (int) $area->id), 403);
 
@@ -149,7 +158,7 @@ class OrientacionController extends Controller
         $temaActual = $resumen['temas']->firstWhere('id', $tema);
         abort_unless($temaActual, 404);
 
-        return view('alumno.tema', [
+        return view('alumno.salud.tema', [
             'usuario' => $usuario,
             'area' => $area,
             'tema' => $temaActual,
