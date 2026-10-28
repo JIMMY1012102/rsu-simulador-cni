@@ -76,4 +76,34 @@ class PanelesPorAreaTest extends TestCase
         $this->get(route('alumno.ciencias-basicas'))->assertRedirect(route('alumno.panel'));
         $this->get(route('alumno.tema', ['tema' => 999]))->assertNotFound();
     }
+    public function test_la_eleccion_inicial_persiste_y_determina_el_destino_en_los_cinco_casos(): void
+    {
+        $destinos = [
+            'A' => null, // Se renderiza Salud en alumno.panel
+            'B' => 'alumno.ciencias-basicas',
+            'C' => null, // Panel general
+            'D' => null, // Panel general
+            'E' => 'alumno.inicio',
+        ];
+
+        foreach ($destinos as $codigo => $ruta) {
+            $alumno = Usuario::create([
+                'nombres' => 'Nuevo', 'apellidos' => 'Area '.$codigo,
+                'usuario' => 'nuevo_'.$codigo, 'password' => 'ClaveCNI2026!',
+                'rol' => 'estudiante', 'activo' => true,
+            ]);
+            $idArea = DB::table('areas_postulacion')->where('codigo', $codigo)->value('id');
+            $this->actingAs($alumno, 'web')
+                ->post(route('alumno.area.guardar'), ['area_id' => $idArea])
+                ->assertRedirect(route('alumno.panel'));
+            $this->assertSame((int) $idArea, (int) $alumno->fresh()->area_postulacion_id);
+            $respuesta = $this->get(route('alumno.panel'));
+            if ($ruta) {
+                $respuesta->assertRedirect(route($ruta));
+            } else {
+                $respuesta->assertOk();
+            }
+        }
+    }
+
 }
