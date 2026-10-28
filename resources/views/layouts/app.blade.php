@@ -9,8 +9,8 @@
     @stack('styles')
     @livewireStyles
 </head>
-<body class="{{ request()->routeIs('login') ? 'login-screen' : (request()->routeIs('admin.*') ? 'admin-shell-page' : (request()->routeIs('alumno.elegir-area') ? 'selector-areas-screen' : '')) }}">
-    @unless (request()->routeIs('login') || request()->routeIs('admin.*') || request()->routeIs('alumno.elegir-area'))
+<body class="{{ request()->routeIs('login') ? 'login-screen' : (request()->routeIs('admin.*') ? 'admin-shell-page' : (request()->routeIs('alumno.elegir-area', 'alumno.preview-areas') ? 'selector-areas-screen' : '')) }}">
+    @unless (request()->routeIs('login') || request()->routeIs('admin.*') || request()->routeIs('alumno.elegir-area', 'alumno.preview-areas'))
         <header>
             <a href="{{ route('inicio') }}" class="brand">Simulador CNI</a>
             @auth('web')
