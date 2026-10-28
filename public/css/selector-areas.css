@@ -1,6 +1,4 @@
-/* Selector de áreas del primer ingreso — sin imágenes externas ni mascotas incluidas.
-   Cuando estén listas las ilustraciones, colocar cada una dentro de
-   .area-opcion__mascota y ajustar su tamaño con CSS.
+/* Selector de áreas del primer ingreso con mascotas SVG transparentes e independientes.
    La pantalla es independiente del estilo de orientacion.css (panel y resultados). */
 
 .selector-areas-screen {
@@ -232,27 +230,28 @@
 .area-opcion__mascota {
     position: absolute;
     z-index: 1;
-    right: 12%;
-    bottom: 14px;
-    left: 12%;
-    display: grid;
-    place-items: center;
-    height: min(76%, 290px);
-    min-height: 180px;
-    padding: 20px;
-    border: 2px dashed #ffffffb8;
-    border-radius: 47% 47% 30% 30%;
-    background: #ffffff17;
-    color: #fff;
-    text-align: center;
+    inset: 0 0 -17px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    padding: 5px 2px 0;
+    pointer-events: none;
 }
 
-.area-opcion__mascota span {
-    max-width: 135px;
-    font-size: .87rem;
-    font-weight: 800;
-    line-height: 1.4;
-    text-shadow: 0 2px 9px #092d5d52;
+.area-opcion__mascota img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 11px 10px #07234755);
+    transform-origin: center bottom;
+    transition: transform .2s ease;
+}
+
+.area-opcion:hover .area-opcion__mascota img,
+.area-opcion:focus-within .area-opcion__mascota img {
+    transform: translateY(-4px) scale(1.025);
 }
 
 .area-opcion__info {
@@ -451,10 +450,8 @@
     }
 
     .area-opcion__mascota {
-        height: 75%;
-        min-height: 130px;
-        max-width: 210px;
-        margin-inline: auto;
+        inset: 0 0 -14px;
+        padding: 0 8px;
     }
 
     .area-opcion__info {
@@ -487,7 +484,9 @@
 
     .area-opcion:hover,
     .area-opcion:focus-within,
-    .area-opcion__seleccionar:hover {
+    .area-opcion__seleccionar:hover,
+    .area-opcion:hover .area-opcion__mascota img,
+    .area-opcion:focus-within .area-opcion__mascota img {
         transform: none;
     }
 }
