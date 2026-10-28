@@ -47,7 +47,7 @@
         <p class="selector-page__subtitulo">Selecciona una opción para personalizar tu panel de estudio</p>
     </div>
 
-    <div class="selector-page__grid" role="group" aria-label="Cinco áreas de postulación">
+    <div class="selector-page__grid areas-grid" role="group" aria-label="Cinco áreas de postulación">
         @forelse ($areasOrdenadas as $area)
             @php
                 $presentacion = $presentaciones[$area->codigo] ?? [
@@ -55,7 +55,7 @@
                     'descripcion' => 'Prepárate para tu examen de admisión.',
                 ];
             @endphp
-            <form class="area-opcion" data-area="{{ $area->codigo }}"
+            <form class="area-opcion area-tarjeta" data-area="{{ $area->codigo }}"
                   method="POST" action="{{ route('alumno.area.guardar') }}"
                   aria-labelledby="area-titulo-{{ $area->id }}">
                 @csrf
