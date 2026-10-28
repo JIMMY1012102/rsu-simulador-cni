@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 320" role="img">
+<defs>
+<filter id="drop" x="-35%" y="-35%" width="180%" height="190%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#08224a" flood-opacity=".33"/></filter>
+<linearGradient id="white" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#fff"/><stop offset=".6" stop-color="#f2f5ff"/><stop offset="1" stop-color="#afc6dc"/></linearGradient>
+<linearGradient id="shine" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff" stop-opacity=".72"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#052958" stop-opacity=".25"/></linearGradient>
+<linearGradient id="navy" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#2b70d6"/><stop offset=".55" stop-color="#173963"/><stop offset="1" stop-color="#0a1741"/></linearGradient>
+<linearGradient id="green" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#d5ff73"/><stop offset=".52" stop-color="#6edc36"/><stop offset="1" stop-color="#229b48"/></linearGradient>
+<linearGradient id="blue" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#67e6ff"/><stop offset=".38" stop-color="#1687ff"/><stop offset="1" stop-color="#063eaf"/></linearGradient>
+<linearGradient id="brown" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#d89049"/><stop offset=".6" stop-color="#92522e"/><stop offset="1" stop-color="#4b2631"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#fff5a9"/><stop offset=".45" stop-color="#ffd13c"/><stop offset="1" stop-color="#ed8914"/></linearGradient>
+</defs><g filter="url(#drop)">
+<!-- ala saludando -->
+<path d="M92 219 Q39 198 39 146 Q42 131 54 140 L63 158 L62 129 Q68 112 79 132 L90 172" fill="url(#blue)" stroke="#0957ad" stroke-width="3"/>
+<!-- cuerpo y bata -->
+<path d="M107 196 Q70 205 70 307 L227 307 Q226 222 190 197Z" fill="url(#white)" stroke="#b7dcf1" stroke-width="3"/>
+<path d="M123 195 L147 246 L170 194 L178 307 L117 307Z" fill="#42d3ce"/>
+<path d="M111 196 L148 242 L114 299 L92 307 L100 252Z" fill="#fff" stroke="#c3dbe4" stroke-width="2"/>
+<path d="M180 195 L149 242 L186 299 L215 306 L192 242Z" fill="#fff" stroke="#c3dbe4" stroke-width="2"/>
+<!-- cabeza -->
+<ellipse cx="146" cy="127" rx="83" ry="89" fill="url(#blue)" stroke="#0a53b6" stroke-width="3"/>
+<path d="M89 109 Q98 65 140 72 Q184 63 201 114 Q209 182 157 196 Q98 201 88 154Z" fill="url(#white)"/>
+<ellipse cx="116" cy="136" rx="20" ry="27" fill="#fff"/><ellipse cx="174" cy="133" rx="21" ry="27" fill="#fff"/>
+<ellipse cx="121" cy="134" rx="12" ry="17" fill="#0a438c"/><ellipse cx="178" cy="131" rx="13" ry="17" fill="#0a438c"/>
+<circle cx="124" cy="128" r="6" fill="#fff"/><circle cx="181" cy="125" r="6" fill="#fff"/>
+<ellipse cx="103" cy="167" rx="14" ry="9" fill="#fda8c2"/><ellipse cx="196" cy="164" rx="14" ry="9" fill="#fda8c2"/>
+<path d="M131 154 Q150 137 169 155 Q163 183 150 191 Q136 184 131 154Z" fill="#ffca38" stroke="#d67e0c" stroke-width="3"/>
+<path d="M138 169 Q150 171 162 169" stroke="#9e3b30" stroke-width="5" stroke-linecap="round"/>
+<!-- estrellas -->
+<path d="M170 34 l7 13 15 2 -11 11 3 15 -14-7 -13 8 2-16 -11-10 15-2Z" fill="url(#gold)" stroke="#fff2a9" stroke-width="2"/>
+<path d="M204 54 l5 9 10 2 -8 8 2 10 -9-5 -9 5 2-11 -7-7 10-2Z" fill="#fff17d"/>
+<!-- estetoscopio -->
+<path d="M132 236 Q121 271 152 272 Q186 271 179 244" fill="none" stroke="#233957" stroke-width="6"/>
+<circle cx="154" cy="279" r="10" fill="#9dadbb" stroke="#273c52" stroke-width="4"/>
+<!-- portapapeles -->
+<rect x="178" y="221" width="69" height="86" rx="6" transform="rotate(-8 178 221)" fill="#125ab6" stroke="#a6dfff" stroke-width="3"/>
+<path d="M194 247 l31-4 M197 262 l31-4 M199 277 l24-3" stroke="#d0f4ff" stroke-width="5" stroke-linecap="round"/>
+<path d="M207 217 h16 v10 h-16Z" fill="#e4eef6" transform="rotate(-8 207 217)"/>
+</g></svg>
