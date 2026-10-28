@@ -88,7 +88,7 @@ class CienciasBasicasPanelTest extends TestCase
             ->assertSee(route('alumno.panel'))->assertSee('No hay simulacros disponibles para tu área')
             ->assertDontSee('42%')->assertDontSee('72%')->assertDontSee('1240 preguntas');
 
-        $this->get(route('alumno.panel'))->assertOk()->assertDontSee('css/alumno/ciencias-basicas.css');
+        $this->get(route('alumno.panel'))->assertRedirect(route('alumno.ciencias-basicas'));
     }
 
     public function test_inicia_solo_simulacros_del_area_b_con_el_examen_existente(): void
