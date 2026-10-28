@@ -5,6 +5,7 @@ namespace App\Services\Alumno;
 use App\Models\Usuario;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Historial de simulacros del estudiante autenticado.
@@ -14,17 +15,24 @@ class HistorialAlumnoService
 {
     public function obtener(Usuario $usuario): array
     {
+        // Algunas instalaciones locales conservan el esquema anterior sin
+        // simulacros.carrera_id. El Historial debe funcionar en ambos casos.
+        $columnas = [
+            'i.id', 'i.fecha_inicio', 'i.estado', 'i.puntaje_total',
+            'i.total_preguntas', 's.nombre as nombre_simulacro',
+            's.puntaje_correcta',
+        ];
+        $columnas[] = Schema::hasColumn('simulacros', 'carrera_id')
+            ? 's.carrera_id as carrera_simulacro'
+            : DB::raw('NULL as carrera_simulacro');
+
         $filas = DB::table('intentos as i')
             ->leftJoin('simulacros as s', 's.id', '=', 'i.simulacro_id')
             ->where('i.usuario_id', $usuario->id)
             ->where('i.tipo', 'simulacro')
             ->orderBy('i.fecha_inicio')
             ->orderBy('i.id')
-            ->get([
-                'i.id', 'i.fecha_inicio', 'i.estado', 'i.puntaje_total',
-                'i.total_preguntas', 's.nombre as nombre_simulacro',
-                's.carrera_id as carrera_simulacro', 's.puntaje_correcta',
-            ]);
+            ->get($columnas);
 
         $registros = [];
         $calificados = [];
