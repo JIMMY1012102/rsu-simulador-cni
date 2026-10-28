@@ -18,6 +18,16 @@
         'E' => 'mascota-humanidades.svg',
     ];
 
+    // Si el equipo agrega recortes WebP de los personajes originales, se usan automáticamente.
+    // De lo contrario, se muestran las mascotas SVG incluidas en el repositorio.
+    $mascotasOriginales = [
+        'B' => 'cni-mascota-basicas.webp',
+        'A' => 'cni-mascota-salud.webp',
+        'C' => 'cni-mascota-ingenierias.webp',
+        'D' => 'cni-mascota-economicas.webp',
+        'E' => 'cni-mascota-humanidades.webp',
+    ];
+
     $presentaciones = [
         'B' => [
             'titulo' => 'Ciencias Básicas',
@@ -70,8 +80,13 @@
 
                 <div class="area-opcion__ilustracion" aria-hidden="true">
                     @if (isset($mascotas[$area->codigo]))
+                        @php
+                            $webp = 'images/mascotas/'.$mascotasOriginales[$area->codigo];
+                            $svg = 'images/mascotas/'.$mascotas[$area->codigo];
+                            $imagenMascota = is_file(public_path($webp)) ? $webp : $svg;
+                        @endphp
                         <div class="area-opcion__mascota">
-                            <img src="{{ asset('images/mascotas/'.$mascotas[$area->codigo]) }}"
+                            <img src="{{ asset($imagenMascota) }}"
                                  alt="" loading="eager" decoding="async">
                         </div>
                     @endif
