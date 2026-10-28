@@ -93,14 +93,20 @@ try {
   assert.equal(await areas.count(), 5, 'Deben verse cinco áreas A-E');
   await captura('06-cinco-areas');
   await anchoMovil('07-areas-movil');
-  await areas.filter({ hasText: 'Ingenierías' }).getByRole('button', { name: /Seleccionar área/ }).click();
+  await areas.filter({ hasText: 'Ingenierías' }).getByRole('button', { name: /Seleccionar Ingenierías/i }).click();
   await page.waitForURL(url => url.pathname === '/alumno/panel');
-  await page.getByRole('heading', { name: /Bienvenido/i }).waitFor();
-  await page.getByText('Tu área elegida es').waitFor();
+  await page.locator('.cni-alumno[data-area="C"]').waitFor();
+  await page.getByRole('heading', { name: /Bienvenido a Ingenierías/i }).waitFor();
+  await page.locator('#perfil').waitFor({ state: 'visible' });
   await captura('08-panel-alumno');
   await anchoMovil('09-panel-alumno-movil');
 
-  const ficha = page.locator('.simulacro-fila').filter({ hasText: 'DEMO CNI - Área C' });
+  // El panel único abre primero Mi perfil: navegar a Mi progreso y luego a la vista de exámenes.
+  await page.locator('.cni-alumno-menu a[href="#progreso"]').click();
+  await page.locator('#progreso').waitFor({ state: 'visible' });
+  await page.locator('#progreso [data-go-panel="#intentos"]').first().click();
+  await page.locator('#intentos').waitFor({ state: 'visible' });
+  const ficha = page.locator('#intentos .cni-alumno-exam').filter({ hasText: 'DEMO CNI - Área C' });
   await ficha.getByRole('button', { name: /Iniciar examen/ }).click();
   await page.waitForURL(url => /^\/intentos\/\d+\/examen$/.test(url.pathname), { timeout: 20000 });
   const intento = page.url().match(/\/intentos\/(\d+)\/examen/);
