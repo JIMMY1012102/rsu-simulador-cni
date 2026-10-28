@@ -36,9 +36,15 @@ Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::clas
         Route::post('/elegir-area', [OrientacionController::class, 'guardarArea'])->name('area.guardar');
         Route::get('/panel', [OrientacionController::class, 'panel'])->name('panel');
         Route::post('/carrera', [OrientacionController::class, 'guardarCarrera'])->name('carrera.guardar');
+        Route::get('/tema/{tema}', [OrientacionController::class, 'tema'])
+            ->whereNumber('tema')->name('tema');
         Route::get('/resultados/{intento}', [OrientacionController::class, 'resultados'])
             ->whereNumber('intento')->name('resultados');
     });
+
+// Portales de área independientes; los grupos internos ya aplican guard web y permisos.
+require __DIR__.'/alumno-ciencias-basicas.php';
+require __DIR__.'/alumno-humanidades.php';
 
 // Herramientas internas de administración; nunca disponibles para estudiantes/docentes.
 Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class])
