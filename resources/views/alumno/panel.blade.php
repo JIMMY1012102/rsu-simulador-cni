@@ -144,19 +144,7 @@
             </section>
 
             <section class="cni-alumno-vista cni-alumno-history" id="historial" data-panel-view="historial" aria-labelledby="historial-titulo" hidden>
-                <span id="mis-intentos" class="cni-alumno-anchor" aria-hidden="true"></span>
-                <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">TU HISTORIAL</span><h2 id="historial-titulo">Mis últimos resultados</h2></div></div>
-                @forelse($intentos as $intento)
-                    <article class="cni-alumno-history-row"><div><strong>Intento #{{ $intento->id }}</strong><small>{{ $intento->fecha_inicio }}</small></div><span class="cni-alumno-history-score">{{ number_format((float) $intento->puntaje_total, 2) }} pts</span>
-                        @if($esVistaPrevia)
-                            <span class="cni-alumno-disabled">Vista previa</span>
-                        @else
-                            <a href="{{ route('alumno.resultados', ['intento' => $intento->id]) }}">Ver resultados →</a>
-                        @endif
-                    </article>
-                @empty
-                    <div class="cni-alumno-empty">Aún no tienes evaluaciones calificadas. Tus resultados aparecerán aquí al terminar tus simulacros.</div>
-                @endforelse
+                @include('alumno.partials.historial')
             </section>
 
 
