@@ -15,14 +15,14 @@
 
 @if($ultimo)
     <section class="cni-progreso-resumen" aria-label="Resumen del último intento">
-        <div class="cni-progreso-anillo" role="img" aria-label="Último puntaje: {{ number_format($ultimo['porcentaje'], 1) }} por ciento del máximo">
+        <div class="cni-progreso-anillo" role="img" aria-label="Último puntaje: {{ number_format($ultimo['porcentaje'], 1, ',', '.') }} por ciento del máximo">
             <svg viewBox="0 0 120 120" aria-hidden="true" focusable="false">
                 <circle cx="60" cy="60" r="47" class="cni-progreso-anillo-fondo" />
                 <circle cx="60" cy="60" r="47" class="cni-progreso-anillo-avance"
                         stroke-dasharray="{{ round($ultimo['porcentaje'] * 2.9531, 2) }} 295.31"
                         transform="rotate(-90 60 60)" />
             </svg>
-            <div><strong>{{ number_format($ultimo['porcentaje'], 1) }}%</strong><span>del máximo</span></div>
+            <div><strong>{{ number_format($ultimo['porcentaje'], 1, ',', '.') }}%</strong><span>del máximo</span></div>
         </div>
         <div class="cni-progreso-resumen-datos">
             <span class="cni-alumno-section-kicker">ÚLTIMO SIMULACRO CALIFICADO</span>
