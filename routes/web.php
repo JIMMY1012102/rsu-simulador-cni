@@ -82,6 +82,19 @@ Route::get('/docente/exportar', \App\Http\Controllers\Docente\ExportarCalificaci
 
 // Vistas previas de diseño sin autenticación: exclusivas del entorno local.
 if (app()->environment('local')) {
+    // Vista previa visual sin usuario ni MariaDB. No procesa elecciones reales.
+    Route::get('/preview-areas', function () {
+        $areas = collect([
+            ['id' => 1, 'codigo' => 'A', 'nombre' => 'Ciencias de la Salud'],
+            ['id' => 2, 'codigo' => 'B', 'nombre' => 'Ciencias Básicas'],
+            ['id' => 3, 'codigo' => 'C', 'nombre' => 'Ingenierías'],
+            ['id' => 4, 'codigo' => 'D', 'nombre' => 'Ciencias Económicas y de la Gestión'],
+            ['id' => 5, 'codigo' => 'E', 'nombre' => 'Humanidades y Ciencias Jurídicas y Sociales'],
+        ])->map(fn (array $area) => (object) $area);
+
+        return view('alumno.elegir-area', compact('areas'));
+    })->name('alumno.preview-areas');
+
     Route::view('/docente-preview', 'livewire.docente.panel-docente');
     Route::redirect('/preview-docente', '/docente-preview');
 
