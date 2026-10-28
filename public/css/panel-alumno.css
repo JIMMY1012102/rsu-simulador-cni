@@ -140,3 +140,240 @@ body:has(.cni-alumno){background:#f8f9fe}
         bottom:0;
     }
 }
+
+
+/* ================================================================
+   MENÚ LATERAL ÚNICO · Mi perfil / Mis intentos / Historial
+   Escritorio: contraer/expandir. Celular: panel lateral superpuesto.
+   ================================================================ */
+.cni-alumno{
+    min-width:0;
+}
+.cni-alumno-sidebar{
+    z-index:22;
+    transition:width .23s ease, flex-basis .23s ease, padding .23s ease;
+}
+.cni-alumno-sidebar-top{
+    padding-top:55px;
+}
+.cni-alumno-sidebar-toggle{
+    position:fixed;
+    z-index:42;
+    top:16px;
+    left:16px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:9px;
+    min-width:48px;
+    height:43px;
+    padding:0 12px;
+    border:1px solid #ffffff50;
+    border-radius:13px;
+    background:var(--navy);
+    color:#fff;
+    box-shadow:0 5px 18px #081b4030;
+    cursor:pointer;
+    font:700 12px Inter,'Segoe UI',sans-serif;
+    transition:background .2s ease, box-shadow .2s ease;
+}
+.cni-alumno-sidebar-toggle:hover{
+    background:var(--accent-dark);
+}
+.cni-alumno-sidebar-toggle:focus-visible{
+    outline:3px solid #ffc344;
+    outline-offset:3px;
+}
+.cni-alumno-sidebar-toggle-icon{
+    font-size:18px;
+    width:20px;
+    text-align:center;
+}
+.cni-alumno-sidebar-backdrop{
+    display:none;
+}
+.cni-alumno-sidebar-backdrop[hidden]{
+    display:none!important;
+}
+.cni-alumno .cni-alumno-menu{
+    display:grid;
+    gap:7px;
+}
+.cni-alumno .cni-alumno-menu a{
+    display:flex;
+    align-items:center;
+    gap:13px;
+    padding:13px 14px;
+    font-size:14px;
+    font-weight:750;
+}
+.cni-alumno .cni-alumno-menu a>span{
+    flex:none;
+    width:23px;
+    font-size:21px;
+    text-align:center;
+}
+.cni-alumno .cni-alumno-menu a.is-active{
+    background:linear-gradient(100deg,var(--accent),var(--accent-dark));
+}
+.cni-alumno.is-sidebar-collapsed .cni-alumno-sidebar{
+    width:0;
+    flex-basis:0;
+    padding-left:0;
+    padding-right:0;
+    overflow:hidden;
+    visibility:hidden;
+}
+.cni-alumno-workspace{
+    min-width:0;
+}
+.cni-alumno-topbar{
+    padding-left:clamp(65px,5vw,86px);
+}
+.cni-alumno-exams,
+.cni-alumno-history,
+.cni-alumno-profile{
+    scroll-margin-top:16px;
+}
+.cni-alumno-anchor{
+    display:block;
+    height:0;
+    position:relative;
+    scroll-margin-top:16px;
+}
+
+/* Evitar el antiguo modo iconos de 960px: el menú es realmente desplegable. */
+@media(max-width:960px){
+    .cni-alumno .cni-alumno-sidebar{
+        flex-basis:232px;
+        width:232px;
+        padding:23px 13px 18px;
+    }
+    .cni-alumno.is-sidebar-collapsed .cni-alumno-sidebar{
+        flex-basis:0;
+        width:0;
+        padding-left:0;
+        padding-right:0;
+        visibility:hidden;
+    }
+    .cni-alumno .cni-alumno-marca{
+        display:flex;
+        margin:0 0 20px;
+    }
+    .cni-alumno .cni-alumno-marca>span:last-child{
+        display:flex;
+        flex-direction:column;
+    }
+    .cni-alumno .cni-alumno-area-chip{
+        display:flex;
+        font-size:11px;
+    }
+    .cni-alumno .cni-alumno-menu{
+        display:grid;
+        gap:7px;
+    }
+    .cni-alumno .cni-alumno-menu a{
+        justify-content:flex-start;
+        padding:13px 14px;
+        font-size:14px;
+    }
+    .cni-alumno .cni-alumno-sidebar-bottom,
+    .cni-alumno .cni-alumno-side-user,
+    .cni-alumno .cni-alumno-salir{
+        display:flex;
+    }
+    .cni-alumno .cni-alumno-salir{
+        display:block;
+    }
+    .cni-alumno .cni-alumno-side-art{
+        display:none;
+    }
+}
+
+/* En teléfonos el menú no ocupa la parte inferior: sale desde la izquierda. */
+@media(max-width:680px){
+    .cni-alumno .cni-alumno-sidebar{
+        position:fixed;
+        z-index:32;
+        top:0;
+        bottom:0;
+        left:0;
+        flex-basis:auto;
+        width:min(292px,86vw);
+        height:100vh;
+        height:100dvh;
+        padding:23px 15px 20px;
+        overflow-y:auto;
+        visibility:hidden;
+        pointer-events:none;
+        transform:translateX(-102%);
+        box-shadow:10px 0 25px #09162e22;
+        transition:transform .22s ease,visibility .22s ease;
+    }
+    .cni-alumno.is-sidebar-open .cni-alumno-sidebar{
+        width:min(292px,86vw);
+        visibility:visible;
+        pointer-events:auto;
+        transform:translateX(0);
+    }
+    .cni-alumno .cni-alumno-sidebar-top{
+        width:100%;
+        padding-top:55px;
+    }
+    .cni-alumno .cni-alumno-marca{
+        display:flex;
+        margin-bottom:20px;
+    }
+    .cni-alumno .cni-alumno-menu{
+        display:grid;
+        gap:8px;
+    }
+    .cni-alumno .cni-alumno-menu a{
+        max-width:none;
+        width:100%;
+        justify-content:flex-start;
+        padding:15px;
+        font-size:14px;
+    }
+    .cni-alumno .cni-alumno-menu a>span{
+        font-size:21px;
+    }
+    .cni-alumno .cni-alumno-sidebar-bottom{
+        display:block;
+    }
+    .cni-alumno .cni-alumno-side-user{
+        display:flex;
+    }
+    .cni-alumno .cni-alumno-salir{
+        display:block;
+    }
+    .cni-alumno .cni-alumno-sidebar-backdrop:not([hidden]){
+        position:fixed;
+        z-index:31;
+        display:block;
+        inset:0;
+        width:100%;
+        height:100%;
+        padding:0;
+        border:0;
+        border-radius:0;
+        background:#0b1e3b9c;
+        cursor:pointer;
+    }
+    .cni-alumno-sidebar-toggle{
+        top:11px;
+        left:11px;
+    }
+    .cni-alumno-topbar{
+        padding-left:75px;
+    }
+    .cni-alumno-content{
+        padding-bottom:25px;
+    }
+}
+@media(prefers-reduced-motion:reduce){
+    .cni-alumno-sidebar,
+    .cni-alumno-sidebar-toggle{
+        transition:none!important;
+    }
+}
