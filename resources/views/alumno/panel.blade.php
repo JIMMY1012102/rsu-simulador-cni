@@ -32,7 +32,7 @@
             </a>
             <span class="cni-alumno-area-chip"><span aria-hidden="true">{{ $temaArea['icono'] }}</span> {{ $area->nombre }}</span>
             <nav class="cni-alumno-menu" aria-label="Navegación del alumno">
-                <a href="#perfil"><span aria-hidden="true">♙</span> Mi perfil</a>
+                <a href="#perfil" class="is-active" aria-current="location"><span aria-hidden="true">♙</span> Mi perfil</a>
                 <a href="#intentos"><span aria-hidden="true">▤</span> Mis intentos</a>
                 <a href="#historial"><span aria-hidden="true">◷</span> Historial</a>
             </nav>
@@ -60,7 +60,8 @@
             @endif
             @if(session('status')) <div class="cni-alumno-alert cni-alumno-alert-ok" role="status">{{ session('status') }}</div> @endif
 
-            <section class="cni-alumno-banner" aria-labelledby="bienvenida-titulo">
+            <section class="cni-alumno-vista cni-alumno-vista-perfil" id="perfil" data-panel-view="perfil" aria-label="Mi perfil">
+                <div class="cni-alumno-banner" aria-labelledby="bienvenida-titulo">
                 <div class="cni-alumno-welcome">
                     <span class="cni-alumno-overline">TU ESPACIO DE PREPARACIÓN · ÁREA {{ $area->codigo }}</span>
                     <h1 id="bienvenida-titulo">¡Hola, {{ $primeraPalabra }}!</h1>
@@ -75,7 +76,7 @@
                      alt="Mascota del área de {{ $area->nombre }}">
             </section>
 
-            <div class="cni-alumno-metric-grid" aria-label="Resumen académico">
+                <div class="cni-alumno-metric-grid" aria-label="Resumen académico">
                 <section class="cni-alumno-progress-card">
                     <div class="cni-alumno-card-heading"><span class="cni-alumno-circle" aria-hidden="true">▥</span><div><h2>Tu progreso en {{ $area->nombre }}</h2><p>Simulacros disponibles completados</p></div><strong class="cni-alumno-metric-value">{{ $d['progreso'] }}%</strong></div>
                     <div class="cni-alumno-progress-track" role="progressbar" aria-label="Progreso de simulacros" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $d['progreso'] }}"><span style="width:{{ $d['progreso'] }}%"></span></div>
@@ -94,31 +95,9 @@
                     <p class="cni-alumno-streak-note">La racha se calcula con exámenes finalizados y calificados.</p>
                 </section>
             </div>
-
-            <section class="cni-alumno-topics" id="temas" aria-labelledby="temas-titulo">
-                <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">BANCO DE PREGUNTAS</span><h2 id="temas-titulo">Temas de estudio</h2></div><span class="cni-alumno-count">{{ $d['temas']->count() }} temas disponibles</span></div>
-                @if($d['temas']->isNotEmpty())
-                    <div class="cni-alumno-topic-grid">
-                    @foreach($d['temas'] as $indice => $tema)
-                        <article class="cni-alumno-topic tone-{{ $indice % 6 }}">
-                            <div class="cni-alumno-topic-row"><span class="cni-alumno-topic-icon" aria-hidden="true">{{ ['✚','✦','◇','▤','◎','▣'][$indice % 6] }}</span><span class="cni-alumno-topic-name"><strong>{{ $tema->nombre }}</strong><small>{{ $tema->asignatura }}</small></span></div>
-                            <div class="cni-alumno-topic-bar" role="progressbar" aria-label="Avance en {{ $tema->nombre }}" aria-valuenow="{{ $tema->avance }}" aria-valuemin="0" aria-valuemax="100"><span style="width:{{ $tema->avance }}%"></span></div>
-                            <div class="cni-alumno-topic-foot"><span>{{ $tema->realizadas }}/{{ $tema->total }} preguntas vistas</span>
-                                @if($esVistaPrevia)
-                                    <span class="cni-alumno-topic-more" aria-label="Detalles no disponibles en vista previa">→</span>
-                                @else
-                                    <a class="cni-alumno-topic-more" href="{{ route('alumno.tema', ['tema' => $tema->id]) }}" aria-label="Ver detalles de {{ $tema->nombre }}">→</a>
-                                @endif
-                            </div>
-                        </article>
-                    @endforeach
-                    </div>
-                @else
-                    <div class="cni-alumno-empty">No hay temas disponibles para los simulacros publicados de tu área. Cuando el colegio habilite preguntas, aparecerán aquí.</div>
-                @endif
             </section>
 
-            <section class="cni-alumno-exams" id="intentos" aria-labelledby="simulacros-titulo">
+            <section class="cni-alumno-vista cni-alumno-exams" id="intentos" data-panel-view="intentos" aria-labelledby="simulacros-titulo" hidden>
                 <span id="simulacros-disponibles" class="cni-alumno-anchor" aria-hidden="true"></span>
                 <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">PREPARACIÓN</span><h2 id="simulacros-titulo">Mis intentos · Iniciar Simulador CNI</h2></div><span class="cni-alumno-count">{{ $simulacros->count() }} disponibles</span></div>
                 <p class="cni-alumno-section-description">Exámenes de tu área · Dar examen simulador. Elige una evaluación activa de {{ $area->nombre }} para comenzar.</p>
@@ -133,9 +112,31 @@
                 @empty
                     <div class="cni-alumno-empty">No hay simulacros abiertos en este momento. Cuando el docente habilite uno, podrás iniciarlo desde aquí.</div>
                 @endforelse
+
+                @unless($carrera)
+                    <div class="cni-alumno-profile cni-alumno-carrera-opcional" aria-label="Carrera de interés">
+                        <h3>Carrera de interés</h3>
+                        <p>Si tu simulacro requiere una carrera, puedes elegirla aquí. La elección es opcional para los exámenes generales del área.</p>
+                        @unless($esVistaPrevia)
+                            <form method="POST" action="{{ route('alumno.carrera.guardar') }}">@csrf
+                                <label for="carrera_id">Selecciona una carrera de {{ $area->nombre }}</label>
+                                <div class="cni-alumno-form-row">
+                                    <select id="carrera_id" name="carrera_id" required>
+                                        <option value="">Selecciona una carrera</option>
+                                        @foreach($carreras as $opcion)
+                                            <option value="{{ $opcion->id }}" @selected(old('carrera_id') == $opcion->id)>{{ $opcion->nombre }}</option>
+                                        @endforeach
+                                    </select>
+                                    <button type="submit" class="cni-alumno-primary" @disabled($carreras->isEmpty())>Guardar carrera</button>
+                                </div>
+                                @error('carrera_id')<p class="cni-alumno-error" role="alert">{{ $message }}</p>@enderror
+                            </form>
+                        @endunless
+                    </div>
+                @endunless
             </section>
 
-            <section class="cni-alumno-history" id="historial" aria-labelledby="historial-titulo">
+            <section class="cni-alumno-vista cni-alumno-history" id="historial" data-panel-view="historial" aria-labelledby="historial-titulo" hidden>
                 <span id="mis-intentos" class="cni-alumno-anchor" aria-hidden="true"></span>
                 <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">TU HISTORIAL</span><h2 id="historial-titulo">Mis últimos resultados</h2></div></div>
                 @forelse($intentos as $intento)
@@ -151,19 +152,7 @@
                 @endforelse
             </section>
 
-            <section class="cni-alumno-profile" id="perfil" aria-labelledby="perfil-titulo"><div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">MI CUENTA</span><h2 id="perfil-titulo">Mi perfil académico</h2></div></div>
-                <p><strong>Estudiante:</strong> {{ $nombreCompleto }}</p><p><strong>Área de postulación:</strong> {{ $area->nombre }}</p>
-                @if($carrera)
-                    <p><strong>Carrera de interés:</strong> {{ $carrera->nombre }}</p>
-                @elseif(!$esVistaPrevia)
-                    <p>Si deseas, puedes indicar una carrera de interés dentro de tu área. Es opcional para rendir exámenes.</p>
-                    <form method="POST" action="{{ route('alumno.carrera.guardar') }}">@csrf
-                        <label for="carrera_id">Carrera</label>
-                        <div class="cni-alumno-form-row"><select id="carrera_id" name="carrera_id" required><option value="">Elige una carrera</option>@foreach($carreras as $opcion)<option value="{{ $opcion->id }}" @selected(old('carrera_id') == $opcion->id)>{{ $opcion->nombre }}</option>@endforeach</select><button type="submit" class="cni-alumno-primary" @disabled($carreras->isEmpty())>Guardar carrera</button></div>
-                        @error('carrera_id')<p class="cni-alumno-error" role="alert">{{ $message }}</p>@enderror
-                    </form>
-                @endif
-            </section>
+
         </main>
     </div>
 </div>
@@ -204,23 +193,35 @@
             toggle.focus();
         }
     });
-    const marcarSeccion = (destino) => {
+    // Sólo una sección visible a la vez. Por defecto: portada + dos tarjetas.
+    const vistas = [...panel.querySelectorAll('[data-panel-view]')];
+    const destinos = ['#perfil', '#intentos', '#historial'];
+    const mostrarSeccion = (destino, navegar = false) => {
+        const seleccion = destinos.includes(destino) ? destino : '#perfil';
+        vistas.forEach((vista) => {
+            vista.hidden = '#' + vista.id !== seleccion;
+        });
         links.forEach((enlace) => {
-            const activa = enlace.getAttribute('href') === destino;
+            const activa = enlace.getAttribute('href') === seleccion;
             enlace.classList.toggle('is-active', activa);
             if (activa) enlace.setAttribute('aria-current', 'location');
             else enlace.removeAttribute('aria-current');
         });
+        if (navegar) window.history.pushState(null, '', seleccion);
+        window.scrollTo(0, 0);
     };
-    links.forEach((enlace) => enlace.addEventListener('click', () => {
-        marcarSeccion(enlace.getAttribute('href'));
-        if (!mobile.matches) return;
-        abierto = false;
-        actualizar();
+    links.forEach((enlace) => enlace.addEventListener('click', (evento) => {
+        evento.preventDefault();
+        mostrarSeccion(enlace.getAttribute('href'), true);
+        if (mobile.matches) {
+            abierto = false;
+            actualizar();
+            toggle.focus();
+        }
     }));
-    if (['#perfil', '#intentos', '#historial'].includes(location.hash)) {
-        marcarSeccion(location.hash);
-    }
+    window.addEventListener('popstate', () => mostrarSeccion(window.location.hash));
+    window.addEventListener('hashchange', () => mostrarSeccion(window.location.hash));
+    mostrarSeccion(window.location.hash);
     mobile.addEventListener('change', () => {
         abierto = !mobile.matches;
         actualizar();
