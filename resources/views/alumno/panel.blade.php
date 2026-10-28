@@ -204,11 +204,23 @@
             toggle.focus();
         }
     });
+    const marcarSeccion = (destino) => {
+        links.forEach((enlace) => {
+            const activa = enlace.getAttribute('href') === destino;
+            enlace.classList.toggle('is-active', activa);
+            if (activa) enlace.setAttribute('aria-current', 'location');
+            else enlace.removeAttribute('aria-current');
+        });
+    };
     links.forEach((enlace) => enlace.addEventListener('click', () => {
+        marcarSeccion(enlace.getAttribute('href'));
         if (!mobile.matches) return;
         abierto = false;
         actualizar();
     }));
+    if (['#perfil', '#intentos', '#historial'].includes(location.hash)) {
+        marcarSeccion(location.hash);
+    }
     mobile.addEventListener('change', () => {
         abierto = !mobile.matches;
         actualizar();
