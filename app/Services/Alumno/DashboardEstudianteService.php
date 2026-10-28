@@ -107,6 +107,7 @@ class DashboardEstudianteService
                     $total = (int) ($totales[$tema->id] ?? 0);
                     $realizadas = min($total, (int) ($respondidas[$tema->id] ?? 0));
                     return (object) [
+                        'id' => (int) $tema->id,
                         'nombre' => $tema->nombre,
                         'asignatura' => $tema->asignatura,
                         'realizadas' => $realizadas,

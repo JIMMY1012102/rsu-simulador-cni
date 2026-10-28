@@ -1,85 +1,96 @@
-/* Panel alumno Salud — no afecta al docente ni al examen existente. */
-body:has(.cni-estudiante) > header{display:none!important}
-body:has(.cni-estudiante) > main{max-width:none;margin:0;padding:0}
-body:has(.cni-estudiante){background:#f2f6ff}
-.cni-estudiante{--ink:#10254d;--royal:#1269ec;--navy:#142d58;--soft:#eef5ff;--edge:#e2ebf8;display:flex;min-height:100vh;background:#f3f6fe;color:var(--ink);font-family:Inter,"Segoe UI",Arial,sans-serif;line-height:1.4}
-.cni-estudiante *{box-sizing:border-box}
-.cni-estudiante a{text-decoration:none}
-.cni-estudiante h1,.cni-estudiante h2,.cni-estudiante h3,.cni-estudiante p{margin:0}
-.cni-est-sidebar{position:sticky;top:0;display:flex;flex-direction:column;justify-content:space-between;flex:0 0 234px;width:234px;height:100vh;background:#142d55;color:#fff;padding:22px 12px 26px;overflow-y:auto}
-.cni-est-logo{display:flex;align-items:center;gap:12px;margin:0 14px 30px;color:#fff;font-size:21px;font-weight:900;line-height:1.05}
-.cni-est-logo-mascot{display:grid;place-items:center;width:46px;height:46px;border-radius:17px;background:#d6efff;color:#1767d8;font-size:35px}
-.cni-est-nav{display:grid;gap:9px}
-.cni-est-nav a{display:flex;align-items:center;gap:14px;padding:13px 20px;border-radius:13px;color:#d3e2fa;font-size:16px;font-weight:650}
-.cni-est-nav a:first-letter{font-size:25px}
-.cni-est-nav a.selected,.cni-est-nav a:hover{color:#fff;background:linear-gradient(110deg,#348cff,#1368ed);box-shadow:0 4px 13px #0065ff30}
-.cni-est-small-paws{text-align:center;display:block;margin-bottom:42px;color:#4a699c;font-size:28px;letter-spacing:15px}
-.cni-est-sidebar-bottom{border-top:1px solid #ffffff24;padding:20px 12px 0;display:grid;gap:12px}
-.cni-est-area-info{font-size:11px;color:#b6c9e9}.cni-est-area-info strong{display:block;color:#fff;font-size:13px;margin-top:4px}
-.cni-est-logout{width:100%;text-align:left;background:transparent;border:0;padding:12px 2px;color:#fff;font-weight:700;cursor:pointer}
-.cni-est-main{flex:1;min-width:0}
-.cni-est-topbar{height:82px;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(22px,3vw,50px);background:#fff;border-bottom:1px solid #e2eaf4;gap:18px}
-.cni-est-top-label{display:flex;align-items:center;gap:20px;font-size:23px;font-weight:800;min-width:0}
-.cni-est-topicon{display:grid;place-items:center;width:50px;height:50px;border-radius:50%;color:#fff;font-size:27px;background:linear-gradient(135deg,#20bafa,#0654ec);box-shadow:0 5px 12px #1f9eee24}
-.cni-est-account{display:flex;align-items:center;gap:12px;font-size:14px;min-width:0}
-.cni-est-account strong,.cni-est-account small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.cni-est-account small{font-size:12px;color:#8291ac}
-.cni-est-avatar{width:43px;height:43px;display:grid;place-items:center;flex:none;border-radius:50%;background:#dceafe;color:#3366b3;font-weight:800}
-.cni-est-content{padding:0 clamp(22px,3vw,50px) 50px}
-.cni-est-notice{margin:16px 0;background:#e0f9f1;border:1px solid #92dec1;padding:12px 15px;border-radius:10px}
-.cni-est-hero{height:440px;position:relative;isolation:isolate;background:radial-gradient(circle at 81% 36%,#9ad8ff 0%,#c4e9ff 27%,transparent 56%),linear-gradient(125deg,#e4f3ff 0%,#b9dcfe 55%,#d1e9ff 100%);border-radius:0 0 21px 21px;overflow:hidden;padding:39px 35px}
-.cni-est-hero:after{content:'';position:absolute;inset:0;z-index:-2;background:repeating-linear-gradient(110deg,transparent,transparent 67px,#ffffff10 67px,#ffffff10 69px)}
-.cni-est-hero-copy{position:relative;z-index:2;max-width:550px}
-.cni-est-hero h1{font-size:clamp(32px,3.2vw,48px);font-weight:900;line-height:1.1;letter-spacing:-.045em}
-.cni-est-hero h2{font-size:19px;font-weight:800;line-height:1.3;margin-top:8px}
-.cni-est-hero-copy>p{max-width:510px;color:#445a78;font-size:16px;margin-top:5px}
-.cni-est-hero blockquote{display:inline-block;margin:17px 0 0;padding:12px 20px;background:#ffffffb5;border-radius:12px;font-weight:650;font-style:italic;font-size:14px;max-width:360px}
-.cni-est-hero-mascot{position:absolute;right:25px;top:17px;height:304px;width:auto;object-fit:contain;max-width:40%;border-radius:0;opacity:1;mask-image:none}
-.cni-est-area-letter{position:absolute;right:10%;top:10px;font-size:215px;font-weight:900;color:#ffffff90}
-.cni-est-progress{position:absolute;z-index:3;bottom:19px;left:35px;width:min(660px,calc(100% - 70px));background:#fffd;border-radius:18px;padding:18px 24px;border:1px solid #e8effb;box-shadow:0 7px 25px #153f6a18}
-.cni-est-progress-line{display:flex;gap:18px;align-items:center}
-.cni-est-progress-icon{width:55px;height:55px;flex:none;border-radius:50%;display:grid;place-items:center;background:#188cf2;color:white;font-size:32px}
-.cni-est-progress-meter{flex:1;min-width:0}
-.cni-est-meter-label{display:flex;justify-content:space-between;align-items:center;gap:15px;font-size:14px}
-.cni-est-meter-track,.cni-est-topic-bar{height:11px;border-radius:20px;background:#c8e0fa;overflow:hidden;margin-top:10px}
-.cni-est-meter-track span,.cni-est-topic-bar span{display:block;height:100%;border-radius:20px;background:#1775f4}
-.cni-est-progress-meter>small{font-size:11px;color:#6883a3}
-.cni-est-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:14px}
-.cni-est-stats>div{display:grid;grid-template-columns:29px 1fr;column-gap:6px;align-items:center}
-.cni-est-stats span{grid-row:span 2;font-size:23px;color:#1681eb}
-.cni-est-stats strong{font-size:23px;line-height:1.05}
-.cni-est-stats small{font-size:11px;color:#667992}
-.cni-est-lower-grid{display:grid;grid-template-columns:minmax(0,2.2fr) minmax(250px,1fr);gap:16px;margin-top:16px}
-.cni-est-start{min-width:0;display:grid;grid-template-columns:100px minmax(170px,1fr) minmax(190px,auto);align-items:center;gap:18px;background:linear-gradient(110deg,#d6eaff,#c7e2ff);border-radius:17px;padding:24px}
-.cni-est-illustration{font-size:71px;line-height:1;color:#176be9}
-.cni-est-start h2{font-size:28px;line-height:1.05;letter-spacing:-.03em}
-.cni-est-start p{color:#526987;font-size:13px;margin-top:9px}
-.cni-est-primary{display:block;text-align:center;padding:15px 19px;border-radius:15px;background:linear-gradient(110deg,#1788ff,#1264ed);color:#fff!important;font-size:16px;font-weight:800;box-shadow:0 6px 14px #236fdb29}
-.cni-est-inactive{background:#8cb1da;box-shadow:none}
-.cni-est-streak{background:#fff;border:1px solid #e5edf9;border-radius:17px;padding:18px}
-.cni-est-streak-top{display:flex;align-items:center;gap:12px}
-.cni-est-flame{width:50px;height:50px;border-radius:16px;background:#fff0d9;color:#ed8a0e;display:grid;place-items:center;font-size:33px}
-.cni-est-streak strong{font-size:13px}.cni-est-streak h2{font-size:24px}.cni-est-streak small{color:#7284a2;font-size:11px}
-.cni-est-week{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:22px}
-.cni-est-week>div{display:grid;justify-items:center;gap:5px}.cni-est-week>div>span{display:grid;place-items:center;width:25px;height:25px;border:2px solid #d9e3f1;color:#b4c0ce;border-radius:50%;font-size:15px}
-.cni-est-week>div>span.done{background:#10b994;color:white;border-color:#10b994}
-.cni-est-topics,.cni-est-exams,.cni-est-career{margin-top:22px}
-.cni-est-section-title{display:flex;justify-content:space-between;align-items:center;gap:14px;margin-bottom:16px}
-.cni-est-section-title h2{font-size:24px;letter-spacing:-.03em}.cni-est-section-title small{color:#677d9d}
-.cni-est-section-title h2>span{color:#227bf3}
-.cni-est-topic-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
-.cni-est-topic{min-width:0;display:flex;gap:10px;align-items:center;border-radius:17px;padding:16px 13px;min-height:107px;background:#e4f6fc}
-.cni-est-tone-0{background:#ffedf4}.cni-est-tone-1{background:#e4f8f5}.cni-est-tone-2{background:#f4eafd}.cni-est-tone-3{background:#e5f1ff}.cni-est-tone-4{background:#fff6dd}.cni-est-tone-5{background:#ffe9ef}
-.cni-est-topic-icon{flex:none;display:grid;place-items:center;width:43px;height:43px;border-radius:15px;background:#ffffffa4;color:#e45d91;font-size:28px}
-.cni-est-topic-text{min-width:0;flex:1}.cni-est-topic-text strong{display:block;font-size:12px;line-height:1.25}.cni-est-topic-text small{display:block;color:#60718d;font-size:10px;margin-top:5px}
-.cni-est-topic-bar{height:5px;margin:8px 0 0;background:#cfdeed}.cni-est-topic-arrow{font-size:21px;color:#457ab1}
-.cni-est-exam-row{display:flex;align-items:center;justify-content:space-between;gap:18px;margin:10px 0;padding:17px 20px;background:white;border:1px solid #e0eafb;border-radius:14px}
-.cni-est-exam-row p,.cni-est-career p{font-size:13px;color:#607594;margin-top:6px}
-.cni-est-exam-row button,.cni-est-career button{border:0;border-radius:11px;padding:12px 18px;background:#176cef;color:#fff;font-weight:800;cursor:pointer}
-.cni-est-exam-row a{color:#176cef;font-weight:800}
-.cni-est-empty,.cni-est-career{background:#fff;border:1px solid #e0eafb;border-radius:15px;padding:20px;color:#557095;font-size:14px}
-.cni-est-career h2{font-size:19px}.cni-est-career label{font-size:13px;margin-top:15px;display:block}
-.cni-est-career select{max-width:450px;display:block;margin:7px 0 10px;padding:12px;border:1px solid #bbcee6;border-radius:9px}
-@media(max-width:1250px){.cni-est-start{grid-template-columns:70px 1fr}.cni-est-start-actions{grid-column:1/-1}.cni-est-illustration{font-size:55px}.cni-est-topic-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:950px){.cni-est-sidebar{flex-basis:76px;width:76px;padding:18px 8px}.cni-est-logo{font-size:0;margin:0 5px 25px}.cni-est-logo-mascot{width:44px}.cni-est-nav a{font-size:21px;padding:12px 18px}.cni-est-nav a span,.cni-est-sidebar-bottom,.cni-est-small-paws{display:none}.cni-est-lower-grid{grid-template-columns:1fr}.cni-est-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:690px){.cni-est-sidebar{position:fixed;top:auto;bottom:0;height:65px;min-height:0;width:100%;z-index:10;flex-direction:row;padding:4px 10px;justify-content:center}.cni-est-logo,.cni-est-sidebar-end{display:none}.cni-est-nav{display:flex;gap:3px}.cni-est-nav a{padding:10px 22px}.cni-est-content{padding:0 12px 85px}.cni-est-topbar{height:66px;padding:0 15px}.cni-est-top-label{font-size:16px;gap:9px}.cni-est-topicon{width:37px;height:37px;font-size:20px}.cni-est-account strong{font-size:11px;max-width:120px}.cni-est-hero{height:auto;min-height:540px;padding:22px 18px 245px}.cni-est-hero h1{font-size:31px}.cni-est-hero h2{font-size:16px}.cni-est-hero-copy>p{font-size:13px}.cni-est-hero-mascot{top:170px;right:0;height:180px;max-width:55%;opacity:.9}.cni-est-progress{bottom:12px;left:12px;width:calc(100% - 24px);padding:15px 13px}.cni-est-progress-icon{width:37px;height:37px;font-size:23px}.cni-est-stats strong{font-size:18px}.cni-est-stats small{font-size:10px}.cni-est-start{grid-template-columns:50px 1fr}.cni-est-start h2{font-size:23px}.cni-est-illustration{font-size:43px}.cni-est-topic-grid{grid-template-columns:1fr}.cni-est-section-title{align-items:flex-start;flex-direction:column}.cni-est-exam-row{align-items:flex-start;flex-direction:column}}
+/* RSU CNI · Panel del estudiante. Estilos aislados del panel docente. */
+body:has(.cni-alumno)>header{display:none!important}
+body:has(.cni-alumno)>main{max-width:none;margin:0;padding:0}
+body:has(.cni-alumno){background:#f8f9fe}
+.cni-alumno{--accent:#1575e8;--accent-dark:#0e4796;--navy:#14315c;--ink:#172b50;--muted:#71819c;--line:#e2eaf7;--pale:#eaf4ff;display:flex;min-height:100vh;color:var(--ink);background:#f8faff;font-family:Inter,'Segoe UI',Arial,sans-serif;font-size:14px;line-height:1.45}
+.cni-alumno[data-area="E"]{--accent:#9b3348;--accent-dark:#6c1c32;--navy:#671f30;--pale:#fff0f2}
+.cni-alumno[data-area="D"]{--accent:#bd6f25;--accent-dark:#8b4e19;--navy:#5d3e32;--pale:#fff4e6}
+.cni-alumno[data-area="C"]{--accent:#155dc7;--accent-dark:#123d8c;--navy:#132a62;--pale:#e9f1ff}
+.cni-alumno[data-area="B"]{--accent:#117e87;--accent-dark:#07606b;--navy:#154854;--pale:#e6f8fa}
+.cni-alumno *{box-sizing:border-box}
+.cni-alumno :where(h1,h2,h3,p,blockquote){margin:0}
+.cni-alumno :where(button,select){font:inherit}
+.cni-alumno a{text-decoration:none;color:inherit}
+.cni-alumno :where(a,button,select):focus-visible{outline:3px solid #ffbe3f;outline-offset:3px}
+.cni-alumno-sidebar{position:sticky;top:0;flex:0 0 232px;width:232px;height:100vh;display:flex;flex-direction:column;justify-content:space-between;gap:24px;padding:23px 13px 18px;color:#fff;background:linear-gradient(168deg,#143967,var(--navy) 65%,#0a2149);overflow-y:auto}
+.cni-alumno-marca{display:flex;align-items:center;gap:12px;color:#fff!important;padding:0 6px;margin-bottom:20px;line-height:1.15}
+.cni-alumno-marca-icon{display:grid;place-items:center;width:43px;height:43px;flex-shrink:0;border-radius:15px;color:#1263d0;background:#d7eafe;font-size:30px}
+.cni-alumno-marca strong{display:block;font-size:18px;letter-spacing:-.02em;font-weight:900}.cni-alumno-marca small{font-size:11px;color:#c4d8f4;display:block;margin-top:4px}
+.cni-alumno-area-chip{display:flex;align-items:center;gap:8px;background:#ffffff1d;color:#e9f2ff;padding:9px 12px;border-radius:11px;margin:0 0 16px;font-size:11px;font-weight:750}
+.cni-alumno-area-chip span{font-size:17px;color:#b8e8ff}
+.cni-alumno-menu{display:grid;gap:5px}
+.cni-alumno-menu a{display:flex;gap:13px;align-items:center;padding:12px 15px;border-radius:10px;color:#d4e1f7;font-size:13px;font-weight:700;transition:background .15s}
+.cni-alumno-menu a>span{width:21px;text-align:center;flex-shrink:0;font-size:19px;line-height:1}
+.cni-alumno-menu a:hover{background:#ffffff20;color:#fff}
+.cni-alumno-menu a.is-active{background:linear-gradient(100deg,#1c85ff,var(--accent));box-shadow:0 5px 17px #06173725;color:#fff}
+.cni-alumno-side-art{min-height:140px;display:flex;justify-content:space-around;align-items:center;opacity:.15;color:#b9dcff;font-size:65px;transform:rotate(-12deg)}
+.cni-alumno-side-art>span{font-size:32px;transform:translateY(40px)}
+.cni-alumno-sidebar-bottom{border-top:1px solid #ffffff29;padding-top:13px}
+.cni-alumno-side-user{display:flex;gap:10px;align-items:center;margin:8px 0 15px;min-width:0}
+.cni-alumno-side-user>span:last-child{min-width:0}.cni-alumno-side-user strong,.cni-alumno-side-user small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.cni-alumno-side-user strong{font-size:12px}.cni-alumno-side-user small{font-size:10px;color:#b3c9e9}
+.cni-alumno-avatar{width:38px;height:38px;border-radius:50%;background:#dce9fe;color:#1455ae;display:grid;place-items:center;flex:none;font-size:14px;font-weight:800}
+.cni-alumno-salir{background:transparent;color:#d9e7fd;border:0;text-align:left;padding:11px 6px;font-weight:750;font-size:12px;cursor:pointer}
+.cni-alumno-workspace{flex:1;min-width:0;background:#f8faff}
+.cni-alumno-topbar{height:74px;display:flex;justify-content:space-between;align-items:center;gap:16px;background:#fff;border-bottom:1px solid #e7ebf4;padding:0 clamp(18px,2.6vw,42px)}
+.cni-alumno-top-title{display:flex;align-items:center;gap:13px;min-width:0}
+.cni-alumno-top-title strong{display:block;font-weight:850;font-size:17px;letter-spacing:-.03em;line-height:1.2}
+.cni-alumno-top-title small{font-size:10px;color:#8392a9}
+.cni-alumno-topicon{display:grid;place-items:center;flex:none;border-radius:50%;width:40px;height:40px;background:var(--pale);color:var(--accent);font-size:22px}
+.cni-alumno-top-profile{display:flex;align-items:center;gap:10px;min-width:0}.cni-alumno-top-profile>span:last-child{max-width:190px;min-width:0}
+.cni-alumno-top-profile strong,.cni-alumno-top-profile small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cni-alumno-top-profile strong{font-size:12px}.cni-alumno-top-profile small{font-size:10px;color:#8492aa}
+.cni-alumno-content{max-width:1800px;padding:18px clamp(16px,2.6vw,42px) 55px;margin:0 auto}
+.cni-alumno-alert{background:#fff8e8;border:1px solid #efdcad;color:#815d23;padding:12px 17px;border-radius:12px;margin:0 0 15px;font-size:12px}.cni-alumno-alert-ok{background:#eaf8f2;border-color:#b1dec5;color:#216b4c}
+.cni-alumno-banner{position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;min-height:285px;border-radius:17px;background:linear-gradient(100deg,#f0f7ff 0%,#d5eaff 52%,#96cef8 100%);border:1px solid #dce8f8;padding:30px clamp(24px,3.4vw,48px)}
+.cni-alumno[data-area="E"] .cni-alumno-banner{background:linear-gradient(100deg,#fff8f4,#f5e4df 56%,#efc8b9)}
+.cni-alumno-banner-pattern{position:absolute;inset:0;background:radial-gradient(circle at 87% 13%,#ffffff85 0 11%,transparent 11.5%),radial-gradient(circle at 96% 75%,#ffffff42 0 14%,transparent 14.5%),linear-gradient(115deg,transparent 70%,#ffffff15 70%);z-index:-1}
+.cni-alumno-welcome{position:relative;z-index:2;max-width:64%}
+.cni-alumno-overline,.cni-alumno-section-kicker{font-weight:800;letter-spacing:.09em;font-size:10px;color:var(--accent-dark)}
+.cni-alumno-welcome h1{font-size:clamp(29px,3.3vw,44px);line-height:1.14;font-weight:900;letter-spacing:-.048em;margin:8px 0 4px}
+.cni-alumno-welcome h2{font-size:clamp(15px,1.55vw,19px);font-weight:850;margin-bottom:6px}
+.cni-alumno-welcome>p{max-width:550px;color:#526782;font-size:13px}
+.cni-alumno-welcome blockquote{display:inline-flex;align-items:center;max-width:430px;margin-top:18px;background:#ffffffad;border-left:3px solid #1c7df1;border-radius:0 10px 10px 0;padding:11px 15px;font-size:12px;font-style:italic;color:#496584}
+.cni-alumno-mascota{position:absolute;right:clamp(16px,5%,70px);bottom:-8px;height:105%;max-width:38%;object-fit:contain;object-position:center bottom;z-index:1;filter:drop-shadow(0 14px 15px #1c559228)}
+.cni-alumno-grupo{position:absolute;right:10%;bottom:-75px;font-size:230px;font-weight:900;color:#ffffff88;line-height:1}
+.cni-alumno-metric-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(275px,1fr);gap:16px;margin:17px 0 22px}
+.cni-alumno-progress-card,.cni-alumno-streak-card{background:#fff;border-radius:16px;border:1px solid #e3eaf4;box-shadow:0 5px 17px #233d6810;padding:19px 22px}
+.cni-alumno-card-heading{display:flex;gap:13px;align-items:center}.cni-alumno-card-heading>div{flex:1;min-width:0}.cni-alumno-card-heading h2{font-size:15px;font-weight:850}.cni-alumno-card-heading p{font-size:11px;color:#73829a;margin-top:2px}
+.cni-alumno-circle{width:44px;height:44px;background:var(--pale);color:var(--accent);border-radius:50%;display:grid;place-items:center;flex:none;font-size:24px}
+.cni-alumno-metric-value{font-size:23px;color:var(--accent-dark)}
+.cni-alumno-progress-track{height:12px;background:#e0e9f8;border-radius:100px;overflow:hidden;margin-top:13px}
+.cni-alumno-progress-track>span{height:100%;display:block;background:linear-gradient(90deg,#52abfa,var(--accent));border-radius:100px}
+.cni-alumno-progress-note{font-size:10px;color:#7b89a1;margin-top:6px}
+.cni-alumno-mini-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:17px}
+.cni-alumno-mini-stats>div{background:#f4f8ff;border-radius:11px;display:grid;grid-template-columns:32px minmax(0,1fr);grid-template-rows:auto auto;column-gap:7px;align-items:center;padding:11px 10px}
+.cni-alumno-mini-stats>div>span{display:grid;grid-row:span 2;place-items:center;border-radius:9px;width:32px;height:32px;font-size:20px;background:#e3ecff}
+.cni-alumno-mini-stats>div>span.blue{color:#2e70e7}.cni-alumno-mini-stats>div>span.mint{color:#19a87f;background:#e1f8ee}.cni-alumno-mini-stats>div>span.indigo{color:#884fcf;background:#eee5ff}
+.cni-alumno-mini-stats strong{font-size:18px;line-height:1.1}.cni-alumno-mini-stats small{font-size:9px;color:#73839e}
+.cni-alumno-streak-title{display:flex;align-items:center;gap:13px}.cni-alumno-streak-title h2{font-size:14px;font-weight:850}.cni-alumno-streak-title p{font-size:11px}.cni-alumno-streak-title p strong{font-size:22px;color:var(--accent-dark)}
+.cni-alumno-fire{display:grid;place-items:center;width:44px;height:44px;border-radius:15px;background:#fff0d4;color:#ee9c26;font-size:28px}
+.cni-alumno-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:19px}.cni-alumno-week>div{display:grid;justify-items:center;gap:5px}.cni-alumno-week>div>span{display:grid;place-items:center;width:25px;height:25px;border:1.5px solid #d3ddeb;border-radius:50%;font-size:17px;line-height:1;color:#bec8d9}.cni-alumno-week>div>span.done{background:#12b38c;border-color:#12b38c;color:white;font-size:13px}.cni-alumno-week small{font-size:9px;color:#70829c}
+.cni-alumno-streak-note{font-size:10px;color:#8591a8;margin-top:10px}
+.cni-alumno-section-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:0 0 14px}
+.cni-alumno-section-head h2{font-size:22px;font-weight:900;letter-spacing:-.035em;margin-top:2px}.cni-alumno-count{font-size:11px;color:var(--accent-dark);font-weight:700;white-space:nowrap}
+.cni-alumno-topics,.cni-alumno-exams,.cni-alumno-history,.cni-alumno-profile{margin-top:23px;scroll-margin-top:16px}
+.cni-alumno-topic-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.cni-alumno-topic{border-radius:14px;background:#fff2f3;min-height:122px;padding:16px;border:1px solid #ffffff60;display:flex;flex-direction:column;justify-content:space-between;gap:14px}
+.cni-alumno-topic.tone-0{background:#fcebef;--topic:#b44974}.cni-alumno-topic.tone-1{background:#e7f3ff;--topic:#2978c9}.cni-alumno-topic.tone-2{background:#fff1ea;--topic:#be6c42}.cni-alumno-topic.tone-3{background:#e6f7ee;--topic:#368466}.cni-alumno-topic.tone-4{background:#f2eafd;--topic:#7e58b5}.cni-alumno-topic.tone-5{background:#e9f7f5;--topic:#2b8d88}
+.cni-alumno-topic-row{display:flex;gap:13px;align-items:center}.cni-alumno-topic-name{min-width:0;display:block}.cni-alumno-topic-name strong{display:block;font-size:14px;font-weight:850;word-break:break-word}.cni-alumno-topic-name small{display:block;font-size:10px;color:#667994;margin-top:2px}
+.cni-alumno-topic-icon{width:38px;height:38px;display:grid;place-items:center;flex:none;background:var(--topic);color:#fff;border-radius:10px;font-size:24px}
+.cni-alumno-topic-bar{width:100%;height:6px;border-radius:8px;background:#ffffffad;overflow:hidden}.cni-alumno-topic-bar span{display:block;height:100%;border-radius:8px;background:var(--topic)}
+.cni-alumno-topic-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;color:var(--topic);font-size:10px;font-weight:750}
+.cni-alumno-topic-more{background:white!important;display:grid;place-items:center;width:29px;height:29px;border-radius:50%;color:var(--topic)!important;font-size:18px;font-weight:900;box-shadow:0 3px 8px #12294a12}
+.cni-alumno-topic-more:hover{transform:translateX(2px)}
+.cni-alumno-section-description{font-size:12px;color:#677b96;margin:-7px 0 13px}
+.cni-alumno-exam,.cni-alumno-history-row{display:flex;align-items:center;gap:13px;background:#fff;border:1px solid var(--line);padding:15px 17px;border-radius:12px;margin-bottom:9px}
+.cni-alumno-exam-icon{display:grid;place-items:center;flex:none;width:46px;height:46px;border-radius:13px;background:var(--pale);color:var(--accent);font-size:26px}
+.cni-alumno-exam>div,.cni-alumno-history-row>div{flex:1;min-width:0}.cni-alumno-exam strong,.cni-alumno-history-row strong{display:block;font-size:14px;font-weight:800}.cni-alumno-exam small,.cni-alumno-history-row small{display:block;font-size:11px;color:#71829a;margin-top:5px}
+.cni-alumno-primary{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;padding:11px 17px;background:var(--accent);border-radius:9px;color:#fff!important;font-weight:750;font-size:12px;cursor:pointer}.cni-alumno-primary:hover{background:var(--accent-dark)}.cni-alumno-primary:disabled{opacity:.5;cursor:not-allowed}
+.cni-alumno-disabled{display:block;font-size:11px;color:#8291a8;font-weight:650}.cni-alumno-empty{background:#fff;padding:21px;border-radius:13px;border:1px solid var(--line);font-size:12px;color:#617899}
+.cni-alumno-history-score{font-weight:850;color:var(--accent-dark);white-space:nowrap}.cni-alumno-history-row>a,.cni-alumno-text-link{font-size:12px;font-weight:800;color:var(--accent)!important;white-space:nowrap}
+.cni-alumno-profile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}.cni-alumno-profile p{font-size:12px;color:#62758d;margin:7px 0}.cni-alumno-profile p strong{color:var(--ink)}
+.cni-alumno-profile label{display:block;margin:14px 0 6px;font-size:12px;font-weight:750}.cni-alumno-form-row{display:flex;gap:10px;align-items:center}.cni-alumno-profile select{max-width:430px;width:100%;padding:10px 12px;border:1px solid #c7d9ed;background:#fff;border-radius:9px}.cni-alumno-error{color:#b62535!important}
+.cni-alumno-detail-card{background:#fff;border-radius:19px;padding:clamp(24px,3vw,48px);border:1px solid var(--line)}.cni-alumno-detail-card h1{font-size:clamp(26px,3vw,38px);margin:8px 0}.cni-alumno-detail-card>p{color:#70819b;margin-top:7px}.cni-alumno-detail-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:25px 0}.cni-alumno-detail-stats article{background:var(--pale);padding:19px;border-radius:13px}.cni-alumno-detail-stats strong{display:block;font-size:29px;color:var(--accent-dark)}.cni-alumno-detail-stats span{font-size:12px;color:#71839e}.cni-alumno-detail-action{margin-top:24px}
+@media(max-width:1200px){.cni-alumno-topic-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.cni-alumno-sidebar{flex-basis:205px;width:205px}.cni-alumno-mini-stats>div{padding:9px 7px}.cni-alumno-banner{min-height:260px}}
+@media(max-width:960px){.cni-alumno-sidebar{flex-basis:64px;width:64px;padding:15px 7px}.cni-alumno-marca{margin:0 4px 25px}.cni-alumno-marca>span:last-child,.cni-alumno-area-chip,.cni-alumno-menu a{font-size:0}.cni-alumno-menu a{justify-content:center;padding:13px 0}.cni-alumno-menu a>span{font-size:21px}.cni-alumno-side-art,.cni-alumno-side-user,.cni-alumno-salir{display:none}.cni-alumno-metric-grid{grid-template-columns:1fr}.cni-alumno-welcome{max-width:64%}.cni-alumno-banner{min-height:250px}}
+@media(max-width:680px){.cni-alumno-sidebar{position:fixed;z-index:15;top:auto;bottom:0;left:0;width:100%;height:62px;padding:6px 8px;overflow:visible}.cni-alumno-sidebar-top{width:100%}.cni-alumno-marca,.cni-alumno-sidebar-bottom{display:none}.cni-alumno-menu{display:flex;justify-content:space-around;gap:2px}.cni-alumno-menu a{flex:1;max-width:66px;padding:13px 2px;border-radius:9px}.cni-alumno-menu a>span{font-size:19px}.cni-alumno-content{padding:12px 12px 90px}.cni-alumno-topbar{height:65px;padding:0 12px}.cni-alumno-top-title{gap:9px}.cni-alumno-top-title strong{font-size:13px}.cni-alumno-top-title small{font-size:9px}.cni-alumno-topicon{width:34px;height:34px}.cni-alumno-top-profile>.cni-alumno-avatar{display:none}.cni-alumno-top-profile strong{font-size:11px;max-width:105px}.cni-alumno-banner{min-height:340px;align-items:flex-start;padding:20px 17px}.cni-alumno-welcome{max-width:84%}.cni-alumno-welcome h1{font-size:29px}.cni-alumno-welcome h2{font-size:13px}.cni-alumno-welcome>p{font-size:11px;max-width:290px}.cni-alumno-welcome blockquote{font-size:10px;max-width:225px}.cni-alumno-mascota{right:-13px;bottom:-2px;height:49%;max-width:52%}.cni-alumno-card-heading h2{font-size:13px}.cni-alumno-progress-card,.cni-alumno-streak-card{padding:14px}.cni-alumno-mini-stats>div{display:flex;flex-direction:column;justify-content:center;text-align:center;gap:4px}.cni-alumno-mini-stats>div>span{display:none}.cni-alumno-mini-stats small{font-size:9px}.cni-alumno-topic-grid{grid-template-columns:1fr}.cni-alumno-topic{min-height:110px}.cni-alumno-section-head h2{font-size:20px}.cni-alumno-exam,.cni-alumno-history-row{align-items:flex-start;flex-wrap:wrap}.cni-alumno-exam form{width:100%}.cni-alumno-exam form button{width:100%}.cni-alumno-profile{padding:15px}.cni-alumno-form-row{flex-direction:column;align-items:stretch}.cni-alumno-detail-stats{grid-template-columns:1fr}}
