@@ -1,10 +1,11 @@
 @extends('layouts.app')
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/dashboard-salud.css') }}?v=4">
+<link rel="stylesheet" href="{{ asset('css/dashboard-salud.css') }}?v=5">
 @endpush
 @section('content')
 @php
     $d = $dashboard;
+    $paginaActiva = 'inicio';
     $esVistaPrevia = $esVistaPrevia ?? false;
     $esSalud = $area->codigo === 'A';
     $nombreCompleto = trim($usuario->nombres.' '.($usuario->apellidos ?? ''));
@@ -12,38 +13,10 @@
     $primeraPalabra = explode(' ', trim($usuario->nombres))[0];
 @endphp
 <div class="cni-alumno" data-area="{{ $area->codigo }}" id="inicio">
-    <aside class="cni-alumno-sidebar" aria-label="Menú del estudiante">
-        <div class="cni-alumno-sidebar-top">
-            <a class="cni-alumno-marca" href="{{ $esVistaPrevia ? route('alumno.salud-preview') : route('alumno.panel') }}">
-                <span class="cni-alumno-marca-icon" aria-hidden="true">✦</span>
-                <span><strong>Simulador</strong><small>CNI · Imperial</small></span>
-            </a>
-            <span class="cni-alumno-area-chip"><span aria-hidden="true">{{ $esSalud ? '♥' : '◆' }}</span> {{ $area->nombre }}</span>
-            <nav class="cni-alumno-menu" aria-label="Navegación principal">
-                <a class="is-active" href="#inicio" aria-current="page"><span aria-hidden="true">⌂</span> Inicio</a>
-                <a href="#mis-intentos"><span aria-hidden="true">▤</span> Mis intentos</a>
-                <a href="#temas"><span aria-hidden="true">▦</span> Banco de preguntas</a>
-                <a href="#temas"><span aria-hidden="true">▣</span> Temas de estudio</a>
-                <a href="#simulacros-disponibles"><span aria-hidden="true">◇</span> Simulacros</a>
-                <a href="#perfil"><span aria-hidden="true">♙</span> Mi perfil</a>
-            </nav>
-        </div>
-        <div class="cni-alumno-sidebar-bottom">
-            <div class="cni-alumno-side-art" aria-hidden="true">✦<span>✦</span>✦</div>
-            <div class="cni-alumno-side-user"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante · Área {{ $area->codigo }}</small></span></div>
-            @unless($esVistaPrevia)
-                <form method="POST" action="{{ route('logout') }}">@csrf
-                    <button class="cni-alumno-salir" type="submit">↪ &nbsp; Cerrar sesión</button>
-                </form>
-            @endunless
-        </div>
-    </aside>
+    @include('alumno.partials.sidebar')
 
     <div class="cni-alumno-workspace">
-        <header class="cni-alumno-topbar">
-            <div class="cni-alumno-top-title"><span class="cni-alumno-topicon" aria-hidden="true">{{ $esSalud ? '♥' : '◆' }}</span><span><strong>{{ $area->nombre }}</strong><small>Simulador de Examen de Admisión CNI</small></span></div>
-            <div class="cni-alumno-top-profile"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante</small></span></div>
-        </header>
+        @include('alumno.partials.topbar')
 
         <main class="cni-alumno-content">
             @if($esVistaPrevia)
