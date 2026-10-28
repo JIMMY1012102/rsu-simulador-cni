@@ -93,8 +93,8 @@ class OrientacionAlumnoTest extends TestCase
         $this->alumno('persistente', $this->carrera('Derecho'));
         $this->post('/login', ['usuario' => 'persistente', 'password' => 'ClaveCNI2026!'])
             ->assertRedirect(route('alumno.panel'));
-        $this->get(route('alumno.panel'))->assertRedirect(route('alumno.inicio'));
-        $this->get(route('alumno.inicio'))->assertOk()->assertSee('Derecho');
+        $this->get(route('alumno.panel'))->assertOk()->assertSee('Derecho')->assertSee('panel-alumno.css');
+        $this->get(route('alumno.inicio'))->assertRedirect(route('alumno.panel'));
         $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('C')])->assertForbidden();
         $this->post(route('alumno.carrera.guardar'), ['carrera_id' => $this->carrera('Ingeniería de Sistemas')])
             ->assertForbidden();
@@ -153,7 +153,7 @@ class OrientacionAlumnoTest extends TestCase
         $this->post('/login', ['usuario' => 'primer_ingreso', 'password' => 'ClaveCNI2026!'])
             ->assertRedirect(route('alumno.elegir-area'));
         $this->get(route('alumno.elegir-area'))->assertOk()
-            ->assertSee('areas-grid')->assertSee('area-tarjeta');
+            ->assertSee('selector-page__grid')->assertSee('area-opcion');
 
         $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('C')])
             ->assertRedirect(route('alumno.panel'));
