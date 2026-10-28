@@ -150,7 +150,7 @@ class PanelesPorAreaTest extends TestCase
         $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
 
         $this->assertStringContainsString('Mis intentos · Iniciar Simulador CNI', $html);
-        $this->assertStringContainsString('route(', file_get_contents(resource_path('views/alumno/panel.blade.php')));
+        $this->assertStringContainsString(route('alumno.carrera.guardar'), $html);
         $this->assertStringContainsString('Carrera de interés', $html);
         $this->assertStringContainsString('Mi perfil', $html);
     }
