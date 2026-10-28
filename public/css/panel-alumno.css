@@ -731,3 +731,55 @@ body:has(.cni-alumno){background:#f8f9fe}
     .cni-progreso-svg {min-width:590px}
     .cni-progreso-barra-etiquetas {font-size:10px}
 }
+
+
+/* Historial de simulacros: tarjetas y tabla, con el mismo tema A-E del panel. */
+.cni-historial{display:grid;gap:16px;width:100%;min-width:0}
+.cni-historial-metricas{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.cni-historial-metrica{display:flex;align-items:center;gap:12px;min-width:0;min-height:72px;padding:13px 16px;background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:0 4px 14px #163b7110}
+.cni-historial-icono{flex:none;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:var(--pale);color:var(--accent);font-size:20px}
+.cni-historial-metrica div{min-width:0;display:grid;gap:1px}
+.cni-historial-metrica strong{font-size:clamp(16px,1.8vw,23px);line-height:1.15;color:var(--accent-dark);font-weight:850;font-variant-numeric:tabular-nums}
+.cni-historial-metrica div span{font-size:11px;color:var(--accent-dark)}
+.cni-historial-panel{min-width:0;padding:18px 18px 14px;background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 4px 16px #163b7110}
+.cni-historial-encabezado{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:15px;flex-wrap:wrap}
+.cni-historial-encabezado h2{font-weight:850;font-size:19px;color:var(--accent-dark)}
+.cni-historial-controles{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.cni-historial-controles input,.cni-historial-controles select{height:38px;min-width:0;padding:8px 11px;border:1px solid #cbd9ec;border-radius:9px;background:#fff;color:var(--accent-dark);font-family:inherit;font-size:12px;outline-offset:2px}
+.cni-historial-controles input{width:180px;color:var(--ink)}
+.cni-historial-controles input::placeholder{color:#94a5bd}
+.cni-historial-controles select{max-width:225px;font-weight:650;cursor:pointer}
+.cni-historial-scroll{width:100%;overflow-x:auto;border-radius:8px}
+.cni-historial-tabla{width:100%;min-width:760px;border-collapse:collapse;text-align:left;table-layout:auto;font-size:12px}
+.cni-historial-tabla th{background:#eef3f9;color:var(--accent-dark);font-size:11px;text-transform:uppercase;font-weight:800;letter-spacing:.035em;white-space:nowrap;padding:10px 12px}
+.cni-historial-tabla td{padding:10px 12px;border-bottom:1px solid #e8eef7;color:#334b6d;vertical-align:middle}
+.cni-historial-tabla tbody tr:hover{background:#f7fbff}
+.cni-historial-tabla tbody tr[hidden]{display:none!important}
+.cni-historial-id,.cni-historial-puntaje{color:var(--accent-dark)!important;font-weight:800;font-variant-numeric:tabular-nums}
+.cni-historial-tabla td:nth-child(2),.cni-historial-tabla td:nth-child(4){white-space:nowrap}
+.cni-historial-estado{display:inline-block;min-width:88px;max-width:100%;text-align:center;border-radius:999px;background:#eef1f5;color:#647995;font-size:10px;font-weight:750;padding:4px 10px;white-space:nowrap}
+.cni-historial-estado-curso{color:#537098;background:#ebf0f7}
+.cni-historial-evolucion{font-weight:800;color:#61728d;white-space:nowrap}
+.cni-historial-evolucion-sube{color:#00985e}
+.cni-historial-evolucion-baja{color:#df4b58}
+.cni-historial-guion{color:#7185a0}
+.cni-historial-resultado{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;color:var(--accent)!important;border:1px solid var(--accent);padding:6px 9px;border-radius:7px;font-size:11px;font-weight:800;transition:background .15s}
+.cni-historial-resultado:hover{background:var(--pale)}
+.cni-historial-pie{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 18px;padding-top:12px;color:#8190a6;font-size:10px}
+.cni-historial-sin-datos,.cni-historial-sin-resultados{padding:24px 12px;text-align:center;color:var(--muted);font-size:13px}
+.cni-historial-sin-resultados[hidden]{display:none!important}
+.cni-historial-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(max-width:1150px){
+    .cni-historial-metricas{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .cni-historial-encabezado{align-items:flex-start;flex-direction:column}
+    .cni-historial-controles{width:100%}
+}
+@media(max-width:680px){
+    .cni-historial-metricas{gap:8px}
+    .cni-historial-metrica{padding:11px 9px;gap:7px}
+    .cni-historial-icono{width:32px;height:32px;font-size:17px}
+    .cni-historial-metrica div span{font-size:10px}
+    .cni-historial-panel{padding:13px 10px}
+    .cni-historial-encabezado h2{font-size:18px}
+    .cni-historial-controles input,.cni-historial-controles select{width:100%;max-width:none;flex:1 1 100%}
+}
