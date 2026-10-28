@@ -94,4 +94,35 @@ if (app()->environment('local')) {
             'alumnos' => collect(),
         ]);
     });
+
+    // Vista previa SOLO local: no consulta MySQL ni requiere sesión de alumno.
+    Route::get('/alumno/salud-preview', function () {
+        $dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+        return view('alumno.panel', [
+            'esVistaPrevia' => true,
+            'usuario' => (object) ['nombres' => 'Estudiante', 'apellidos' => '(vista previa)'],
+            'area' => (object) ['codigo' => 'A', 'nombre' => 'Ciencias de la Salud'],
+            'carrera' => null,
+            'carreras' => collect(),
+            'simulacros' => collect(),
+            'intentos' => collect(),
+            'dashboard' => [
+                'progreso' => 0,
+                'resueltas' => 0,
+                'correctas' => 0,
+                'porcentajeAcierto' => 0,
+                'simulacrosCompletados' => 0,
+                'simulacrosDisponibles' => 0,
+                'racha' => 0,
+                'temas' => collect(),
+                'semana' => collect($dias)->map(fn ($dia, $i) => [
+                    'dia' => $dia,
+                    'fecha' => now()->startOfWeek()->addDays($i)->toDateString(),
+                    'actividad' => false,
+                    'futuro' => false,
+                ])->all(),
+            ],
+        ]);
+    })->name('alumno.salud-preview');
 }

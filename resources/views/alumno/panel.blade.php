@@ -5,6 +5,7 @@
 @section('content')
 @php
     $d = $dashboard;
+    $esVistaPrevia = $esVistaPrevia ?? false;
     $nombreArea = $area->nombre;
     $esSalud = $area->codigo === 'A';
     $disponible = $simulacros->isNotEmpty();
@@ -12,7 +13,7 @@
 @endphp
 <div class="cni-estudiante" id="inicio">
     <aside class="cni-est-sidebar" aria-label="Portal del estudiante">
-        <a class="cni-est-logo" href="{{ route('alumno.panel') }}">
+        <a class="cni-est-logo" href="{{ $esVistaPrevia ? route('alumno.salud-preview') : route('alumno.panel') }}">
             <span class="cni-est-logo-mascot">✦</span>
             <span>Simulador<br>CNI</span>
         </a>
@@ -26,9 +27,11 @@
             <span class="cni-est-small-paws" aria-hidden="true">✦　✦　✦</span>
             <div class="cni-est-sidebar-bottom">
                 <div class="cni-est-area-info">Área elegida: <strong>{{ $area->nombre }}</strong></div>
+                @unless($esVistaPrevia)
                 <form action="{{ route('logout') }}" method="POST">@csrf
                     <button class="cni-est-logout" type="submit">⇥ Cerrar sesión</button>
                 </form>
+                @endunless
             </div>
         </div>
     </aside>
@@ -38,6 +41,9 @@
             <div class="cni-est-account"><span class="cni-est-avatar">{{ mb_strtoupper($iniciales) }}</span><span><strong>{{ $usuario->nombres }} {{ $usuario->apellidos }}</strong><small>Estudiante</small></span></div>
         </header>
         <main class="cni-est-content">
+            @if($esVistaPrevia)
+                <div class="cni-est-notice" role="status">Vista previa local · sin cuenta de alumno ni conexión a la base de datos. Las cifras están en cero hasta que existan resultados reales.</div>
+            @endif
             @if(session('status'))<div class="cni-est-notice" role="status">{{ session('status') }}</div>@endif
             <section class="cni-est-hero" aria-labelledby="cni-est-bienvenida">
                 <div class="cni-est-hero-copy">
@@ -104,10 +110,12 @@
                 @forelse($intentos as $intento)<article class="cni-est-exam-row"><div><strong>Intento #{{ $intento->id }}</strong><p>{{ $intento->fecha_inicio }}</p></div><a href="{{ route('alumno.resultados', ['intento' => $intento->id]) }}">Ver resultados · {{ $intento->puntaje_total }}</a></article>
                 @empty<p class="cni-est-empty">Todavía no tienes exámenes calificados.</p>@endforelse
             </section>
+            @unless($esVistaPrevia)
             <section class="cni-est-career" id="carrera">
                 @if($carrera)<h2>Mi carrera de interés</h2><p>{{ $carrera->nombre }}</p>
                 @else<h2>Carrera de interés (opcional)</h2><p>No necesitas elegir una carrera para rendir los simulacros de tu área.</p><form method="POST" action="{{ route('alumno.carrera.guardar') }}">@csrf<label for="carrera_id">Seleccionar carrera</label><select id="carrera_id" name="carrera_id" required><option value="">Selecciona una carrera</option>@foreach($carreras as $opcion)<option value="{{ $opcion->id }}" @selected(old('carrera_id') == $opcion->id)>{{ $opcion->nombre }}</option>@endforeach</select><button type="submit" @disabled($carreras->isEmpty())>Guardar carrera</button>@error('carrera_id')<p role="alert">{{ $message }}</p>@enderror</form>@endif
             </section>
+            @endunless
         </main>
     </div>
 </div>
