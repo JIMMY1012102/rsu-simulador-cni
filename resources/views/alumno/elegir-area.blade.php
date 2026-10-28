@@ -10,17 +10,6 @@
     // Orden de las tarjetas de izquierda a derecha según la referencia.
     $ordenVisual = ['B' => 1, 'A' => 2, 'C' => 3, 'D' => 4, 'E' => 5];
     $areasOrdenadas = $areas->sortBy(fn ($area) => $ordenVisual[$area->codigo] ?? 99);
-    // Escenas 3D recortadas de la referencia: cinco archivos independientes.
-    // Sin estos archivos se siguen mostrando las mascotas SVG de respaldo.
-    $escenas = [
-        'B' => 'escena-basicas.webp',
-        'A' => 'escena-salud.webp',
-        'C' => 'escena-ingenierias.webp',
-        'D' => 'escena-economicas.webp',
-        'E' => 'escena-humanidades.webp',
-    ];
-    $fondoOriginal = 'images/selector-cni/fondo-selector.webp';
-    $tieneFondoOriginal = is_file(public_path($fondoOriginal));
     $mascotas = [
         'B' => 'mascota-basicas.svg',
         'A' => 'mascota-salud.svg',
@@ -29,8 +18,8 @@
         'E' => 'mascota-humanidades.svg',
     ];
 
-    // Si el equipo agrega recortes WebP de los personajes originales, se usan automáticamente.
-    // De lo contrario, se muestran las mascotas SVG incluidas en el repositorio.
+    // Preferir mascotas individuales con canal alfa (sin escenarios).
+    // Si aún no están instaladas, usar los SVG ya incluidos en GitHub.
     $mascotasOriginales = [
         'B' => 'cni-mascota-basicas.webp',
         'A' => 'cni-mascota-salud.webp',
@@ -63,9 +52,7 @@
     ];
 @endphp
 
-<section class="selector-page{{ $tieneFondoOriginal ? ' selector-page--referencia' : '' }}"
-         @if ($tieneFondoOriginal) style="--selector-paisaje: url('{{ asset($fondoOriginal) }}')" @endif
-         aria-labelledby="selector-titulo">
+<section class="selector-page" aria-labelledby="selector-titulo">
     <form class="selector-page__salir" method="POST" action="{{ route('logout') }}">
         @csrf
         <button type="submit">Cerrar sesión</button>
@@ -84,12 +71,8 @@
                     'titulo' => $area->nombre,
                     'descripcion' => 'Prepárate para tu examen de admisión.',
                 ];
-                $rutaEscena = 'images/selector-cni/'.($escenas[$area->codigo] ?? '');
-                $tieneEscena = isset($escenas[$area->codigo]) && is_file(public_path($rutaEscena));
             @endphp
             <form class="area-opcion area-tarjeta" data-area="{{ $area->codigo }}"
-                  data-escena="{{ $tieneEscena ? 'original' : 'respaldo' }}"
-                  @if ($tieneEscena) style="--escena-original: url('{{ asset($rutaEscena) }}')" @endif
                   method="POST" action="{{ route('alumno.area.guardar') }}"
                   aria-labelledby="area-titulo-{{ $area->id }}">
                 @csrf
@@ -104,7 +87,8 @@
                         @endphp
                         <div class="area-opcion__mascota">
                             <img src="{{ asset($imagenMascota) }}"
-                                 alt="" loading="eager" decoding="async">
+                                 alt="" loading="eager" decoding="async"
+                                 width="520" height="520">
                         </div>
                     @endif
                 </div>
