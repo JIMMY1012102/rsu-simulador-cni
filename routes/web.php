@@ -35,6 +35,10 @@ Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::clas
         Route::get('/elegir-area', [OrientacionController::class, 'elegirArea'])->name('elegir-area');
         Route::post('/elegir-area', [OrientacionController::class, 'guardarArea'])->name('area.guardar');
         Route::get('/panel', [OrientacionController::class, 'panel'])->name('panel');
+        Route::get('/perfil', [\App\Http\Controllers\Alumno\PortalEstudianteController::class, 'perfil'])->name('perfil');
+        Route::get('/progreso', [\App\Http\Controllers\Alumno\PortalEstudianteController::class, 'progreso'])->name('progreso');
+        Route::get('/historial', [\App\Http\Controllers\Alumno\PortalEstudianteController::class, 'historial'])->name('historial');
+        Route::get('/temas/{tema}', [OrientacionController::class, 'tema'])->whereNumber('tema')->name('tema');
         Route::post('/carrera', [OrientacionController::class, 'guardarCarrera'])->name('carrera.guardar');
         Route::get('/resultados/{intento}', [OrientacionController::class, 'resultados'])
             ->whereNumber('intento')->name('resultados');
@@ -81,6 +85,20 @@ Route::get('/docente/exportar', \App\Http\Controllers\Docente\ExportarCalificaci
     ->name('docente.exportar');
 
 // Vistas previas de diseño sin autenticación: exclusivas del entorno local.
+
+// Datos estructurales para pantallas de vista previa local, sin MySQL ni cuenta real.
+if (! function_exists('cniVistaPreviaAlumno')) {
+    function cniVistaPreviaAlumno(): array
+    {
+        return [
+            'esVistaPrevia' => true,
+            'usuario' => (object) ['nombres' => 'Estudiante', 'apellidos' => '(vista previa)', 'activo' => true],
+            'area' => (object) ['codigo' => 'A', 'nombre' => 'Ciencias de la Salud'],
+            'carrera' => null,
+        ];
+    }
+}
+
 if (app()->environment('local')) {
     Route::view('/docente-preview', 'livewire.docente.panel-docente');
     Route::redirect('/preview-docente', '/docente-preview');
@@ -94,4 +112,57 @@ if (app()->environment('local')) {
             'alumnos' => collect(),
         ]);
     });
+
+    // Vista previa SOLO local: no consulta MySQL ni requiere sesión de alumno.
+    Route::get('/alumno/salud-preview', function () {
+        $dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+
+        return view('alumno.panel', [
+            'esVistaPrevia' => true,
+            'usuario' => (object) ['nombres' => 'Estudiante', 'apellidos' => '(vista previa)'],
+            'area' => (object) ['codigo' => 'A', 'nombre' => 'Ciencias de la Salud'],
+            'carrera' => null,
+            'carreras' => collect(),
+            'simulacros' => collect(),
+            'intentos' => collect(),
+            'dashboard' => [
+                'progreso' => 0,
+                'resueltas' => 0,
+                'correctas' => 0,
+                'porcentajeAcierto' => 0,
+                'simulacrosCompletados' => 0,
+                'simulacrosDisponibles' => 0,
+                'racha' => 0,
+                'temas' => collect(),
+                'semana' => collect($dias)->map(fn ($dia, $i) => [
+                    'dia' => $dia,
+                    'fecha' => now()->startOfWeek()->addDays($i)->toDateString(),
+                    'actividad' => false,
+                    'futuro' => false,
+                ])->all(),
+            ],
+        ]);
+    })->name('alumno.salud-preview');
+    Route::get('/alumno/perfil-preview', function () {
+        return view('alumno.perfil', array_merge(cniVistaPreviaAlumno(), [
+            'paginaActiva' => 'perfil', 'tituloPagina' => 'Mi perfil', 'carreras' => collect(),
+        ]));
+    })->name('alumno.perfil-preview');
+
+    Route::get('/alumno/progreso-preview', function () {
+        return view('alumno.progreso', array_merge(cniVistaPreviaAlumno(), [
+            'paginaActiva' => 'progreso', 'tituloPagina' => 'Mi progreso',
+            'resumen' => ['total' => 0, 'mejor' => null, 'ultimo' => null, 'promedio' => null,
+                'minEje' => 0, 'maxEje' => 1, 'serie' => [], 'puntos' => ''],
+        ]));
+    })->name('alumno.progreso-preview');
+
+    Route::get('/alumno/historial-preview', function () {
+        return view('alumno.historial', array_merge(cniVistaPreviaAlumno(), [
+            'paginaActiva' => 'historial', 'tituloPagina' => 'Historial de intentos',
+            'intentos' => collect(), 'cambios' => [],
+            'totales' => ['intentos' => 0, 'mejor' => null, 'ultimo' => null, 'promedio' => null],
+        ]));
+    })->name('alumno.historial-preview');
+
 }

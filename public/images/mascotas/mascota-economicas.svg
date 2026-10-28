@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 320" role="img">
+<defs>
+<filter id="drop" x="-35%" y="-35%" width="180%" height="190%"><feDropShadow dx="0" dy="9" stdDeviation="8" flood-color="#08224a" flood-opacity=".33"/></filter>
+<linearGradient id="white" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#fff"/><stop offset=".6" stop-color="#f2f5ff"/><stop offset="1" stop-color="#afc6dc"/></linearGradient>
+<linearGradient id="shine" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#fff" stop-opacity=".72"/><stop offset=".5" stop-color="#fff" stop-opacity=".08"/><stop offset="1" stop-color="#052958" stop-opacity=".25"/></linearGradient>
+<linearGradient id="navy" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#2b70d6"/><stop offset=".55" stop-color="#173963"/><stop offset="1" stop-color="#0a1741"/></linearGradient>
+<linearGradient id="green" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#d5ff73"/><stop offset=".52" stop-color="#6edc36"/><stop offset="1" stop-color="#229b48"/></linearGradient>
+<linearGradient id="blue" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#67e6ff"/><stop offset=".38" stop-color="#1687ff"/><stop offset="1" stop-color="#063eaf"/></linearGradient>
+<linearGradient id="brown" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#d89049"/><stop offset=".6" stop-color="#92522e"/><stop offset="1" stop-color="#4b2631"/></linearGradient>
+<linearGradient id="gold" x1="0" y1="0" x2=".9" y2="1"><stop stop-color="#fff5a9"/><stop offset=".45" stop-color="#ffd13c"/><stop offset="1" stop-color="#ed8914"/></linearGradient>
+</defs><g filter="url(#drop)">
+<!-- chaqueta ejecutiva -->
+<path d="M94 188 Q62 214 62 306 L242 306 Q240 211 204 187 L157 196Z" fill="url(#navy)" stroke="#0f3155" stroke-width="4"/>
+<path d="M114 194 L151 248 L185 194 L164 303 L132 303Z" fill="url(#white)"/>
+<path d="M149 233 l-14 22 14 53 15-53Z" fill="#e56a2b"/>
+<path d="M112 208 L143 246 L121 275 L95 222 M190 209 L162 244 L183 279 L215 221" fill="none" stroke="#d19c46" stroke-width="6"/>
+<!-- plumas cuerpo -->
+<path d="M78 237 Q43 237 49 278 L64 303 L113 303Z" fill="url(#brown)" stroke="#6f432c" stroke-width="3"/>
+<path d="M212 231 Q246 234 257 268 L247 308 L202 302Z" fill="url(#brown)"/>
+<!-- cabeza águila -->
+<path d="M92 124 Q94 60 140 48 L151 29 L167 43 L183 27 L183 46 Q228 61 227 121 Q218 161 201 183 L184 194 L167 187 L152 207 L139 189 L118 193 L105 176 L96 182 L87 164Z" fill="url(#white)" stroke="#a3aec7" stroke-width="4"/>
+<path d="M102 123 Q113 108 137 116 M172 115 Q196 107 213 120" stroke="#80552f" stroke-width="9" stroke-linecap="round"/>
+<ellipse cx="126" cy="131" rx="15" ry="19" fill="#fff"/><ellipse cx="193" cy="130" rx="15" ry="19" fill="#fff"/>
+<circle cx="129" cy="132" r="10" fill="#7d421d"/><circle cx="195" cy="131" r="10" fill="#7d421d"/>
+<circle cx="132" cy="127" r="4" fill="#fff"/><circle cx="197" cy="126" r="4" fill="#fff"/>
+<path d="M147 128 Q178 124 195 144 Q184 171 160 192 Q145 187 142 167 L130 148Z" fill="url(#gold)" stroke="#cc761e" stroke-width="4"/>
+<path d="M151 167 Q168 164 177 164" stroke="#b05f20" stroke-width="4" stroke-linecap="round"/>
+<!-- calculadora -->
+<rect x="40" y="193" width="59" height="92" rx="8" transform="rotate(-10 40 193)" fill="#194f90" stroke="#efffff" stroke-width="4"/>
+<rect x="51" y="202" width="38" height="19" rx="3" transform="rotate(-10 51 202)" fill="#c3eff6"/>
+<g fill="#ffbd40"><circle cx="56" cy="234" r="5"/><circle cx="73" cy="232" r="5"/><circle cx="88" cy="230" r="5"/><circle cx="60" cy="251" r="5"/><circle cx="77" cy="249" r="5"/><circle cx="90" cy="247" r="5"/><circle cx="62" cy="266" r="5"/><circle cx="81" cy="264" r="5"/></g>
+<!-- monedas -->
+<g stroke="#dc8b18" stroke-width="3" fill="url(#gold)">
+<ellipse cx="178" cy="303" rx="36" ry="11"/><path d="M142 288 h72 v15 q-36 21-72 0Z"/><ellipse cx="178" cy="288" rx="36" ry="11"/>
+<ellipse cx="218" cy="286" rx="30" ry="9"/><path d="M188 270 h60 v16 q-30 20-60 0Z"/><ellipse cx="218" cy="270" rx="30" ry="9"/>
+<circle cx="217" cy="243" r="29"/><path d="M217 223 v40 M229 230 Q200 218 205 239 Q213 245 223 246 Q238 261 205 259" fill="none" stroke="#d18a21" stroke-width="5" stroke-linecap="round"/>
+</g>
+</g></svg>
