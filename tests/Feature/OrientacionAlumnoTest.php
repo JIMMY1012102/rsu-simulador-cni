@@ -93,8 +93,8 @@ class OrientacionAlumnoTest extends TestCase
         $this->alumno('persistente', $this->carrera('Derecho'));
         $this->post('/login', ['usuario' => 'persistente', 'password' => 'ClaveCNI2026!'])
             ->assertRedirect(route('alumno.panel'));
-        $this->get(route('alumno.panel'))->assertOk()
-            ->assertSee('Humanidades y Ciencias Jurídicas y Sociales')->assertSee('Derecho');
+        $this->get(route('alumno.panel'))->assertRedirect(route('alumno.inicio'));
+        $this->get(route('alumno.inicio'))->assertOk()->assertSee('Derecho');
         $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('C')])->assertForbidden();
         $this->post(route('alumno.carrera.guardar'), ['carrera_id' => $this->carrera('Ingeniería de Sistemas')])
             ->assertForbidden();
@@ -114,7 +114,7 @@ class OrientacionAlumnoTest extends TestCase
         $this->actingAs($this->alumno('ingeniera', $this->carrera('Ingeniería de Sistemas')), 'web')
             ->get(route('alumno.panel'))->assertSee(ExamenDemoSeeder::SIMULACRO);
         $this->actingAs($this->alumno('abogada', $this->carrera('Derecho')), 'web')
-            ->get(route('alumno.panel'))->assertDontSee(ExamenDemoSeeder::SIMULACRO);
+            ->get(route('alumno.intentos'))->assertDontSee(ExamenDemoSeeder::SIMULACRO);
         $this->post(route('examen.iniciar', $simulacro))->assertSessionHasErrors('carrera_id');
     }
 
@@ -194,7 +194,7 @@ class OrientacionAlumnoTest extends TestCase
         $otra = $this->alumno('humanidades');
         $this->actingAs($otra, 'web');
         $this->post(route('alumno.area.guardar'), ['area_id' => $this->area('E')]);
-        $this->get(route('alumno.panel'))->assertDontSee(ExamenDemoSeeder::SIMULACRO);
+        $this->get(route('alumno.intentos'))->assertDontSee(ExamenDemoSeeder::SIMULACRO);
         $this->post(route('examen.iniciar', $simulacro))->assertSessionHasErrors('carrera_id');
     }
 
