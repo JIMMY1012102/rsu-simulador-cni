@@ -8,6 +8,7 @@ use App\Models\Carrera;
 use App\Models\Usuario;
 use App\Services\ResultadoService;
 use App\Services\SimulacroService;
+use App\Services\Alumno\DashboardEstudianteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +59,7 @@ class OrientacionController extends Controller
             ->with('status', 'Área de preparación seleccionada.');
     }
 
-    public function panel(Request $request, SimulacroService $servicio): View|RedirectResponse
+    public function panel(Request $request, SimulacroService $servicio, DashboardEstudianteService $dashboard): View|RedirectResponse
     {
         $usuario = $this->estudiante($request);
         $carrera = $usuario->carrera()->with('areaPostulacion')->first();
@@ -103,6 +104,8 @@ class OrientacionController extends Controller
                 ->where('area_postulacion_id', $area->id)->orderBy('nombre')->get(),
             'simulacros' => $simulacros,
             'intentos' => $intentos,
+            'dashboard' => $dashboard->obtener($usuario, $simulacros),
+            'esVistaPrevia' => false,
         ]);
     }
 
