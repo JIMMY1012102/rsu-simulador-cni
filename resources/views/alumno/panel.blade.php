@@ -33,7 +33,7 @@
             <span class="cni-alumno-area-chip"><span aria-hidden="true">{{ $temaArea['icono'] }}</span> {{ $area->nombre }}</span>
             <nav class="cni-alumno-menu" aria-label="Navegación del alumno">
                 <a href="#perfil" class="is-active" aria-current="location"><span aria-hidden="true">♙</span> Mi perfil</a>
-                <a href="#intentos"><span aria-hidden="true">▤</span> Mis intentos</a>
+                <a href="#progreso"><span aria-hidden="true">▤</span> Mi progreso</a>
                 <a href="#historial"><span aria-hidden="true">◷</span> Historial</a>
             </nav>
         </div>
@@ -95,6 +95,10 @@
                     <p class="cni-alumno-streak-note">La racha se calcula con exámenes finalizados y calificados.</p>
                 </section>
             </div>
+            </section>
+
+            <section class="cni-alumno-vista cni-alumno-vista-progreso" id="progreso" data-panel-view="progreso" aria-labelledby="progreso-titulo" hidden>
+                @include('alumno.partials.progreso')
             </section>
 
             <section class="cni-alumno-vista cni-alumno-exams" id="intentos" data-panel-view="intentos" aria-labelledby="simulacros-titulo" hidden>
@@ -195,7 +199,8 @@
     });
     // Sólo una sección visible a la vez. Por defecto: portada + dos tarjetas.
     const vistas = [...panel.querySelectorAll('[data-panel-view]')];
-    const destinos = ['#perfil', '#intentos', '#historial'];
+    // #intentos es una vista secundaria accesible desde el botón "Rendir simulacro".
+    const destinos = ['#perfil', '#progreso', '#historial', '#intentos'];
     const mostrarSeccion = (destino, navegar = false) => {
         const seleccion = destinos.includes(destino) ? destino : '#perfil';
         vistas.forEach((vista) => {
@@ -219,6 +224,9 @@
             toggle.focus();
         }
     }));
+    panel.querySelectorAll('[data-go-panel]').forEach((boton) => {
+        boton.addEventListener('click', () => mostrarSeccion(boton.getAttribute('data-go-panel'), true));
+    });
     window.addEventListener('popstate', () => mostrarSeccion(window.location.hash));
     window.addEventListener('hashchange', () => mostrarSeccion(window.location.hash));
     mostrarSeccion(window.location.hash);
