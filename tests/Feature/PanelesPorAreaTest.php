@@ -53,7 +53,12 @@ class PanelesPorAreaTest extends TestCase
                 ->assertSee($tema['descripcion'])
                 ->assertSee($tema['lema'])
                 ->assertSee('Iniciar Simulador CNI')
-                ->assertSee('Mascota del área de');
+                ->assertSee('Mascota del área de')
+                ->assertSee('href="#perfil"', false)
+                ->assertSee('href="#intentos"', false)
+                ->assertSee('href="#historial"', false)
+                ->assertSee('aria-controls="cni-alumno-sidebar"', false)
+                ->assertSee('data-sidebar-toggle', false);
         }
     }
 
@@ -98,6 +103,27 @@ class PanelesPorAreaTest extends TestCase
     {
         $this->actingAs($this->estudiante('E'), 'web');
         $this->get(route('alumno.tema', ['tema' => 9999]))->assertNotFound();
+    }
+
+    public function test_menu_lateral_tiene_exactamente_tres_opciones_y_un_boton_para_contraerlo(): void
+    {
+        $this->actingAs($this->estudiante('C'), 'web');
+        $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
+
+        $this->assertSame(1, preg_match(
+            '/<nav class="cni-alumno-menu"[^>]*>(.*?)<\\/nav>/s',
+            $html,
+            $navegacion
+        ));
+        $this->assertSame(3, preg_match_all('/<a\\b/', $navegacion[1]));
+        $this->assertStringContainsString('Mi perfil', $navegacion[1]);
+        $this->assertStringContainsString('Mis intentos', $navegacion[1]);
+        $this->assertStringContainsString('Historial', $navegacion[1]);
+        $this->assertStringContainsString('aria-expanded="true"', $html);
+        $this->assertStringContainsString('data-sidebar-backdrop', $html);
+        $this->assertStringContainsString('id="intentos"', $html);
+        $this->assertStringContainsString('id="historial"', $html);
+        $this->assertStringContainsString('id="perfil"', $html);
     }
 
     public function test_docente_no_puede_abrir_el_panel_de_alumno(): void
