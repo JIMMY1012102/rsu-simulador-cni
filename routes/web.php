@@ -40,6 +40,8 @@ Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::clas
             ->whereNumber('intento')->name('resultados');
     });
 
+require __DIR__.'/alumno-ciencias-basicas.php';
+
 // Herramientas internas de administración; nunca disponibles para estudiantes/docentes.
 Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class])
     ->prefix('administracion')->name('admin.')->group(function () {
