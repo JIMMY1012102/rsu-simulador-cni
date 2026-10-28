@@ -101,6 +101,16 @@ try {
   await captura('08-panel-alumno');
   await anchoMovil('09-panel-alumno-movil');
 
+  // Historial vacío: la nueva tabla se abre desde el mismo menú A-E.
+  await page.locator('.cni-alumno-menu a[href="#historial"]').click();
+  await page.locator('#historial').waitFor({ state: 'visible' });
+  await page.getByRole('heading', { name: 'Historial de simulacros' }).waitFor();
+  assert.equal(await page.locator('#historial [data-historial-fila]').count(), 0);
+  await page.locator('#historial [data-historial-buscar]').fill('no-existe');
+  assert.ok((await page.locator('#historial [data-historial-conteo]').textContent()).includes('0 de 0'));
+  await page.locator('#historial [data-historial-buscar]').fill('');
+  await captura('09b-historial-vacio');
+
   // El panel único abre primero Mi perfil: navegar a Mi progreso y luego a la vista de exámenes.
   await page.locator('.cni-alumno-menu a[href="#progreso"]').click();
   await page.locator('#progreso').waitFor({ state: 'visible' });
@@ -132,6 +142,17 @@ try {
   await page.getByText('Resultados por asignatura').waitFor();
   await captura('12-resultados-guardados');
   console.log('[OK] Pantallas y acciones: selección, examen, respuesta Livewire, resultado');
+
+  // Al volver al panel, el intento calificado debe aparecer en el historial propio.
+  await page.goto(base + '/alumno/panel#historial', { waitUntil: 'domcontentloaded' });
+  await page.locator('#historial').waitFor({ state: 'visible' });
+  assert.equal(await page.locator('#historial [data-historial-fila]').count(), 1);
+  await page.locator('#historial [data-historial-buscar]').fill(String(intento[1]));
+  assert.equal(await page.locator('#historial [data-historial-fila]:visible').count(), 1);
+  await page.locator('#historial [data-historial-filtrar]').selectOption('sin-nivel');
+  assert.equal(await page.locator('#historial [data-historial-fila]:visible').count(), 1);
+  await page.locator('#historial [data-historial-fila] a.cni-historial-resultado').waitFor();
+  await captura('12b-historial-con-resultados');
 
   await logout();
 
