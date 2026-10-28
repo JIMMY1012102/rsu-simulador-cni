@@ -67,6 +67,9 @@
                     <h1 id="bienvenida-titulo">¡Hola, {{ $primeraPalabra }}!</h1>
                     <h2>Bienvenido a {{ $area->nombre }}</h2>
                     <p>{{ $temaArea['descripcion'] }}</p>
+                    @if($carrera)
+                        <p class="cni-alumno-carrera">Carrera de interés: <strong>{{ $carrera->nombre }}</strong></p>
+                    @endif
                     <blockquote>“{{ $temaArea['lema'] }}”</blockquote>
                 </div>
                 <div class="cni-alumno-banner-pattern" aria-hidden="true"></div>
