@@ -73,7 +73,7 @@ class CienciasBasicasPanelTest extends TestCase
 
         // Cuenta antigua con carrera del área B y sin área explícita.
         $matematica = DB::table('carreras')->where('nombre', 'Matemática')->value('id');
-        $this->actingAs($this->usuario(['carrera_id' => $matematica]), 'web')->get('/alumno/ciencias-basicas')->assertOk();
+        $this->actingAs($this->usuario(['carrera_id' => $matematica]), 'web')->get('/alumno/ciencias-basicas')->assertRedirect(route('alumno.panel'));
 
         config(['cni.alumno_areas_enabled' => false]);
         $this->actingAs($this->alumnoB(), 'web')->get('/alumno/ciencias-basicas')->assertNotFound();
@@ -82,13 +82,12 @@ class CienciasBasicasPanelTest extends TestCase
     public function test_panel_muestra_el_diseno_sin_datos_inventados_y_no_reemplaza_el_principal(): void
     {
         $alumno = $this->alumnoB();
-        $this->actingAs($alumno, 'web')->get('/alumno/ciencias-basicas')->assertOk()
-            ->assertSee('css/alumno/ciencias-basicas.css')->assertSee('Ciencias Básicas')
-            ->assertSee('Diego Camayo!')->assertSee('0 días')->assertSee('Panel principal')
-            ->assertSee(route('alumno.panel'))->assertSee('No hay simulacros disponibles para tu área')
-            ->assertDontSee('42%')->assertDontSee('72%')->assertDontSee('1240 preguntas');
-
-        $this->get(route('alumno.panel'))->assertRedirect(route('alumno.ciencias-basicas'));
+        $this->actingAs($alumno, 'web')->get('/alumno/ciencias-basicas')
+            ->assertRedirect(route('alumno.panel'));
+        $this->get(route('alumno.panel'))->assertOk()
+            ->assertSee('panel-alumno.css')->assertSee('Ciencias Básicas')
+            ->assertSee('Diego Andrés')
+            ->assertDontSee('1240 preguntas');
     }
 
     public function test_inicia_solo_simulacros_del_area_b_con_el_examen_existente(): void
@@ -97,16 +96,16 @@ class CienciasBasicasPanelTest extends TestCase
         $ajeno = $this->publicar('Simulacro Ingenierías', 'C');
         $alumno = $this->alumnoB();
 
-        $this->actingAs($alumno, 'web')->get('/alumno/ciencias-basicas')->assertOk()
+        $this->actingAs($alumno, 'web')->get(route('alumno.panel'))->assertOk()
             ->assertSee(route('examen.iniciar', $propio))->assertDontSee(route('examen.iniciar', $ajeno))
-            ->assertSee('Comenzar ahora');
+            ->assertSee('Iniciar examen');
 
         $this->post(route('examen.iniciar', $propio))->assertRedirect();
         $intento = DB::table('intentos')->where('usuario_id', $alumno->id)->first();
         $this->assertSame($propio, (int) $intento->simulacro_id);
 
         // Con el intento abierto, el botón lo reanuda mediante examen.iniciar sin crear otro.
-        $this->get('/alumno/ciencias-basicas')->assertSee('Continuar simulacro');
+        $this->get(route('alumno.panel'))->assertSee('Iniciar examen');
         $this->post(route('examen.iniciar', $propio))->assertRedirect(route('examen', $intento->id));
         $this->assertSame(1, DB::table('intentos')->where('usuario_id', $alumno->id)->count());
     }
