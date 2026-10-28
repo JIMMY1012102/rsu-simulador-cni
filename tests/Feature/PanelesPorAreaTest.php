@@ -9,6 +9,9 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
+/**
+ * Una sola ruta y una sola plantilla Blade, con cinco identidades visuales.
+ */
 class PanelesPorAreaTest extends TestCase
 {
     use RefreshDatabase;
@@ -21,89 +24,92 @@ class PanelesPorAreaTest extends TestCase
         $this->seed(CarreraSeeder::class);
     }
 
-    private function estudiante(string $codigo): Usuario
+    private function estudiante(string $codigo, bool $conArea = true): Usuario
     {
         return Usuario::create([
             'nombres' => 'Alumno',
             'apellidos' => 'Area '.$codigo,
-            'usuario' => 'alumno_'.$codigo,
+            'usuario' => uniqid('alumno_'.$codigo.'_'),
             'password' => 'ClaveCNI2026!',
             'rol' => 'estudiante',
             'activo' => true,
-            'area_postulacion_id' => DB::table('areas_postulacion')
-                ->where('codigo', $codigo)->value('id'),
+            'area_postulacion_id' => $conArea
+                ? DB::table('areas_postulacion')->where('codigo', $codigo)->value('id')
+                : null,
         ]);
     }
 
-    public function test_redirige_al_panel_de_diego_para_ciencias_basicas(): void
+    public function test_cinco_areas_usan_misma_ruta_y_plantilla_pero_identidad_diferente(): void
     {
-        $this->actingAs($this->estudiante('B'), 'web');
-        $this->get(route('alumno.panel'))->assertRedirect(route('alumno.ciencias-basicas'));
-        $this->get(route('alumno.ciencias-basicas'))->assertOk()->assertSee('Ciencias Básicas');
-    }
+        $temas = config('panel_alumno.areas');
+        $this->assertSame(['A', 'B', 'C', 'D', 'E'], array_keys($temas));
 
-    public function test_redirige_al_portal_de_dafne_para_humanidades(): void
-    {
-        $this->actingAs($this->estudiante('E'), 'web');
-        $this->get(route('alumno.panel'))->assertRedirect(route('alumno.inicio'));
-        $this->get(route('alumno.inicio'))->assertOk()->assertSee('Hola, Alumno');
-    }
-
-    public function test_panel_de_salud_se_presenta_sin_cambiar_el_panel_general(): void
-    {
-        $this->actingAs($this->estudiante('A'), 'web');
-        $this->get(route('alumno.panel'))->assertOk()
-            ->assertSee('dashboard-salud.css')
-            ->assertSee('Ciencias de la Salud');
-    }
-
-    public function test_ingenierias_y_economicas_conservan_el_panel_general(): void
-    {
-        foreach (['C', 'D'] as $codigo) {
+        foreach ($temas as $codigo => $tema) {
             $this->actingAs($this->estudiante($codigo), 'web');
-            $this->get(route('alumno.panel'))->assertOk()
-                ->assertSee('orientacion.css');
+            $this->get(route('alumno.panel'))
+                ->assertOk()
+                ->assertSee('panel-alumno.css')
+                ->assertSee('data-area="'.$codigo.'"', false)
+                ->assertSee($tema['descripcion'])
+                ->assertSee($tema['lema'])
+                ->assertSee('Iniciar Simulador CNI')
+                ->assertSee('Mascota del área de');
         }
     }
 
-    public function test_las_rutas_de_otras_areas_no_se_pueden_abrir_con_el_usuario_equivocado(): void
+    public function test_eleccion_persiste_y_llega_a_la_misma_pagina_para_cada_area(): void
     {
-        $this->actingAs($this->estudiante('A'), 'web');
-        $this->get(route('alumno.ciencias-basicas'))->assertRedirect(route('alumno.panel'));
-        $this->get(route('alumno.inicio'))->assertRedirect(route('alumno.panel'));
-
-        $this->actingAs($this->estudiante('E'), 'web');
-        $this->get(route('alumno.ciencias-basicas'))->assertRedirect(route('alumno.panel'));
-        $this->get(route('alumno.tema', ['tema' => 999]))->assertNotFound();
-    }
-    public function test_la_eleccion_inicial_persiste_y_determina_el_destino_en_los_cinco_casos(): void
-    {
-        $destinos = [
-            'A' => null, // Se renderiza Salud en alumno.panel
-            'B' => 'alumno.ciencias-basicas',
-            'C' => null, // Panel general
-            'D' => null, // Panel general
-            'E' => 'alumno.inicio',
-        ];
-
-        foreach ($destinos as $codigo => $ruta) {
-            $alumno = Usuario::create([
-                'nombres' => 'Nuevo', 'apellidos' => 'Area '.$codigo,
-                'usuario' => 'nuevo_'.$codigo, 'password' => 'ClaveCNI2026!',
-                'rol' => 'estudiante', 'activo' => true,
-            ]);
+        foreach (['A', 'B', 'C', 'D', 'E'] as $codigo) {
+            $usuario = $this->estudiante($codigo, false);
             $idArea = DB::table('areas_postulacion')->where('codigo', $codigo)->value('id');
-            $this->actingAs($alumno, 'web')
+
+            $this->actingAs($usuario, 'web')
                 ->post(route('alumno.area.guardar'), ['area_id' => $idArea])
                 ->assertRedirect(route('alumno.panel'));
-            $this->assertSame((int) $idArea, (int) $alumno->fresh()->area_postulacion_id);
-            $respuesta = $this->get(route('alumno.panel'));
-            if ($ruta) {
-                $respuesta->assertRedirect(route($ruta));
-            } else {
-                $respuesta->assertOk();
-            }
+
+            $this->assertDatabaseHas('usuarios', [
+                'id' => $usuario->id,
+                'area_postulacion_id' => $idArea,
+                'carrera_id' => null,
+            ]);
+
+            $this->get(route('alumno.panel'))->assertOk()
+                ->assertSee('data-area="'.$codigo.'"', false);
         }
     }
 
+    public function test_una_cuenta_sin_area_ve_el_selector_en_vez_del_panel(): void
+    {
+        $this->actingAs($this->estudiante('A', false), 'web');
+        $this->get(route('alumno.panel'))
+            ->assertRedirect(route('alumno.elegir-area'));
+    }
+
+    public function test_las_urls_anteriores_de_diego_y_dafne_redirigen_al_panel_unificado(): void
+    {
+        $this->actingAs($this->estudiante('B'), 'web');
+        $this->get(route('alumno.ciencias-basicas'))->assertRedirect(route('alumno.panel'));
+
+        $this->actingAs($this->estudiante('E'), 'web');
+        $this->get(route('alumno.inicio'))->assertRedirect(route('alumno.panel'));
+    }
+
+    public function test_los_temas_de_otras_areas_no_se_abren_mediante_url_directa(): void
+    {
+        $this->actingAs($this->estudiante('E'), 'web');
+        $this->get(route('alumno.tema', ['tema' => 9999]))->assertNotFound();
+    }
+
+    public function test_docente_no_puede_abrir_el_panel_de_alumno(): void
+    {
+        $docente = Usuario::create([
+            'nombres' => 'Docente', 'apellidos' => 'CNI',
+            'usuario' => 'docente_unificado',
+            'password' => 'ClaveCNI2026!',
+            'rol' => 'docente', 'activo' => true,
+        ]);
+
+        $this->actingAs($docente, 'web')
+            ->get(route('alumno.panel'))->assertForbidden();
+    }
 }
