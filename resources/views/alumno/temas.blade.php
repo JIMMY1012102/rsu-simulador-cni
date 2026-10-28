@@ -2,7 +2,7 @@
     "Temas de estudio": todos los temas por área con el avance del alumno.
     Datos: App\Http\Controllers\Alumno\TemasController (ProgresoAlumnoService::temas).
 --}}
-@extends('layouts.alumno', ['variante' => 'derecho', 'title' => 'Temas de estudio'])
+@extends('layouts.alumno-derecho', ['variante' => 'derecho', 'title' => 'Temas de estudio'])
 
 @section('content')
 <div class="pagina">
