@@ -16,20 +16,25 @@
     $primeraPalabra = explode(' ', trim($usuario->nombres))[0];
 @endphp
 <div class="cni-alumno" data-area="{{ $area->codigo }}" id="inicio">
-    <aside class="cni-alumno-sidebar" aria-label="Menú del estudiante">
+    <button type="button" class="cni-alumno-sidebar-toggle"
+            data-sidebar-toggle aria-controls="cni-alumno-sidebar"
+            aria-expanded="true" aria-label="Cerrar menú lateral">
+        <span class="cni-alumno-sidebar-toggle-icon" aria-hidden="true">❮</span>
+        <span class="cni-alumno-sidebar-toggle-text">Menú</span>
+    </button>
+    <button type="button" class="cni-alumno-sidebar-backdrop" data-sidebar-backdrop
+            aria-label="Cerrar menú lateral" hidden></button>
+    <aside class="cni-alumno-sidebar" id="cni-alumno-sidebar" aria-label="Menú del estudiante">
         <div class="cni-alumno-sidebar-top">
             <a class="cni-alumno-marca" href="{{ route('alumno.panel') }}">
                 <span class="cni-alumno-marca-icon" aria-hidden="true">✦</span>
                 <span><strong>Simulador</strong><small>CNI · Imperial</small></span>
             </a>
             <span class="cni-alumno-area-chip"><span aria-hidden="true">{{ $temaArea['icono'] }}</span> {{ $area->nombre }}</span>
-            <nav class="cni-alumno-menu" aria-label="Navegación principal">
-                <a class="is-active" href="#inicio" aria-current="page"><span aria-hidden="true">⌂</span> Inicio</a>
-                <a href="#mis-intentos"><span aria-hidden="true">▤</span> Mis intentos</a>
-                <a href="#temas"><span aria-hidden="true">▦</span> Banco de preguntas</a>
-                <a href="#temas"><span aria-hidden="true">▣</span> Temas de estudio</a>
-                <a href="#simulacros-disponibles"><span aria-hidden="true">◇</span> Simulacros</a>
+            <nav class="cni-alumno-menu" aria-label="Navegación del alumno">
                 <a href="#perfil"><span aria-hidden="true">♙</span> Mi perfil</a>
+                <a href="#intentos"><span aria-hidden="true">▤</span> Mis intentos</a>
+                <a href="#historial"><span aria-hidden="true">◷</span> Historial</a>
             </nav>
         </div>
         <div class="cni-alumno-sidebar-bottom">
@@ -113,8 +118,9 @@
                 @endif
             </section>
 
-            <section class="cni-alumno-exams" id="simulacros-disponibles" aria-labelledby="simulacros-titulo">
-                <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">PREPARACIÓN</span><h2 id="simulacros-titulo">Iniciar Simulador CNI</h2></div><span class="cni-alumno-count">{{ $simulacros->count() }} disponibles</span></div>
+            <section class="cni-alumno-exams" id="intentos" aria-labelledby="simulacros-titulo">
+                <span id="simulacros-disponibles" class="cni-alumno-anchor" aria-hidden="true"></span>
+                <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">PREPARACIÓN</span><h2 id="simulacros-titulo">Mis intentos · Iniciar Simulador CNI</h2></div><span class="cni-alumno-count">{{ $simulacros->count() }} disponibles</span></div>
                 <p class="cni-alumno-section-description">Exámenes de tu área · Dar examen simulador. Elige una evaluación activa de {{ $area->nombre }} para comenzar.</p>
                 @forelse($simulacros as $simulacro)
                     <article class="cni-alumno-exam"><span class="cni-alumno-exam-icon" aria-hidden="true">▤</span><div><strong>{{ $simulacro['nombre'] }}</strong><small>{{ $simulacro['total_preguntas'] }} preguntas · {{ $simulacro['tiempo_limite'] }} minutos</small></div>
@@ -129,7 +135,8 @@
                 @endforelse
             </section>
 
-            <section class="cni-alumno-history" id="mis-intentos" aria-labelledby="historial-titulo">
+            <section class="cni-alumno-history" id="historial" aria-labelledby="historial-titulo">
+                <span id="mis-intentos" class="cni-alumno-anchor" aria-hidden="true"></span>
                 <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">TU HISTORIAL</span><h2 id="historial-titulo">Mis últimos resultados</h2></div></div>
                 @forelse($intentos as $intento)
                     <article class="cni-alumno-history-row"><div><strong>Intento #{{ $intento->id }}</strong><small>{{ $intento->fecha_inicio }}</small></div><span class="cni-alumno-history-score">{{ number_format((float) $intento->puntaje_total, 2) }} pts</span>
@@ -160,4 +167,53 @@
         </main>
     </div>
 </div>
+<script>
+(() => {
+    const panel = document.querySelector('.cni-alumno');
+    if (!panel) return;
+    const sidebar = panel.querySelector('#cni-alumno-sidebar');
+    const toggle = panel.querySelector('[data-sidebar-toggle]');
+    const backdrop = panel.querySelector('[data-sidebar-backdrop]');
+    const links = [...sidebar.querySelectorAll('.cni-alumno-menu a')];
+    const mobile = window.matchMedia('(max-width: 680px)');
+    let abierto = !mobile.matches;
+
+    const actualizar = () => {
+        panel.classList.toggle('is-sidebar-collapsed', !abierto);
+        panel.classList.toggle('is-sidebar-open', abierto);
+        toggle.setAttribute('aria-expanded', String(abierto));
+        toggle.setAttribute('aria-label', abierto ? 'Cerrar menú lateral' : 'Abrir menú lateral');
+        toggle.querySelector('.cni-alumno-sidebar-toggle-icon').textContent = abierto ? '❮' : '☰';
+        backdrop.hidden = !mobile.matches || !abierto;
+        sidebar.inert = !abierto;
+    };
+
+    toggle.addEventListener('click', () => {
+        abierto = !abierto;
+        actualizar();
+    });
+    backdrop.addEventListener('click', () => {
+        abierto = false;
+        actualizar();
+        toggle.focus();
+    });
+    document.addEventListener('keydown', (evento) => {
+        if (evento.key === 'Escape' && mobile.matches && abierto) {
+            abierto = false;
+            actualizar();
+            toggle.focus();
+        }
+    });
+    links.forEach((enlace) => enlace.addEventListener('click', () => {
+        if (!mobile.matches) return;
+        abierto = false;
+        actualizar();
+    }));
+    mobile.addEventListener('change', () => {
+        abierto = !mobile.matches;
+        actualizar();
+    });
+    actualizar();
+})();
+</script>
 @endsection
