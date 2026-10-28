@@ -10,6 +10,7 @@ use App\Services\ResultadoService;
 use App\Services\SimulacroService;
 use App\Services\Alumno\DashboardEstudianteService;
 use App\Services\Alumno\ProgresoAlumnoService;
+use App\Services\Alumno\HistorialAlumnoService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -60,7 +61,7 @@ class OrientacionController extends Controller
             ->with('status', 'Área de preparación seleccionada.');
     }
 
-    public function panel(Request $request, SimulacroService $servicio, DashboardEstudianteService $dashboard, ProgresoAlumnoService $progresoService): View|RedirectResponse
+    public function panel(Request $request, SimulacroService $servicio, DashboardEstudianteService $dashboard, ProgresoAlumnoService $progresoService, HistorialAlumnoService $historialService): View|RedirectResponse
     {
         $usuario = $this->estudiante($request);
         $carrera = $usuario->carrera()->with('areaPostulacion')->first();
@@ -88,9 +89,6 @@ class OrientacionController extends Controller
         // No hace falta elegir carrera: el área guardada determina qué examen se ofrece.
         $simulacros = $this->simulacrosDelArea($usuario, $area, $carrera, $servicio);
 
-        $intentos = DB::table('intentos')->where('usuario_id', $usuario->id)
-            ->whereNotNull('puntaje_total')->orderByDesc('fecha_inicio')->limit(10)->get();
-
         return view('alumno.panel', [
             'usuario' => $usuario,
             'area' => $area,
@@ -98,7 +96,7 @@ class OrientacionController extends Controller
             'carreras' => $carrera ? collect() : Carrera::query()->where('activo', true)
                 ->where('area_postulacion_id', $area->id)->orderBy('nombre')->get(),
             'simulacros' => $simulacros,
-            'intentos' => $intentos,
+            'historial' => $historialService->obtener($usuario),
             'dashboard' => $dashboard->obtener($usuario, $simulacros),
             'progreso' => $progresoService->obtener($usuario),
             'esVistaPrevia' => false,
