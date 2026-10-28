@@ -2,7 +2,7 @@
     "Mis intentos": simulacros abiertos para rendir y próximos simulacros.
     Datos: App\Http\Controllers\Alumno\IntentosController.
 --}}
-@extends('layouts.alumno', ['variante' => 'derecho', 'title' => 'Mis intentos'])
+@extends('layouts.alumno-derecho', ['variante' => 'derecho', 'title' => 'Mis intentos'])
 
 @section('content')
 <div class="pagina">
