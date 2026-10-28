@@ -22,8 +22,9 @@ class IntentosController extends Controller
             ->where('s.activo', true)
             ->whereExists(fn ($q) => $q->selectRaw('1')->from('area_postulacion_simulacro as aps')
                 ->whereColumn('aps.simulacro_id', 's.id')->where('aps.area_postulacion_id', $areaId))
-            ->where(fn ($q) => $q->whereNull('s.carrera_id')
-                ->orWhere('s.carrera_id', $usuario->carrera_id ?? 0))
+            ->when(\Illuminate\Support\Facades\Schema::hasColumn('simulacros', 'carrera_id'),
+                fn ($q) => $q->where(fn ($carrera) => $carrera->whereNull('s.carrera_id')
+                    ->orWhere('s.carrera_id', $usuario->carrera_id ?? 0)))
             ->where('s.fecha_inicio', '<=', $ahora)->where('s.fecha_fin', '>', $ahora)
             ->orderBy('s.fecha_fin')
             ->select('s.id', 's.nombre', 's.total_preguntas', 's.tiempo_limite', 's.fecha_fin')
@@ -42,8 +43,9 @@ class IntentosController extends Controller
             ->where('s.activo', true)->where('s.fecha_inicio', '>', $ahora)
             ->whereExists(fn ($q) => $q->selectRaw('1')->from('area_postulacion_simulacro as aps')
                 ->whereColumn('aps.simulacro_id', 's.id')->where('aps.area_postulacion_id', $areaId))
-            ->where(fn ($q) => $q->whereNull('s.carrera_id')
-                ->orWhere('s.carrera_id', $usuario->carrera_id ?? 0))
+            ->when(\Illuminate\Support\Facades\Schema::hasColumn('simulacros', 'carrera_id'),
+                fn ($q) => $q->where(fn ($carrera) => $carrera->whereNull('s.carrera_id')
+                    ->orWhere('s.carrera_id', $usuario->carrera_id ?? 0)))
             ->orderBy('s.fecha_inicio')->limit(5)
             ->get(['s.id', 's.nombre', 's.total_preguntas', 's.tiempo_limite', 's.fecha_inicio']);
 
