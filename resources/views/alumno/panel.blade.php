@@ -68,6 +68,33 @@
                     <h2>Bienvenido a {{ $area->nombre }}</h2>
                     <p>{{ $temaArea['descripcion'] }}</p>
                     <blockquote>“{{ $temaArea['lema'] }}”</blockquote>
+
+                    {{-- Botón real hacia el examen. Se habilita sólo para simulacros de su área. --}}
+                    <div class="cni-alumno-exam-cta">
+                        @if($esVistaPrevia)
+                            <span class="cni-alumno-exam-unavailable">Los exámenes están disponibles al iniciar sesión.</span>
+                        @elseif($simulacros->count() === 1)
+                            @php $simulacroDirecto = $simulacros->first(); @endphp
+                            <form method="POST" action="{{ route('examen.iniciar', ['simulacro' => $simulacroDirecto['id']]) }}">
+                                @csrf
+                                <button type="submit" class="cni-alumno-exam-button">
+                                    <span aria-hidden="true">▶</span> Dar examen
+                                    <span class="cni-alumno-exam-button-arrow" aria-hidden="true">→</span>
+                                </button>
+                                <small>{{ $simulacroDirecto['nombre'] }} · {{ $simulacroDirecto['total_preguntas'] }} preguntas</small>
+                            </form>
+                        @elseif($simulacros->isNotEmpty())
+                            <button type="button" class="cni-alumno-exam-button" data-go-panel="#intentos">
+                                <span aria-hidden="true">▶</span> Elegir simulacro
+                                <span class="cni-alumno-exam-button-arrow" aria-hidden="true">→</span>
+                            </button>
+                            <small>{{ $simulacros->count() }} simulacros disponibles de tu área</small>
+                        @else
+                            <span class="cni-alumno-exam-unavailable" role="status">
+                                Aún no hay simulacros disponibles para tu área.
+                            </span>
+                        @endif
+                    </div>
                 </div>
                 <div class="cni-alumno-banner-pattern" aria-hidden="true"></div>
                 <img class="cni-alumno-mascota"
