@@ -51,6 +51,8 @@ class ResultadoService
                 'alt.pregunta_id as alternativa_pregunta_id',
                 'alt.es_correcta'
             )
+            // Preguntas del banco aún sin respuesta registrada en el Excel (0 claves).
+            ->selectRaw('(SELECT COUNT(*) FROM alternativas WHERE pregunta_id = re.pregunta_id AND es_correcta = 1) as claves')
             ->get();
     }
 
@@ -63,10 +65,13 @@ class ResultadoService
                 '=',
                 'alt.pregunta_id'
             )
+            ->join('preguntas as p', 'p.id', '=', 're.pregunta_id')
             ->where('re.intento_id', $intentoId)
-            ->groupBy('re.pregunta_id')
+            ->groupBy('re.pregunta_id', 'p.codigo')
+            // Excepción: una pregunta del banco del Excel (con codigo) aún sin respuesta no se califica.
             ->havingRaw(
-                'SUM(CASE WHEN alt.es_correcta = 1 THEN 1 ELSE 0 END) <> 1'
+                'SUM(CASE WHEN alt.es_correcta = 1 THEN 1 ELSE 0 END) > 1
+                 OR (SUM(CASE WHEN alt.es_correcta = 1 THEN 1 ELSE 0 END) = 0 AND p.codigo IS NULL)'
             )
             ->pluck('re.pregunta_id');
 
@@ -100,6 +105,11 @@ class ResultadoService
             throw ValidationException::withMessages([
                 'respuesta' => 'La alternativa no pertenece a la pregunta.',
             ]);
+        }
+
+        // Sin respuesta registrada no se puede saber si acertó: no suma ni resta (como en blanco).
+        if (isset($respuesta->claves) && (int) $respuesta->claves === 0) {
+            return 'en_blanco';
         }
 
         return (int) $respuesta->es_correcta === 1
