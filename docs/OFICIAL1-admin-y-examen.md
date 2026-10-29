@@ -47,3 +47,25 @@ La pantalla de examen incluida es la que ya estaba integrada en OFICIAL#1. La ra
 Un administrador debe contar con preguntas válidas en el banco y crear un simulacro desde `/administracion/simulacros/nuevo`, eligiendo la **misma área de postulación del alumno**, una ventana vigente y una distribución con suficientes preguntas. Un examen que no cumpla esos requisitos no aparecerá en la portada del alumno.
 
 No ejecutes `migrate:fresh` ni `db:wipe` en bases con usuarios o intentos: borran datos. Si faltan migraciones, revisa antes con `php artisan migrate:status` y realiza un respaldo.
+
+## Cuenta local de superadministrador
+
+El usuario de acceso para esta instalación es `Super_Admin` (rol interno `admin`). **No se sube ninguna contraseña a GitHub ni se crea automáticamente en servidores ajenos.**
+
+Tras hacer `git pull --ff-only`, con MariaDB activa y `CNI_ADMIN_ACADEMICO_ENABLED=true` en el `.env` local, ejecuta una sola vez:
+
+```bash
+php artisan cni:crear-superadmin
+```
+
+El comando pregunta de forma oculta por la contraseña elegida, crea la cuenta activa y almacena un hash mediante el modelo `Usuario`. Luego:
+
+```bash
+php artisan optimize:clear
+php artisan test --filter=CrearSuperAdminTest
+php artisan serve
+```
+
+Inicia sesión como `Super_Admin` en http://127.0.0.1:8000/login y abre http://127.0.0.1:8000/administracion.
+
+Si la cuenta ya existe, el comando no cambia su contraseña sin autorización; para restablecerla manualmente usa `php artisan cni:crear-superadmin --restablecer`. No requiere `migrate:fresh` ni elimina registros. Solo se admite en `APP_ENV=local` o `testing`.
