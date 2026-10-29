@@ -165,7 +165,7 @@ class IntentoService
             ->get(['p.id', 'p.enunciado', 'p.imagen', 'p.nivel', 'r.orden',
                 't.nombre as tema', 'a.nombre as area', 'a.bloque']);
         $alternativas = DB::table('alternativas')->whereIn('pregunta_id', $preguntas->pluck('id'))
-            ->orderBy('letra')->get(['id', 'pregunta_id', 'letra', 'texto'])->groupBy('pregunta_id');
+            ->orderBy('letra')->get(['id', 'pregunta_id', 'letra', 'texto', 'imagen'])->groupBy('pregunta_id');
 
         return $preguntas->map(function ($pregunta) use ($alternativas) {
             $pregunta->alternativas = $alternativas->get($pregunta->id, collect());

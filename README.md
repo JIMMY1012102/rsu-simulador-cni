@@ -79,6 +79,22 @@ Los cambios se proponen mediante Pull Request a `develop`; no se modifica `main`
 
 El cierre de intentos vencidos está definido cada minuto en Laravel Scheduler; al desplegar hay que activar el scheduler. En desarrollo puede mantenerse `php artisan schedule:work` en otra terminal. Las preguntas y configuraciones ya usadas no se editan; se crean nuevas versiones para proteger los intentos existentes.
 
+## Banco de preguntas desde Excel
+
+El banco del colegio (`Banco_preguntas_completo.xlsx`, hoja «Banco de preguntas») se carga con:
+
+```bash
+php artisan migrate
+php artisan storage:link
+php artisan banco:importar "C:\ruta\Banco_preguntas_completo.xlsx" --simulacro
+```
+
+- Cada pregunta se identifica por su código (`AM_1`, `LE_12`…), así que el comando se puede repetir cada vez que se actualice el Excel sin duplicar nada.
+- Las imágenes de preguntas y alternativas se guardan en `storage/app/public/banco` y el examen las muestra desde `/storage/banco/…`.
+- La columna «Respuesta correcta» se guarda en `alternativas.es_correcta`; el examen nunca la envía al navegador.
+- Solo las preguntas con respuesta entran a los simulacros. `--simulacro` crea o actualiza «Banco CNI · preguntas con respuesta» con todas ellas, abierto a las cinco áreas.
+- El Excel no se sube al repositorio: el repositorio es público y el archivo contiene las respuestas.
+
 ## Nuevo flujo del estudiante: despliegue seguro (PR #18)
 
 El flujo de primera elección de cinco áreas, panel personalizado y exámenes por área ya está integrado en el código, pero **permanece apagado por defecto** al integrarse en `develop`:

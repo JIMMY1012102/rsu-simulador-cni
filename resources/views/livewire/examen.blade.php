@@ -79,9 +79,13 @@
             <div class="examen-pregunta__contenido">
                 <div class="examen-enunciado">
                     <p>Lee con atención y selecciona una sola respuesta.</p>
-                    <p class="examen-enunciado__texto" id="enunciado-{{ $pregunta->id }}">{!! nl2br(e($pregunta->enunciado)) !!}</p>
+                    {{-- Las preguntas importadas del Excel vienen solo como imagen: entonces la imagen da nombre al grupo de opciones. --}}
+                    @if (trim($pregunta->enunciado) !== '')
+                        <p class="examen-enunciado__texto" id="enunciado-{{ $pregunta->id }}">{!! nl2br(e($pregunta->enunciado)) !!}</p>
+                    @endif
                     @if ($pregunta->imagen)
-                        <img class="examen-enunciado__imagen" src="{{ asset($pregunta->imagen) }}" alt="Imagen de la pregunta {{ $actual + 1 }}">
+                        <img class="examen-enunciado__imagen" src="{{ asset($pregunta->imagen) }}" alt="Pregunta {{ $actual + 1 }}"
+                            @if (trim($pregunta->enunciado) === '') id="enunciado-{{ $pregunta->id }}" @endif>
                     @endif
                 </div>
 
@@ -94,7 +98,12 @@
                             wire:click="responder({{ $alternativa->id }})" wire:loading.attr="disabled" wire:target="responder">
                             <span class="examen-opcion__selector" aria-hidden="true"></span>
                             <span class="examen-opcion__letra">{{ $alternativa->letra }}.</span>
-                            <span class="examen-opcion__texto">{{ $alternativa->texto }}</span>
+                            <span class="examen-opcion__texto">
+                                {{ $alternativa->texto }}
+                                @if ($alternativa->imagen ?? null)
+                                    <img class="examen-opcion__imagen" src="{{ asset($alternativa->imagen) }}" alt="Alternativa {{ $alternativa->letra }}">
+                                @endif
+                            </span>
                             @if ($marcada)
                                 <img src="{{ asset('img/examen/check.svg') }}" width="18" height="18" alt="">
                             @endif
