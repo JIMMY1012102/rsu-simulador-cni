@@ -113,7 +113,9 @@ class IntentoService
                 ->when($cuota->nivel !== 'mixto', fn ($q) => $q->where('p.nivel', $cuota->nivel))
                 ->whereNotIn('p.id', $seleccionadas->pluck('id')->all())
                 ->whereRaw('(SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id) = ?', [(int) $simulacro->cantidad_alternativas])
-                ->whereRaw('(SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 1')
+                // Una clave; o ninguna si es del banco del Excel (codigo) y aún no tiene respuesta: se muestra pero no se califica.
+                ->whereRaw('((SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 1
+                    OR (p.codigo IS NOT NULL AND (SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 0))')
                 ->inRandomOrder()->limit(max(0, $cantidad))->lockForUpdate()->get(['p.id', 'a.bloque']);
             if ($cantidad < 1 || $preguntas->count() !== $cantidad) {
                 throw ValidationException::withMessages([

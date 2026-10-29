@@ -10,46 +10,70 @@ use Illuminate\Support\Facades\Storage;
 /**
  * Importa el banco de preguntas desde el Excel del colegio.
  *
- *   php artisan banco:importar "C:\ruta\Banco_preguntas_completo.xlsx" --simulacro
+ *   php artisan banco:importar "C:\ruta\Banco_preguntas_completo.xlsx" --simulacros
  *
  * Se puede ejecutar de nuevo cada vez que se actualice el Excel: las preguntas se
  * identifican por su código (AM_1, LE_12…) y se actualizan sin duplicarse.
  * Las imágenes se guardan en storage/app/public/banco (requiere `php artisan storage:link`).
- * Solo las preguntas con "Respuesta correcta" entran a los simulacros; el resto queda
- * guardado y aparece en cuanto se complete su respuesta en el Excel y se vuelva a importar.
+ * Las preguntas sin "Respuesta correcta" también entran al examen, pero no se califican
+ * hasta que se complete su respuesta en el Excel y se vuelva a importar.
  */
 class ImportarBancoExcel extends Command
 {
-    public const SIMULACRO = 'Banco CNI · preguntas con respuesta';
+    public const PREFIJO_SIMULACRO = 'Simulacro CNI · Área ';
 
     protected $signature = 'banco:importar
         {archivo : Ruta del Excel (.xlsx)}
-        {--simulacro : Crea o actualiza un simulacro con todas las preguntas que ya tienen respuesta}';
+        {--simulacros : Crea o actualiza un simulacro de 100 preguntas para cada área (A–E)}';
 
     protected $description = 'Importa preguntas, imágenes y alternativas desde el Excel del banco CNI';
 
-    /** Prefijo del código => [área (asignatura del sistema), bloque, tema]. */
+    /** Prefijo del código => [curso (asignatura del sistema), bloque del examen]. */
     private const CURSOS = [
-        'AM' => ['Razonamiento Matemático', 'habilidad_logico_matematica', 'Razonamiento matemático'],
-        'AV' => ['Razonamiento Verbal', 'habilidad_verbal', 'Razonamiento verbal'],
-        'IN' => ['Razonamiento Verbal', 'habilidad_verbal', 'Inglés'],
-        'AL' => ['Matemática', 'habilidad_logico_matematica', 'Álgebra'],
-        'AR' => ['Matemática', 'habilidad_logico_matematica', 'Aritmética'],
-        'GE' => ['Matemática', 'habilidad_logico_matematica', 'Geometría'],
-        'TR' => ['Matemática', 'habilidad_logico_matematica', 'Trigonometría'],
-        'FI' => ['Ciencias', 'conocimientos', 'Física'],
-        'QU' => ['Ciencias', 'conocimientos', 'Química'],
-        'BI' => ['Ciencias', 'conocimientos', 'Biología'],
-        'LE' => ['Humanidades', 'conocimientos', 'Lenguaje'],
-        'LI' => ['Humanidades', 'conocimientos', 'Literatura'],
-        'HP' => ['Humanidades', 'conocimientos', 'Historia del Perú'],
-        'HU' => ['Humanidades', 'conocimientos', 'Historia universal'],
-        'GG' => ['Humanidades', 'conocimientos', 'Geografía'],
-        'EC' => ['Humanidades', 'conocimientos', 'Economía'],
-        'CV' => ['Humanidades', 'conocimientos', 'Educación cívica'],
-        'FL' => ['Humanidades', 'conocimientos', 'Filosofía y lógica'],
-        'PS' => ['Humanidades', 'conocimientos', 'Psicología'],
-        'CG' => ['Humanidades', 'conocimientos', 'Cultura general'],
+        'AM' => ['Razonamiento Matemático', 'habilidad_logico_matematica'],
+        'AV' => ['Razonamiento Verbal', 'habilidad_verbal'],
+        'IN' => ['Inglés', 'habilidad_verbal'],
+        'AR' => ['Aritmética', 'conocimientos'],
+        'AL' => ['Álgebra', 'conocimientos'],
+        'GE' => ['Geometría', 'conocimientos'],
+        'TR' => ['Trigonometría', 'conocimientos'],
+        'FI' => ['Física', 'conocimientos'],
+        'QU' => ['Química', 'conocimientos'],
+        'BI' => ['Biología', 'conocimientos'],
+        'LE' => ['Lenguaje', 'conocimientos'],
+        'LI' => ['Literatura', 'conocimientos'],
+        'PS' => ['Psicología', 'conocimientos'],
+        'CV' => ['Educación Cívica', 'conocimientos'],
+        'EC' => ['Economía', 'conocimientos'],
+        'HP' => ['Historia del Perú', 'conocimientos'],
+        'HU' => ['Historia Universal', 'conocimientos'],
+        'GG' => ['Geografía', 'conocimientos'],
+        'FL' => ['Filosofía y Lógica', 'conocimientos'],
+        'CG' => ['Cultura General', 'conocimientos'],
+    ];
+
+    /**
+     * Preguntas por curso en el examen de cada área (100 en total).
+     * Todas comparten la sección de Habilidades (20); el resto pesa según el área.
+     * D sigue la distribución acordada para Ciencias Económicas y de Gestión.
+     */
+    public const DISTRIBUCION = [
+        'A' => ['AM' => 10, 'AV' => 8, 'IN' => 2, 'AR' => 4, 'AL' => 4, 'GE' => 3, 'TR' => 2,
+            'BI' => 20, 'QU' => 14, 'FI' => 8,
+            'LE' => 7, 'LI' => 3, 'PS' => 5, 'CV' => 2, 'HP' => 2, 'HU' => 2, 'GG' => 2, 'EC' => 1, 'FL' => 1],
+        'B' => ['AM' => 10, 'AV' => 8, 'IN' => 2, 'AR' => 6, 'AL' => 7, 'GE' => 6, 'TR' => 4,
+            'FI' => 12, 'QU' => 12, 'BI' => 12,
+            'LE' => 6, 'LI' => 3, 'PS' => 3, 'CV' => 2, 'HP' => 2, 'HU' => 2, 'GG' => 2, 'FL' => 1],
+        'C' => ['AM' => 10, 'AV' => 8, 'IN' => 2, 'AR' => 6, 'AL' => 8, 'GE' => 8, 'TR' => 6,
+            'FI' => 14, 'QU' => 10, 'BI' => 4,
+            'LE' => 6, 'LI' => 3, 'PS' => 3, 'CV' => 2, 'HP' => 2, 'HU' => 2, 'GG' => 3, 'EC' => 1, 'FL' => 2],
+        'D' => ['AM' => 10, 'AV' => 8, 'IN' => 2, 'AR' => 4, 'AL' => 4, 'GE' => 4, 'TR' => 2,
+            'LE' => 8, 'LI' => 4, 'PS' => 6, 'CV' => 3,
+            'EC' => 8, 'HP' => 3, 'HU' => 3, 'GG' => 4, 'FL' => 4,
+            'FI' => 8, 'QU' => 7, 'BI' => 8],
+        'E' => ['AM' => 10, 'AV' => 8, 'IN' => 2, 'AR' => 4, 'AL' => 3, 'GE' => 3, 'TR' => 1,
+            'FI' => 3, 'QU' => 3, 'BI' => 4,
+            'LE' => 10, 'LI' => 6, 'PS' => 5, 'CV' => 5, 'HP' => 6, 'HU' => 6, 'GG' => 6, 'EC' => 4, 'FL' => 6, 'CG' => 5],
     ];
 
     public function handle(LectorBancoExcel $lector): int
@@ -74,13 +98,15 @@ class ImportarBancoExcel extends Command
         $ahora = now();
         $creador = DB::table('usuarios')->where('rol', 'admin')->orderBy('id')->value('id');
         $temas = [];
-        $conRespuesta = [];
+        $disponibles = [];
+        $conRespuesta = 0;
         $incompletas = [];
 
-        DB::transaction(function () use ($preguntas, $disco, $ahora, $creador, &$temas, &$conRespuesta, &$incompletas) {
+        DB::transaction(function () use ($preguntas, $disco, $ahora, $creador, &$temas, &$disponibles, &$conRespuesta, &$incompletas) {
             foreach ($preguntas as $p) {
-                [$area, $bloque, $tema] = self::CURSOS[$this->prefijo($p['codigo'])];
-                $temaId = $temas[$area.'|'.$tema] ??= $this->tema($area, $bloque, $tema, $ahora);
+                $prefijo = $this->prefijo($p['codigo']);
+                [$curso, $bloque] = self::CURSOS[$prefijo];
+                $temaId = $temas[$prefijo] ??= $this->tema($curso, $bloque, $ahora);
 
                 $imagen = $p['imagen'] ? $this->guardarImagen($disco, $p['codigo'], $p['imagen']) : null;
                 DB::table('preguntas')->updateOrInsert(['codigo' => $p['codigo']], [
@@ -97,7 +123,7 @@ class ImportarBancoExcel extends Command
                 $preguntaId = DB::table('preguntas')->where('codigo', $p['codigo'])->value('id');
                 DB::table('preguntas')->where('id', $preguntaId)->whereNull('created_at')->update(['created_at' => $ahora]);
 
-                $completa = true;
+                $completa = $imagen !== null;
                 foreach ($p['alternativas'] as $letra => $alternativa) {
                     $imagenAlt = $alternativa['imagen']
                         ? $this->guardarImagen($disco, "{$p['codigo']}_{$letra}", $alternativa['imagen']) : null;
@@ -115,23 +141,22 @@ class ImportarBancoExcel extends Command
                     );
                 }
 
-                if (! $completa || ! $imagen) {
+                if (! $completa) {
                     $incompletas[] = $p['codigo'];
-                } elseif ($p['respuesta'] !== null) {
-                    $conRespuesta[$area] = ($conRespuesta[$area] ?? 0) + 1;
                 }
+                $disponibles[$prefijo] = ($disponibles[$prefijo] ?? 0) + 1;
+                $conRespuesta += $p['respuesta'] !== null ? 1 : 0;
             }
         });
 
         $total = count($preguntas);
-        $listas = array_sum($conRespuesta);
-        $this->info("Importadas {$total} preguntas ({$listas} con respuesta, ".($total - $listas).' pendientes de respuesta).');
+        $this->info("Importadas {$total} preguntas ({$conRespuesta} con respuesta, ".($total - $conRespuesta).' aún sin respuesta).');
         if ($incompletas) {
             $this->warn('Revisar en el Excel (falta imagen o alguna alternativa): '.implode(', ', $incompletas));
         }
 
-        if ($this->option('simulacro')) {
-            $this->simulacro($conRespuesta, $creador, $ahora);
+        if ($this->option('simulacros')) {
+            return $this->simulacros($disponibles, $creador, $ahora);
         }
 
         return self::SUCCESS;
@@ -142,14 +167,15 @@ class ImportarBancoExcel extends Command
         return strtoupper(strtok($codigo, '_'));
     }
 
-    private function tema(string $area, string $bloque, string $tema, $ahora): int
+    /** Cada curso es una asignatura con un tema del mismo nombre, para sortear por curso. */
+    private function tema(string $curso, string $bloque, $ahora): int
     {
-        DB::table('areas')->updateOrInsert(['nombre' => $area], ['bloque' => $bloque, 'activo' => true, 'updated_at' => $ahora]);
-        $areaId = DB::table('areas')->where('nombre', $area)->value('id');
+        DB::table('areas')->updateOrInsert(['nombre' => $curso], ['bloque' => $bloque, 'activo' => true, 'updated_at' => $ahora]);
+        $areaId = DB::table('areas')->where('nombre', $curso)->value('id');
         DB::table('areas')->where('id', $areaId)->whereNull('created_at')->update(['created_at' => $ahora]);
 
-        DB::table('temas')->updateOrInsert(['area_id' => $areaId, 'nombre' => $tema], ['activo' => true, 'updated_at' => $ahora]);
-        $temaId = DB::table('temas')->where('area_id', $areaId)->where('nombre', $tema)->value('id');
+        DB::table('temas')->updateOrInsert(['area_id' => $areaId, 'nombre' => $curso], ['activo' => true, 'updated_at' => $ahora]);
+        $temaId = DB::table('temas')->where('area_id', $areaId)->where('nombre', $curso)->value('id');
         DB::table('temas')->where('id', $temaId)->whereNull('created_at')->update(['created_at' => $ahora]);
 
         return $temaId;
@@ -164,41 +190,59 @@ class ImportarBancoExcel extends Command
         return "storage/{$ruta}";
     }
 
-    /** Simulacro abierto a las cinco áreas con todas las preguntas que ya tienen respuesta. */
-    private function simulacro(array $conRespuesta, ?int $creador, $ahora): void
+    /** Un simulacro de 100 preguntas por área de postulación, con la distribución de DISTRIBUCION. */
+    private function simulacros(array $disponibles, ?int $creador, $ahora): int
     {
-        $total = array_sum($conRespuesta);
-        if ($total === 0) {
-            $this->warn('No se creó el simulacro: ninguna pregunta tiene respuesta todavía.');
+        $faltantes = [];
+        foreach (self::DISTRIBUCION as $codigoArea => $cuotas) {
+            foreach ($cuotas as $prefijo => $cantidad) {
+                if (($disponibles[$prefijo] ?? 0) < $cantidad) {
+                    $faltantes[] = "Área {$codigoArea}: ".self::CURSOS[$prefijo][0]." pide {$cantidad} y el Excel tiene ".($disponibles[$prefijo] ?? 0);
+                }
+            }
+        }
+        if ($faltantes) {
+            $this->error("No se crearon los simulacros:\n".implode("\n", $faltantes));
 
-            return;
+            return self::FAILURE;
         }
 
-        DB::table('simulacros')->updateOrInsert(['nombre' => self::SIMULACRO], [
-            'tiempo_limite' => 60, 'total_preguntas' => $total, 'cantidad_alternativas' => 5,
-            'fecha_inicio' => $ahora->copy()->subDay(), 'fecha_fin' => $ahora->copy()->addMonths(3),
-            'activo' => true, 'creado_por' => $creador, 'updated_at' => $ahora,
-        ]);
-        $simulacroId = DB::table('simulacros')->where('nombre', self::SIMULACRO)->value('id');
-        DB::table('simulacros')->where('id', $simulacroId)->whereNull('created_at')->update(['created_at' => $ahora]);
+        foreach (self::DISTRIBUCION as $codigoArea => $cuotas) {
+            $areaPostulacionId = DB::table('areas_postulacion')->where('codigo', $codigoArea)->value('id');
+            if ($areaPostulacionId === null) {
+                $this->warn("No existe el área de postulación {$codigoArea}; se omite su simulacro.");
 
-        DB::table('simulacro_area')->where('simulacro_id', $simulacroId)->delete();
-        foreach ($conRespuesta as $area => $cantidad) {
-            DB::table('simulacro_area')->insert([
-                'simulacro_id' => $simulacroId,
-                'area_id' => DB::table('areas')->where('nombre', $area)->value('id'),
-                'nivel' => 'mixto', 'cantidad_preguntas' => $cantidad,
+                continue;
+            }
+
+            $nombre = self::PREFIJO_SIMULACRO.$codigoArea;
+            DB::table('simulacros')->updateOrInsert(['nombre' => $nombre], [
+                'tiempo_limite' => 180, 'total_preguntas' => array_sum($cuotas), 'cantidad_alternativas' => 5,
+                'fecha_inicio' => $ahora->copy()->subDay(), 'fecha_fin' => $ahora->copy()->addMonths(3),
+                'activo' => true, 'creado_por' => $creador, 'updated_at' => $ahora,
+            ]);
+            $simulacroId = DB::table('simulacros')->where('nombre', $nombre)->value('id');
+            DB::table('simulacros')->where('id', $simulacroId)->whereNull('created_at')->update(['created_at' => $ahora]);
+
+            DB::table('simulacro_area')->where('simulacro_id', $simulacroId)->delete();
+            foreach ($cuotas as $prefijo => $cantidad) {
+                DB::table('simulacro_area')->insert([
+                    'simulacro_id' => $simulacroId,
+                    'area_id' => DB::table('areas')->where('nombre', self::CURSOS[$prefijo][0])->value('id'),
+                    'nivel' => 'mixto', 'cantidad_preguntas' => $cantidad,
+                    'created_at' => $ahora, 'updated_at' => $ahora,
+                ]);
+            }
+
+            DB::table('area_postulacion_simulacro')->where('simulacro_id', $simulacroId)->delete();
+            DB::table('area_postulacion_simulacro')->insert([
+                'area_postulacion_id' => $areaPostulacionId, 'simulacro_id' => $simulacroId,
                 'created_at' => $ahora, 'updated_at' => $ahora,
             ]);
+
+            $this->info("«{$nombre}» listo: ".array_sum($cuotas).' preguntas.');
         }
 
-        foreach (DB::table('areas_postulacion')->pluck('id') as $areaPostulacionId) {
-            DB::table('area_postulacion_simulacro')->updateOrInsert(
-                ['area_postulacion_id' => $areaPostulacionId, 'simulacro_id' => $simulacroId],
-                ['created_at' => $ahora, 'updated_at' => $ahora]
-            );
-        }
-
-        $this->info("Simulacro «".self::SIMULACRO."» listo con {$total} preguntas, abierto a todas las áreas.");
+        return self::SUCCESS;
     }
 }

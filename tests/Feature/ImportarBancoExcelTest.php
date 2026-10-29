@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Console\Commands\ImportarBancoExcel;
+use App\Services\ResultadoService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -34,7 +35,7 @@ class ImportarBancoExcelTest extends TestCase
     public function test_importa_preguntas_con_imagen_alternativas_y_respuesta(): void
     {
         $this->artisan('banco:importar', ['archivo' => $this->archivo])
-            ->expectsOutputToContain('Importadas 2 preguntas (1 con respuesta, 1 pendientes de respuesta).')
+            ->expectsOutputToContain('Importadas 2 preguntas (1 con respuesta, 1 aún sin respuesta).')
             ->assertSuccessful();
 
         $pregunta = DB::table('preguntas')->where('codigo', 'AM_1')->first();
@@ -46,7 +47,7 @@ class ImportarBancoExcelTest extends TestCase
         $this->assertSame(['B'], $alternativas->where('es_correcta', true)->pluck('letra')->values()->all());
 
         $tema = DB::table('temas')->where('id', $pregunta->tema_id)->first();
-        $this->assertSame('Razonamiento matemático', $tema->nombre);
+        $this->assertSame('Razonamiento Matemático', $tema->nombre);
 
         $sinRespuesta = DB::table('preguntas')->where('codigo', 'LE_1')->value('id');
         $this->assertSame(0, DB::table('alternativas')->where('pregunta_id', $sinRespuesta)->where('es_correcta', true)->count());
@@ -61,17 +62,33 @@ class ImportarBancoExcelTest extends TestCase
         $this->assertSame(10, DB::table('alternativas')->count());
     }
 
-    public function test_el_simulacro_solo_usa_preguntas_con_respuesta(): void
+    public function test_cada_area_tiene_100_preguntas_y_la_habilidad_comun(): void
     {
-        DB::table('areas_postulacion')->insert(['codigo' => 'D', 'nombre' => 'Ciencias Económicas', 'activo' => true]);
+        foreach (ImportarBancoExcel::DISTRIBUCION as $area => $cuotas) {
+            $this->assertSame(100, array_sum($cuotas), "Área {$area}");
+            $this->assertSame(20, $cuotas['AM'] + $cuotas['AV'] + $cuotas['IN'], "Habilidades del área {$area}");
+        }
+    }
 
-        $this->artisan('banco:importar', ['archivo' => $this->archivo, '--simulacro' => true])->assertSuccessful();
+    public function test_sin_preguntas_suficientes_no_crea_simulacros(): void
+    {
+        $this->artisan('banco:importar', ['archivo' => $this->archivo, '--simulacros' => true])
+            ->expectsOutputToContain('No se crearon los simulacros')
+            ->assertFailed();
 
-        $simulacro = DB::table('simulacros')->where('nombre', ImportarBancoExcel::SIMULACRO)->first();
-        $this->assertSame(1, (int) $simulacro->total_preguntas);
-        $this->assertSame(5, (int) $simulacro->cantidad_alternativas);
-        $this->assertSame(1, (int) DB::table('simulacro_area')->where('simulacro_id', $simulacro->id)->sum('cantidad_preguntas'));
-        $this->assertSame(1, DB::table('area_postulacion_simulacro')->where('simulacro_id', $simulacro->id)->count());
+        $this->assertSame(0, DB::table('simulacros')->where('nombre', 'like', ImportarBancoExcel::PREFIJO_SIMULACRO.'%')->count());
+    }
+
+    public function test_pregunta_sin_respuesta_no_suma_ni_resta(): void
+    {
+        $servicio = app(ResultadoService::class);
+        $respuesta = (object) ['estado_respuesta' => null, 'alternativa_id' => 7, 'pregunta_id' => 3,
+            'alternativa_pregunta_id' => 3, 'es_correcta' => 0, 'claves' => 0];
+
+        $this->assertSame('en_blanco', $servicio->clasificarRespuesta($respuesta));
+
+        $respuesta->claves = 1;
+        $this->assertSame('incorrecta', $servicio->clasificarRespuesta($respuesta));
     }
 
     public function test_archivo_inexistente_falla_con_mensaje(): void

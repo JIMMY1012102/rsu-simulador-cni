@@ -86,13 +86,16 @@ El banco del colegio (`Banco_preguntas_completo.xlsx`, hoja «Banco de preguntas
 ```bash
 php artisan migrate
 php artisan storage:link
-php artisan banco:importar "C:\ruta\Banco_preguntas_completo.xlsx" --simulacro
+php artisan banco:importar "C:uta\Banco_preguntas_completo.xlsx" --simulacros
 ```
 
 - Cada pregunta se identifica por su código (`AM_1`, `LE_12`…), así que el comando se puede repetir cada vez que se actualice el Excel sin duplicar nada.
+- Cada curso (Álgebra, Física, Lenguaje…) queda como asignatura propia, para poder sortear por curso.
 - Las imágenes de preguntas y alternativas se guardan en `storage/app/public/banco` y el examen las muestra desde `/storage/banco/…`.
 - La columna «Respuesta correcta» se guarda en `alternativas.es_correcta`; el examen nunca la envía al navegador.
-- Solo las preguntas con respuesta entran a los simulacros. `--simulacro` crea o actualiza «Banco CNI · preguntas con respuesta» con todas ellas, abierto a las cinco áreas.
+- Las preguntas del Excel que aún no tienen respuesta también salen en el examen, pero no suman ni restan puntos hasta completar su respuesta y volver a importar.
+- `--simulacros` crea o actualiza «Simulacro CNI · Área A» … «Área E»: 100 preguntas cada uno, 180 minutos, con la distribución por curso de `ImportarBancoExcel::DISTRIBUCION` (20 de Habilidades comunes y el resto según el área).
+- Para probar cada área en local: `php artisan db:seed --class=EstudiantesPorAreaDemoSeeder` crea `estudiante_a_demo` … `estudiante_e_demo`.
 - El Excel no se sube al repositorio: el repositorio es público y el archivo contiene las respuestas.
 
 ## Nuevo flujo del estudiante: despliegue seguro (PR #18)
