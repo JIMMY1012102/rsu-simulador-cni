@@ -731,3 +731,15 @@ body:has(.cni-alumno){background:#f8f9fe}
     .cni-progreso-svg {min-width:590px}
     .cni-progreso-barra-etiquetas {font-size:10px}
 }
+
+/* CTA para rendir examen, dentro de la portada de Mi perfil (A-E).
+   Usa exclusivamente las variables visuales del área. */
+.cni-alumno-exam-cta{position:relative;z-index:4;margin-top:17px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:100%}
+.cni-alumno-exam-cta form{display:flex;flex-direction:column;align-items:flex-start;gap:6px;max-width:100%}
+.cni-alumno .cni-alumno-exam-button{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:11px;background:var(--accent);color:#fff;font-weight:800;font-size:13px;padding:12px 18px;box-shadow:0 7px 17px #06173725;cursor:pointer;max-width:100%}
+.cni-alumno .cni-alumno-exam-button:hover{background:var(--accent-dark)}
+.cni-alumno .cni-alumno-exam-button:focus-visible{outline:3px solid #ffbe3f;outline-offset:3px}
+.cni-alumno-exam-button-arrow{font-size:18px;line-height:1}
+.cni-alumno-exam-cta small{color:var(--accent-dark);font-weight:650;font-size:10px;max-width:300px;overflow-wrap:anywhere}
+.cni-alumno-exam-unavailable{font-size:11px;font-weight:700;color:var(--accent-dark);background:#ffffffb9;border:1px solid #ffffff80;border-radius:9px;padding:10px 13px;max-width:310px}
+@media(max-width:680px){.cni-alumno-exam-cta{margin-top:11px}.cni-alumno .cni-alumno-exam-button{font-size:11px;padding:10px 13px}.cni-alumno-exam-cta small,.cni-alumno-exam-unavailable{font-size:9px;max-width:215px}}
