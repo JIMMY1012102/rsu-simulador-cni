@@ -86,7 +86,7 @@ El banco del colegio (`Banco_preguntas_completo.xlsx`, hoja «Banco de preguntas
 ```bash
 php artisan migrate
 php artisan storage:link
-php artisan banco:importar "C:uta\Banco_preguntas_completo.xlsx" --simulacros
+php artisan banco:importar "C:\ruta\Banco_preguntas_completo.xlsx" --simulacros
 ```
 
 - Cada pregunta se identifica por su código (`AM_1`, `LE_12`…), así que el comando se puede repetir cada vez que se actualice el Excel sin duplicar nada.
