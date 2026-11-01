@@ -79,8 +79,10 @@ class ProgresoAlumnoTest extends TestCase
         $this->actingAs($alumno, 'web')->get(route('alumno.panel'))
             ->assertOk()
             ->assertSee('Mi progreso')
-            ->assertSee('75,0%')
-            ->assertSee('30,00 puntos')
+            ->assertSee('Evolución de tu puntaje')
+            ->assertSee('30,00 de 40,00 puntos')
+            ->assertDontSee('Tu último intento')
+            ->assertDontSee('Simulacros disponibles completados')
             ->assertSee('Examen de 40 puntos')
             ->assertDontSee('Nivel Básico');
     }
@@ -96,7 +98,7 @@ class ProgresoAlumnoTest extends TestCase
 
         $this->actingAs($alumno, 'web')
             ->get(route('alumno.panel'))->assertOk()
-            ->assertSee('Aún no hay intentos calificados')
+            ->assertSee('Completa tu primer simulacro para ver tu progreso.')
             ->assertDontSee('8% avance');
     }
 
