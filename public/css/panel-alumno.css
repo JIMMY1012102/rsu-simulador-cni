@@ -838,3 +838,36 @@ body:has(.cni-alumno){background:#f8f9fe}
     border:0;
     border-radius:12px;
 }
+
+/* Historial: una tarjeta con filtros y tabla. */
+.cni-historial-tarjeta{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 6px 18px #243e5c0a}
+.cni-historial-cabecera{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.cni-historial-cabecera h2{font-size:18px;font-weight:850;color:var(--ink)}
+.cni-historial-filtros{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cni-alumno .cni-historial-filtros :where(input,select,button){min-height:36px;border:1px solid #cddbef;border-radius:7px;padding:7px 10px;background:#fff;color:var(--ink);font:inherit;font-size:12px}
+.cni-historial-filtros input{width:175px;min-width:0}
+.cni-historial-filtros input::placeholder{color:#64748b}
+.cni-alumno .cni-historial-aplicar{background:var(--pale);border-color:var(--accent);color:var(--accent-dark);font-weight:750;cursor:pointer}
+.cni-historial-tabla-marco{overflow-x:auto}
+.cni-historial-tabla{border-collapse:collapse;width:100%;min-width:670px;text-align:left;font-size:13px}
+.cni-historial-tabla th,.cni-historial-tabla td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.cni-historial-tabla thead th{background:#eef3f9;color:#425778;font-size:11px;text-transform:uppercase;letter-spacing:.035em;white-space:nowrap}
+.cni-historial-tabla tbody tr:nth-child(even){background:#f8faff}
+.cni-historial-tabla tbody th{color:var(--accent-dark);font-weight:800}
+.cni-historial-tabla td:nth-child(2),.cni-historial-puntaje{white-space:nowrap}
+.cni-historial-puntaje{font-weight:750}
+.cni-historial-estado{display:inline-block;min-width:84px;padding:4px 9px;border-radius:99px;text-align:center;background:#eef2f6;color:#52627a;font-size:11px;font-weight:650;white-space:nowrap}
+.cni-alumno .cni-historial-resultado{display:inline-block;border:1px solid var(--accent);border-radius:6px;padding:5px 10px;color:var(--accent-dark);font-weight:700;white-space:nowrap}
+.cni-historial-resultado:hover{background:var(--pale)}
+.cni-historial-tabla .cni-historial-vacio{text-align:center;padding:40px 15px;color:#52627a}
+.cni-historial-paginacion{display:flex;align-items:center;justify-content:flex-end;gap:16px;flex-wrap:wrap;margin-top:16px;font-size:12px}
+.cni-historial-paginacion a{color:var(--accent-dark);font-weight:750}
+.cni-alumno .cni-historial-filtros input:focus-visible,.cni-historial-tabla-marco:focus-visible{outline:3px solid #ffbe3f;outline-offset:3px}
+@media(max-width:680px){
+    .cni-historial-tarjeta{padding:14px}
+    .cni-historial-cabecera{align-items:stretch}
+    .cni-historial-filtros{width:100%;display:grid;grid-template-columns:1fr 1fr}
+    .cni-historial-filtros input{width:100%;grid-column:1 / -1}
+    .cni-historial-filtros select{min-width:0;width:100%}
+    .cni-historial-aplicar{grid-column:1 / -1}
+}

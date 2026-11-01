@@ -88,8 +88,45 @@ class OrientacionController extends Controller
         // No hace falta elegir carrera: el área guardada determina qué examen se ofrece.
         $simulacros = $this->simulacrosDelArea($usuario, $area, $carrera, $servicio);
 
-        $intentos = DB::table('intentos')->where('usuario_id', $usuario->id)
-            ->whereNotNull('puntaje_total')->orderByDesc('fecha_inicio')->limit(10)->get();
+        $buscarValor = $request->query('buscar', '');
+        $busqueda = is_string($buscarValor) ? mb_substr(trim($buscarValor), 0, 100) : '';
+        $estado = in_array($request->query('estado'), ['en_curso', 'calificado', 'pendiente'], true)
+            ? $request->query('estado') : '';
+        $orden = in_array($request->query('orden'), ['reciente', 'antiguo', 'puntaje'], true)
+            ? $request->query('orden') : 'reciente';
+
+        $historial = DB::table('intentos as i')
+            ->leftJoin('simulacros as s', 's.id', '=', 'i.simulacro_id')
+            ->where('i.usuario_id', $usuario->id)
+            ->where('i.tipo', 'simulacro')
+            ->select('i.*', 's.nombre as simulacro_nombre', 's.puntaje_correcta')
+            ->when($busqueda !== '', function ($query) use ($busqueda) {
+                $query->where(function ($q) use ($busqueda) {
+                    $q->where('s.nombre', 'like', '%'.$busqueda.'%');
+                    $numero = ltrim($busqueda, '#0');
+                    if (ctype_digit($numero)) {
+                        $q->orWhere('i.id', (int) $numero);
+                    }
+                });
+            });
+
+        if ($estado === 'en_curso') {
+            $historial->where('i.estado', 'en_curso');
+        } elseif ($estado === 'calificado') {
+            $historial->where('i.estado', '!=', 'en_curso')->whereNotNull('i.puntaje_total');
+        } elseif ($estado === 'pendiente') {
+            $historial->where('i.estado', '!=', 'en_curso')->whereNull('i.puntaje_total');
+        }
+
+        if ($orden === 'antiguo') {
+            $historial->orderBy('i.fecha_inicio')->orderBy('i.id');
+        } elseif ($orden === 'puntaje') {
+            $historial->orderByRaw('i.puntaje_total IS NULL')
+                ->orderByDesc('i.puntaje_total')->orderByDesc('i.id');
+        } else {
+            $historial->orderByDesc('i.fecha_inicio')->orderByDesc('i.id');
+        }
+        $intentos = $historial->paginate(10)->withQueryString()->fragment('historial');
 
         return view('alumno.panel', [
             'usuario' => $usuario,
