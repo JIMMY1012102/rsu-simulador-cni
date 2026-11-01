@@ -6,6 +6,7 @@ use App\Services\IntentoService;
 use App\Services\Alumno\ExamenIndependienteService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class ExamenController extends Controller
 {
@@ -16,7 +17,15 @@ class ExamenController extends Controller
         if ($request->user('web')->area_postulacion_id === null && $request->user('web')->carrera_id === null) {
             return redirect()->route('alumno.elegir-area');
         }
-        $intento = $examenes->iniciar($request->user('web'));
+        try {
+            $intento = $examenes->iniciar($request->user('web'));
+        } catch (ValidationException $e) {
+            if (! array_key_exists('preguntas', $e->errors())) {
+                throw $e;
+            }
+
+            return redirect()->route('examen.vacio');
+        }
 
         return redirect()->route('examen', $intento->id);
     }

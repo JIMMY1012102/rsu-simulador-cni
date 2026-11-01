@@ -1,7 +1,7 @@
 @php
     $dos = fn ($n) => str_pad((string) $n, 2, '0', STR_PAD_LEFT);
     $porcentaje = $total > 0 ? (int) round($respondidas * 100 / $total) : 0;
-    $elegida = $respuestas[$pregunta->id] ?? null;
+    $elegida = $pregunta ? ($respuestas[$pregunta->id] ?? null) : null;
     $tiempoInicial = $segundosRestantes === null ? null
         : sprintf('%02d:%02d:%02d', intdiv($segundosRestantes, 3600), intdiv($segundosRestantes % 3600, 60), $segundosRestantes % 60);
     $sinResponder = $preguntas->filter(fn ($p) => ($respuestas[$p->id] ?? null) === null);
@@ -20,12 +20,12 @@
             <h1>Simulador de examen</h1>
             <p>
                 {{ $simulacro ? 'Simulacro de admisión · Práctica general' : 'Práctica · '.($pregunta->area ?? 'Por área') }}
-                · Intento {{ $dos($numeroIntento) }}
+                @unless($sinBanco) · Intento {{ $dos($numeroIntento) }} @endunless
             </p>
         </div>
         <span class="examen-estado">
             <img src="{{ asset('img/examen/indicador.svg') }}" width="6" height="6" alt="">
-            Examen en curso
+            {{ $sinBanco ? 'Sin iniciar' : 'Examen en curso' }}
         </span>
     </section>
 
@@ -44,7 +44,7 @@
                 <span>{{ $respondidas }} de {{ $total }} respondidas</span>
                 <strong>{{ $porcentaje }} %</strong>
             </div>
-            <div class="examen-progreso__barra" role="progressbar" aria-valuemin="0" aria-valuemax="{{ $total }}"
+            <div class="examen-progreso__barra" role="progressbar" aria-valuemin="0" aria-valuemax="{{ max(1, $total) }}"
                 aria-valuenow="{{ $respondidas }}" aria-label="Preguntas respondidas">
                 <span style="width: {{ $porcentaje }}%"></span>
             </div>
@@ -57,7 +57,7 @@
                 @if ($tiempoInicial)
                     <strong wire:ignore x-text="tiempo" role="timer" aria-live="off">{{ $tiempoInicial }}</strong>
                 @else
-                    <strong class="examen-tiempo__libre">Sin límite</strong>
+                    <strong class="examen-tiempo__libre">{{ $sinBanco ? '—' : 'Sin límite' }}</strong>
                 @endif
             </div>
         </div>
@@ -65,6 +65,7 @@
 
     <div class="examen-columnas">
         {{-- Pregunta del examen --}}
+        @if($pregunta)
         <section class="examen-pregunta" wire:key="pregunta-{{ $pregunta->id }}">
             <header class="examen-pregunta__encabezado">
                 <h2>Pregunta {{ $actual + 1 }} <span>de {{ $total }}</span></h2>
@@ -154,6 +155,23 @@
             </footer>
         </section>
 
+        @else
+        <section class="examen-pregunta" aria-labelledby="preguntas-vacias-titulo">
+            <header class="examen-pregunta__encabezado">
+                <h2 id="preguntas-vacias-titulo">Preguntas</h2>
+            </header>
+            <div class="examen-pregunta__contenido">
+                <div class="examen-enunciado" role="status">
+                    <p class="examen-enunciado__texto">Aún no hay preguntas disponibles.</p>
+                </div>
+            </div>
+            <footer class="examen-navegacion">
+                <button type="button" class="examen-boton" disabled>Anterior</button>
+                <button type="button" class="examen-boton examen-boton--primario" disabled>Siguiente</button>
+            </footer>
+        </section>
+        @endif
+
         {{-- Panel de preguntas --}}
         <aside class="examen-panel">
             <section class="examen-mapa">
@@ -162,7 +180,7 @@
                         <h2>Mapa de preguntas</h2>
                         <img src="{{ asset('img/examen/layout-grid.svg') }}" width="18" height="18" alt="">
                     </div>
-                    <p>Selecciona un número para ir a la pregunta.</p>
+                    @unless($sinBanco)<p>Selecciona un número para ir a la pregunta.</p>@endunless
                 </header>
 
                 <nav class="examen-mapa__preguntas" aria-label="Mapa de preguntas">
@@ -179,7 +197,7 @@
                     @endforeach
                 </nav>
 
-                <p class="examen-mapa__actual"><span aria-hidden="true"></span>Pregunta actual: {{ $actual + 1 }}</p>
+                @unless($sinBanco)<p class="examen-mapa__actual"><span aria-hidden="true"></span>Pregunta actual: {{ $actual + 1 }}</p>@endunless
                 <hr class="examen-mapa__separador">
 
                 <ul class="examen-leyenda">
@@ -190,15 +208,16 @@
             </section>
 
             <div class="examen-finalizar">
-                <button type="button" class="examen-boton examen-boton--bloque" @click="confirmar = true">
+                <button type="button" class="examen-boton examen-boton--bloque" @click="confirmar = true" @disabled($sinBanco)>
                     Finalizar examen
                     <img src="{{ asset('img/examen/log-out.svg') }}" width="16" height="16" alt="">
                 </button>
-                <p>Podrás revisar tus respuestas antes de enviar el examen.</p>
+                @unless($sinBanco)<p>Podrás revisar tus respuestas antes de enviar el examen.</p>@endunless
             </div>
         </aside>
     </div>
 
+    @unless($sinBanco)
     {{-- Confirmación (no está en Figma; usa los mismos estilos del frame) --}}
     <div class="examen-modal" x-show="confirmar" x-cloak x-transition.opacity @click.self="confirmar = false">
         <div class="examen-modal__caja" role="dialog" aria-modal="true" aria-labelledby="titulo-confirmar">
@@ -240,4 +259,5 @@
             </div>
         </div>
     </div>
+    @endunless
 </div>

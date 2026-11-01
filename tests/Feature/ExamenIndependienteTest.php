@@ -121,7 +121,7 @@ class ExamenIndependienteTest extends TestCase
             ->update(['activo' => false]);
         $this->actingAs($alumno, 'web')->from(route('alumno.panel'))
             ->post(route('examen.independiente'))
-            ->assertRedirect(route('alumno.panel'))->assertSessionHasErrors('preguntas');
+            ->assertRedirect(route('examen.vacio'));
         $this->assertDatabaseCount('intentos', 0);
         $this->assertDatabaseCount('respuestas_estudiante', 0);
         $this->assertDatabaseCount('simulacros', 0);
@@ -132,7 +132,7 @@ class ExamenIndependienteTest extends TestCase
         $this->post(route('examen.independiente'))->assertRedirect(route('login'));
         $alumno = $this->alumno('C');
         $this->actingAs($alumno, 'web')->from(route('alumno.panel'))
-            ->post(route('examen.independiente'))->assertSessionHasErrors('preguntas');
+            ->post(route('examen.independiente'))->assertRedirect(route('examen.vacio'));
         $this->assertDatabaseCount('intentos', 0);
         $alumno->update(['rol' => 'docente']);
         $this->actingAs($alumno->fresh(), 'web')->post(route('examen.independiente'))->assertForbidden();
@@ -145,4 +145,47 @@ class ExamenIndependienteTest extends TestCase
             ->assertSee('Dar examen')->assertDontSee('Elegir simulacro')
             ->assertDontSee('Carrera de interés')->assertDontSee('0 disponibles');
     }
+    public function test_el_banco_vacio_abre_la_misma_pantalla_sin_crear_intentos_y_luego_el_excel_permite_un_examen_real(): void
+    {
+        $alumno = $this->alumno('C');
+        $this->actingAs($alumno, 'web')->post(route('examen.independiente'))
+            ->assertRedirect(route('examen.vacio'));
+        $this->get(route('examen.vacio'))->assertOk()
+            ->assertSee('Simulador de examen')->assertSee('Aún no hay preguntas disponibles.')
+            ->assertSee('Mapa de preguntas')->assertSee('Sin iniciar')->assertDontSee('Intento 00');
+        $this->assertDatabaseCount('intentos', 0);
+        $this->assertDatabaseCount('respuestas_estudiante', 0);
+
+        // La carga del banco hace que el mismo botón inicie el examen sin otro cambio de configuración.
+        $this->banco();
+        $respuesta = $this->post(route('examen.independiente'));
+        $intento = DB::table('intentos')->where('usuario_id', $alumno->id)->first();
+        $respuesta->assertRedirect(route('examen', $intento->id));
+        $this->get(route('examen', $intento->id))->assertOk()
+            ->assertDontSee('Aún no hay preguntas disponibles.');
+        $this->assertDatabaseCount('intentos', 1);
+        $this->assertDatabaseCount('respuestas_estudiante', 100);
+    }
+
+    public function test_las_acciones_de_la_pantalla_sin_banco_no_guardan_ni_finalizan(): void
+    {
+        $componente = new \App\Livewire\Examen();
+        $componente->sinBanco = true;
+        $componente->responder(999);
+        $componente->finalizar();
+        $componente->tiempoAgotado();
+        $componente->ir(99);
+        $this->assertSame(0, $componente->actual);
+        $this->assertDatabaseCount('intentos', 0);
+        $this->assertDatabaseCount('respuestas_estudiante', 0);
+    }
+
+    public function test_la_pantalla_vacia_tambien_exige_una_sesion_de_estudiante(): void
+    {
+        $this->get(route('examen.vacio'))->assertRedirect(route('login'));
+        $docente = $this->alumno('C');
+        $docente->update(['rol' => 'docente']);
+        $this->actingAs($docente, 'web')->get(route('examen.vacio'))->assertForbidden();
+    }
+
 }

@@ -66,6 +66,7 @@ Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class
 
 // Pantalla de examen del alumno; reanuda intentos propios y valida tiempo en el servidor.
 Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::class])->group(function () {
+    Route::get('/alumno/examen/vista-previa', Examen::class)->name('examen.vacio');
     Route::post('/alumno/examen/iniciar', [ExamenController::class, 'independiente'])
         ->name('examen.independiente');
     Route::post('/simulacros/{simulacro}/iniciar', [ExamenController::class, 'iniciar'])

@@ -24,7 +24,10 @@ use Livewire\Component;
 class Examen extends Component
 {
     #[Locked]
-    public int $intentoId;
+    public int $intentoId = 0;
+
+    #[Locked]
+    public bool $sinBanco = false;
 
     /** Índice (desde 0) de la pregunta visible. */
     public int $actual = 0;
@@ -33,13 +36,24 @@ class Examen extends Component
     #[Locked]
     public array $respuestas = [];
 
-    public function mount(int $intento): void
+    public function mount(?int $intento = null): void
     {
         $usuario = Auth::guard('web')->user();
         abort_unless($usuario && $usuario->activo && $usuario->rol === 'estudiante', 403);
         if ($usuario->area_postulacion_id === null && $usuario->carrera_id === null) {
             throw new HttpResponseException(new RedirectResponse(route('alumno.elegir-area')));
         }
+        if (request()->routeIs('examen.vacio')) {
+            $carrera = $usuario->carrera;
+            $area = $usuario->areaPostulacion ?? $carrera?->areaPostulacion;
+            abort_unless($area?->activo, 403);
+            abort_if($carrera && (! $carrera->activo
+                || (int) $carrera->area_postulacion_id !== (int) $area->id), 403);
+            $this->sinBanco = true;
+
+            return;
+        }
+        abort_unless($intento !== null && $intento > 0, 404);
         $registro = $this->servicio()->obtenerPropio($intento, $this->usuarioId());
         if ($registro->estado !== 'en_curso') {
             // Livewire reemplaza redirect() durante mount; se responde con una redirección HTTP normal.
@@ -59,11 +73,14 @@ class Examen extends Component
     #[Computed]
     public function preguntas(): Collection
     {
-        return $this->servicio()->preguntas($this->intentoId)->values();
+        return $this->sinBanco ? collect() : $this->servicio()->preguntas($this->intentoId)->values();
     }
 
     public function responder(int $alternativaId): void
     {
+        if ($this->sinBanco) {
+            return;
+        }
         $pregunta = $this->preguntas->get($this->actual);
         $guardado = $this->mientrasSigaEnCurso(fn () => $this->servicio()->guardarRespuesta(
             $this->intentoId, $this->usuarioId(),
@@ -76,6 +93,9 @@ class Examen extends Component
 
     public function ir(int $indice): void
     {
+        if ($this->sinBanco) {
+            return;
+        }
         $this->actual = max(0, min($indice, $this->preguntas->count() - 1));
     }
 
@@ -91,6 +111,9 @@ class Examen extends Component
 
     public function finalizar(): void
     {
+        if ($this->sinBanco) {
+            return;
+        }
         $intento = $this->servicio()->finalizar($this->intentoId, $this->usuarioId());
         $this->salir($this->mensajeCierre($intento));
     }
@@ -98,6 +121,9 @@ class Examen extends Component
     /** Lo llama el temporizador del navegador al llegar a cero; el servidor decide si de verdad venció. */
     public function tiempoAgotado(): void
     {
+        if ($this->sinBanco) {
+            return;
+        }
         $intento = $this->servicio()->obtenerPropio($this->intentoId, $this->usuarioId());
         if ($intento->estado !== 'en_curso') {
             $this->salir($this->mensajeCierre($intento));
@@ -106,6 +132,9 @@ class Examen extends Component
 
     public function render()
     {
+        if ($this->sinBanco) {
+            return $this->pantallaSinBanco();
+        }
         $intento = $this->servicio()->obtenerPropio($this->intentoId, $this->usuarioId());
         if ($intento->estado !== 'en_curso') {
             $this->salir($this->mensajeCierre($intento));
@@ -129,6 +158,23 @@ class Examen extends Component
             'limiteMs' => $intento->fecha_limite ? Carbon::parse($intento->fecha_limite)->getTimestampMs() : null,
             'ahoraMs' => now()->getTimestampMs(),
         ])->layout('layouts.alumno', ['migas' => 'Examen en curso'])->title('Simulador de examen');
+    }
+
+    /** La pantalla vacía no crea intentos, respuestas ni resultados. */
+    private function pantallaSinBanco()
+    {
+        $usuario = Auth::guard('web')->user();
+        abort_unless($usuario && $usuario->activo && $usuario->rol === 'estudiante', 403);
+        $area = $usuario->areaPostulacion ?? $usuario->carrera?->areaPostulacion;
+
+        return view('livewire.examen', [
+            'intento' => null,
+            'simulacro' => (object) ['nombre' => 'Examen · '.($area?->nombre ?? ''), 'tiempo_limite' => 180],
+            'numeroIntento' => null,
+            'preguntas' => collect(), 'pregunta' => null,
+            'total' => 0, 'respondidas' => 0, 'segundosRestantes' => null,
+            'limiteMs' => null, 'ahoraMs' => now()->getTimestampMs(),
+        ])->layout('layouts.alumno', ['migas' => 'Examen'])->title('Simulador de examen');
     }
 
     /** Ejecuta una escritura; si el intento ya se cerró (por tiempo u otra pestaña), vuelve al panel. */
