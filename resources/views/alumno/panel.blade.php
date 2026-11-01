@@ -15,10 +15,6 @@
     $iniciales = mb_strtoupper(mb_substr($usuario->nombres, 0, 1).mb_substr($usuario->apellidos ?? '', 0, 1));
     $primeraPalabra = explode(' ', trim($usuario->nombres))[0];
     $seccionAlumno = $esVistaPrevia ? null : $usuario->seccion;
-    $correoAlumno = $usuario->email ?? null;
-    if (! $correoAlumno && filter_var($usuario->usuario ?? '', FILTER_VALIDATE_EMAIL)) {
-        $correoAlumno = $usuario->usuario;
-    }
 @endphp
 <div class="cni-alumno" data-area="{{ $area->codigo }}" id="inicio">
     <button type="button" class="cni-alumno-sidebar-toggle"
@@ -110,7 +106,7 @@
                     <h2 id="datos-alumno-titulo"><span class="cni-alumno-datos-icono" aria-hidden="true">♙</span> Datos del alumno</h2>
                     <dl class="cni-alumno-datos-grid">
                         <div><dt>Nombre completo</dt><dd>{{ $nombreCompleto ?: 'No registrado' }}</dd></div>
-                        <div><dt>Correo electrónico</dt><dd>{{ $correoAlumno ?: 'No registrado' }}</dd></div>
+                        <div><dt>Nombre de usuario</dt><dd>{{ $usuario->usuario ?: 'No registrado' }}</dd></div>
                         <div><dt>Grado</dt><dd>{{ $seccionAlumno?->grado ?? 'No asignado' }}</dd></div>
                         <div><dt>Sección</dt><dd>{{ $seccionAlumno?->nombre ?? 'No asignada' }}</dd></div>
                     </dl>
