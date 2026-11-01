@@ -39,7 +39,6 @@
         </div>
         <div class="cni-alumno-sidebar-bottom">
             <div class="cni-alumno-side-art" aria-hidden="true">✦<span>✦</span>✦</div>
-            <div class="cni-alumno-side-user"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante · Área {{ $area->codigo }}</small></span></div>
             @unless($esVistaPrevia)
                 <form method="POST" action="{{ route('logout') }}">@csrf
                     <button class="cni-alumno-salir" type="submit">↪ &nbsp; Cerrar sesión</button>
