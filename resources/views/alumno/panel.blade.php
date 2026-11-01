@@ -14,6 +14,11 @@
     $nombreCompleto = trim($usuario->nombres.' '.($usuario->apellidos ?? ''));
     $iniciales = mb_strtoupper(mb_substr($usuario->nombres, 0, 1).mb_substr($usuario->apellidos ?? '', 0, 1));
     $primeraPalabra = explode(' ', trim($usuario->nombres))[0];
+    $seccionAlumno = $esVistaPrevia ? null : $usuario->seccion;
+    $correoAlumno = $usuario->email ?? null;
+    if (! $correoAlumno && filter_var($usuario->usuario ?? '', FILTER_VALIDATE_EMAIL)) {
+        $correoAlumno = $usuario->usuario;
+    }
 @endphp
 <div class="cni-alumno" data-area="{{ $area->codigo }}" id="inicio">
     <button type="button" class="cni-alumno-sidebar-toggle"
@@ -100,6 +105,16 @@
                      width="520" height="520"
                      alt="Mascota del área de {{ $area->nombre }}">
                 </div>
+
+                <section class="cni-alumno-datos" aria-labelledby="datos-alumno-titulo">
+                    <h2 id="datos-alumno-titulo"><span class="cni-alumno-datos-icono" aria-hidden="true">♙</span> Datos del alumno</h2>
+                    <dl class="cni-alumno-datos-grid">
+                        <div><dt>Nombre completo</dt><dd>{{ $nombreCompleto ?: 'No registrado' }}</dd></div>
+                        <div><dt>Correo electrónico</dt><dd>{{ $correoAlumno ?: 'No registrado' }}</dd></div>
+                        <div><dt>Grado</dt><dd>{{ $seccionAlumno?->grado ?? 'No asignado' }}</dd></div>
+                        <div><dt>Sección</dt><dd>{{ $seccionAlumno?->nombre ?? 'No asignada' }}</dd></div>
+                    </dl>
+                </section>
             </section>
 
             <section class="cni-alumno-vista cni-alumno-vista-progreso" id="progreso" data-panel-view="progreso" aria-labelledby="progreso-titulo" hidden>
