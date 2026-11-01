@@ -152,7 +152,7 @@ class ExamenIndependienteTest extends TestCase
             ->assertRedirect(route('examen.vacio'));
         $this->get(route('examen.vacio'))->assertOk()
             ->assertSee('Simulador de examen')->assertSee('Aún no hay preguntas disponibles.')
-            ->assertSee('Mapa de preguntas')->assertSee('Sin iniciar')->assertDontSee('Intento 00');
+            ->assertSee('Ver preguntas')->assertSee('Colegio Nacional de Imperial')->assertDontSee('Intento 00');
         $this->assertDatabaseCount('intentos', 0);
         $this->assertDatabaseCount('respuestas_estudiante', 0);
 

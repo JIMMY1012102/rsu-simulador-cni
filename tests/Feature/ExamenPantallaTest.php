@@ -84,9 +84,11 @@ class ExamenPantallaTest extends TestCase
             ->assertSee($primera->enunciado)
             ->assertSee($primera->area)
             ->assertSee('0 de 40 respondidas')
-            ->assertSee('JUAN')
+            ->assertSee('Colegio Nacional de Imperial')
+            ->assertDontSee('portal-lateral')
+            ->assertSee('Ver preguntas')
             ->assertSee('js/examen.js?v='.filemtime(public_path('js/examen.js')))
-            ->assertSee('css/alumno.css?v='.filemtime(public_path('css/alumno.css')))
+            ->assertSee('css/examen-simple.css?v='.filemtime(public_path('css/examen-simple.css')))
             ->assertDontSee('La respuesta correcta es')
             ->assertDontSee('es_correcta');
     }

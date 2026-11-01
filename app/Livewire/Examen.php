@@ -157,7 +157,7 @@ class Examen extends Component
             // Fijo durante todo el intento: el x-data de la vista no debe cambiar entre renders.
             'limiteMs' => $intento->fecha_limite ? Carbon::parse($intento->fecha_limite)->getTimestampMs() : null,
             'ahoraMs' => now()->getTimestampMs(),
-        ])->layout('layouts.alumno', ['migas' => 'Examen en curso'])->title('Simulador de examen');
+        ])->layout('layouts.examen-simple', ['migas' => 'Examen en curso'])->title('Simulador de examen');
     }
 
     /** La pantalla vacía no crea intentos, respuestas ni resultados. */
@@ -174,7 +174,7 @@ class Examen extends Component
             'preguntas' => collect(), 'pregunta' => null,
             'total' => 0, 'respondidas' => 0, 'segundosRestantes' => null,
             'limiteMs' => null, 'ahoraMs' => now()->getTimestampMs(),
-        ])->layout('layouts.alumno', ['migas' => 'Examen'])->title('Simulador de examen');
+        ])->layout('layouts.examen-simple', ['migas' => 'Examen'])->title('Simulador de examen');
     }
 
     /** Ejecuta una escritura; si el intento ya se cerró (por tiempo u otra pestaña), vuelve al panel. */

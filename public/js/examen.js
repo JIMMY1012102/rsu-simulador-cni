@@ -5,6 +5,7 @@ document.addEventListener('alpine:init', () => {
     window.Alpine.data('examen', (intentoId, limiteMs) => ({
         revisar: [],
         confirmar: false,
+        mapaAbierto: false,
         tiempo: '',
         agotado: false,
         desfase: 0,
