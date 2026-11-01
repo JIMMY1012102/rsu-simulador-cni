@@ -67,7 +67,6 @@
                     <h1 id="bienvenida-titulo">¡Hola, {{ $primeraPalabra }}!</h1>
                     <h2>Bienvenido a {{ $area->nombre }}</h2>
                     <p>{{ $temaArea['descripcion'] }}</p>
-                    <blockquote>“{{ $temaArea['lema'] }}”</blockquote>
 
                     {{-- Botón real hacia el examen. Se habilita sólo para simulacros de su área. --}}
                     <div class="cni-alumno-exam-cta">
@@ -101,9 +100,11 @@
                      src="{{ asset($rutaMascota) }}"
                      width="520" height="520"
                      alt="Mascota del área de {{ $area->nombre }}">
+                </div>
             </section>
 
-                <div class="cni-alumno-metric-grid" aria-label="Resumen académico">
+            <section class="cni-alumno-vista cni-alumno-vista-progreso" id="progreso" data-panel-view="progreso" aria-labelledby="progreso-titulo" hidden>
+                @include('alumno.partials.progreso')
                 <section class="cni-alumno-progress-card">
                     <div class="cni-alumno-card-heading"><span class="cni-alumno-circle" aria-hidden="true">▥</span><div><h2>Tu progreso en {{ $area->nombre }}</h2><p>Simulacros disponibles completados</p></div><strong class="cni-alumno-metric-value">{{ $d['progreso'] }}%</strong></div>
                     <div class="cni-alumno-progress-track" role="progressbar" aria-label="Progreso de simulacros" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $d['progreso'] }}"><span style="width:{{ $d['progreso'] }}%"></span></div>
@@ -114,18 +115,6 @@
                         <div><span class="indigo" aria-hidden="true">▥</span><strong>{{ $d['porcentajeAcierto'] }}%</strong><small>Porcentaje de acierto</small></div>
                     </div>
                 </section>
-                <section class="cni-alumno-streak-card" aria-label="Racha de estudio">
-                    <div class="cni-alumno-streak-title"><span class="cni-alumno-fire" aria-hidden="true">♨</span><div><h2>Racha de estudio</h2><p><strong>{{ $d['racha'] }}</strong> {{ $d['racha'] === 1 ? 'día seguido' : 'días seguidos' }}</p></div></div>
-                    <div class="cni-alumno-week" aria-label="Actividad de la semana">@foreach($d['semana'] as $dia)
-                        <div><span @class(['done' => $dia['actividad']]) title="{{ $dia['fecha'] }}">{{ $dia['actividad'] ? '✓' : '○' }}</span><small>{{ $dia['dia'] }}</small></div>
-                    @endforeach</div>
-                    <p class="cni-alumno-streak-note">La racha se calcula con exámenes finalizados y calificados.</p>
-                </section>
-            </div>
-            </section>
-
-            <section class="cni-alumno-vista cni-alumno-vista-progreso" id="progreso" data-panel-view="progreso" aria-labelledby="progreso-titulo" hidden>
-                @include('alumno.partials.progreso')
             </section>
 
             <section class="cni-alumno-vista cni-alumno-exams" id="intentos" data-panel-view="intentos" aria-labelledby="simulacros-titulo" hidden>
@@ -224,7 +213,7 @@
             toggle.focus();
         }
     });
-    // Sólo una sección visible a la vez. Por defecto: portada + dos tarjetas.
+    // Sólo una sección visible a la vez. Por defecto: bienvenida y acceso al examen.
     const vistas = [...panel.querySelectorAll('[data-panel-view]')];
     // #intentos es una vista secundaria accesible desde el botón "Rendir simulacro".
     const destinos = ['#perfil', '#progreso', '#historial', '#intentos'];
