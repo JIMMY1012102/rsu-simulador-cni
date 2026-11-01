@@ -16,13 +16,56 @@ class BancoPreguntasController extends Controller
 {
     public function __construct(private readonly PreguntaService $preguntas) {}
 
-    public function index(): View
+    public function index(Request $request): View
     {
+        $filtros = $request->validate([
+            'tema_id' => ['nullable', 'integer', 'exists:temas,id'],
+            'area_id' => ['nullable', 'integer', 'exists:areas,id'],
+            'estado' => ['nullable', Rule::in(['activo', 'inactivo'])],
+            'buscar' => ['nullable', 'string', 'max:200'],
+        ]);
+        $consulta = DB::table('preguntas as p')->join('temas as t', 't.id', '=', 'p.tema_id')
+            ->join('areas as a', 'a.id', '=', 't.area_id')
+            ->select('p.id', 'p.codigo', 'p.enunciado', 'p.imagen', 'p.activo', 'p.created_at',
+                't.nombre as tema', 'a.nombre as asignatura');
+        if (! empty($filtros['tema_id'])) {
+            $consulta->where('t.id', $filtros['tema_id']);
+        }
+        if (! empty($filtros['area_id'])) {
+            $consulta->where('a.id', $filtros['area_id']);
+        }
+        if (! empty($filtros['estado'])) {
+            $consulta->where('p.activo', $filtros['estado'] === 'activo');
+        }
+        $buscar = trim($filtros['buscar'] ?? '');
+        if ($buscar !== '') {
+            $consulta->where(function ($query) use ($buscar) {
+                $query->where('p.enunciado', 'like', '%'.$buscar.'%')
+                    ->orWhere('p.codigo', 'like', '%'.$buscar.'%');
+                if (ctype_digit($buscar)) {
+                    $query->orWhere('p.id', $buscar);
+                }
+            });
+        }
+
         return view('admin.preguntas.index', [
-            'preguntas' => DB::table('preguntas as p')->join('temas as t', 't.id', '=', 'p.tema_id')
-                ->join('areas as a', 'a.id', '=', 't.area_id')->where('p.activo', true)
-                ->select('p.id', 'p.enunciado', 'p.nivel', 'p.imagen', 't.nombre as tema', 'a.nombre as asignatura')
-                ->orderByDesc('p.id')->paginate(15),
+            'preguntas' => $consulta->orderByDesc('p.id')->paginate(15)->withQueryString(),
+            'temas' => DB::table('temas')->orderBy('nombre')->get(['id', 'nombre']),
+            'areas' => DB::table('areas')->orderBy('nombre')->get(['id', 'nombre']),
+        ]);
+    }
+
+    public function show(int $pregunta): View
+    {
+        $registro = DB::table('preguntas as p')->join('temas as t', 't.id', '=', 'p.tema_id')
+            ->join('areas as a', 'a.id', '=', 't.area_id')
+            ->select('p.*', 't.nombre as tema', 'a.nombre as asignatura')
+            ->where('p.id', $pregunta)->first();
+        abort_unless($registro, 404);
+
+        return view('admin.preguntas.ver', [
+            'pregunta' => $registro,
+            'alternativas' => DB::table('alternativas')->where('pregunta_id', $pregunta)->orderBy('letra')->get(),
         ]);
     }
 

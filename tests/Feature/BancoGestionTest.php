@@ -154,6 +154,34 @@ class BancoGestionTest extends TestCase
         }
     }
 
+    public function test_filtra_preguntas_y_permite_ver_las_inactivas(): void
+    {
+        $this->actingAs($this->usuario(), 'web')
+            ->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])
+            ->assertRedirect(route('admin.importar.index'));
+        $am = DB::table('preguntas')->where('codigo', 'AM_1')->first();
+        $le = DB::table('preguntas')->where('codigo', 'LE_1')->first();
+        DB::table('preguntas')->where('id', $le->id)->update(['activo' => false]);
+        $area = DB::table('temas')->where('id', $am->tema_id)->value('area_id');
+        $this->get(route('admin.preguntas.index'))->assertOk()
+            ->assertSee('AM_1')->assertSee('LE_1')->assertSee('Inactiva')->assertDontSee('Prioridad');
+        $this->get(route('admin.preguntas.index', ['tema_id' => $am->tema_id, 'area_id' => $area, 'estado' => 'activo', 'buscar' => 'AM_1']))
+            ->assertOk()->assertSee('AM_1')->assertDontSee('LE_1');
+        $this->get(route('admin.preguntas.index', ['estado' => 'inactivo']))
+            ->assertOk()->assertSee('LE_1')->assertDontSee('AM_1');
+        $this->get(route('admin.preguntas.index', ['area_id' => $area]))
+            ->assertOk()->assertSee('AM_1')->assertDontSee('LE_1');
+        $this->get(route('admin.preguntas.index', ['buscar' => 'no-existe']))
+            ->assertOk()->assertSee('No hay preguntas para mostrar.');
+        $this->get(route('admin.preguntas.show', $am->id))->assertOk()->assertSee('Correcta')->assertSee('80');
+        $this->get(route('admin.preguntas.show', $le->id))->assertOk()->assertSee('Inactiva');
+        $this->get(route('admin.preguntas.show', 999999))->assertNotFound();
+        foreach (['estudiante', 'docente'] as $rol) {
+            $this->actingAs($this->usuario($rol), 'web')
+                ->get(route('admin.preguntas.show', $am->id))->assertForbidden();
+        }
+    }
+
     private function crearExcel(): string
     {
         $celda = fn (string $ref, string $texto) => '<c r="'.$ref.'" t="inlineStr"><is><t>'.htmlspecialchars($texto).'</t></is></c>';

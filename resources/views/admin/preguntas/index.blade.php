@@ -1,43 +1,65 @@
 @extends('admin.shell')
 @section('admin-page', 'Preguntas')
 @section('admin-content')
-<section class="cni-page-title">
-    <div>
-        <h1>Preguntas</h1>
-        <p>Organiza, revisa y administra las preguntas que alimentarán cada simulacro.</p>
-    </div>
-    <a class="cni-button cni-button--primary" href="{{ route('admin.preguntas.create') }}"><span aria-hidden="true">＋</span> Nueva pregunta</a>
-</section>
-<section class="cni-card cni-table-card" aria-label="Listado de preguntas">
-    <div class="cni-table-card__head">
-        <div><h2>Preguntas registradas</h2><p>Consulta el contenido disponible en tu banco.</p></div>
-        <span class="cni-table-count">{{ $preguntas->total() }} en total</span>
-    </div>
+<section class="cni-card cni-questions" aria-labelledby="preguntas-titulo">
+    <h1 id="preguntas-titulo">Preguntas</h1>
+    <form action="{{ route('admin.preguntas.index') }}" method="GET" class="cni-question-filters">
+        <div class="cni-question-filters__selects">
+            <label for="preguntas-categoria">Categoría
+                <select id="preguntas-categoria" name="tema_id">
+                    <option value="">Todas</option>
+                    @foreach($temas as $tema)<option value="{{ $tema->id }}" @selected((string) request('tema_id') === (string) $tema->id)>{{ $tema->nombre }}</option>@endforeach
+                </select>
+            </label>
+            <label for="preguntas-curso">Curso
+                <select id="preguntas-curso" name="area_id">
+                    <option value="">Todos</option>
+                    @foreach($areas as $area)<option value="{{ $area->id }}" @selected((string) request('area_id') === (string) $area->id)>{{ $area->nombre }}</option>@endforeach
+                </select>
+            </label>
+            <label for="preguntas-estado">Estado
+                <select id="preguntas-estado" name="estado">
+                    <option value="">Todos</option>
+                    <option value="activo" @selected(request('estado') === 'activo')>Activas</option>
+                    <option value="inactivo" @selected(request('estado') === 'inactivo')>Inactivas</option>
+                </select>
+            </label>
+        </div>
+        <div class="cni-question-filters__actions">
+            <label for="preguntas-buscar">Buscar
+                <input id="preguntas-buscar" type="search" name="buscar" value="{{ request('buscar') }}" maxlength="200" placeholder="Enunciado, código o ID">
+            </label>
+            <button class="cni-button cni-button--primary" type="submit">Filtrar</button>
+            <a class="cni-button cni-question-clear" href="{{ route('admin.preguntas.index') }}">Limpiar</a>
+            <a class="cni-button cni-question-new" href="{{ route('admin.preguntas.create') }}"><span aria-hidden="true">＋</span> Nueva pregunta</a>
+        </div>
+    </form>
     <div class="cni-table-scroll">
-        <table class="cni-table">
-            <thead><tr><th scope="col">Pregunta</th><th scope="col">Asignatura</th><th scope="col">Tema</th><th scope="col">Nivel</th><th scope="col"><span class="sr-only">Acciones</span></th></tr></thead>
+        <table class="cni-table cni-question-table">
+            <thead><tr><th scope="col">ID</th><th scope="col">Enunciado</th><th scope="col">Estado</th><th scope="col">Creada</th><th scope="col">Acción</th></tr></thead>
             <tbody>
             @forelse($preguntas as $p)
                 <tr>
-                    <td class="cni-question-cell"><span class="cni-id">#{{ str_pad((string) $p->id, 3, '0', STR_PAD_LEFT) }}</span>
-                        <strong>{{ \Illuminate\Support\Str::limit($p->enunciado, 96) }}</strong>
-                        @if($p->imagen)<span class="cni-attachment">◧ Imagen adjunta</span>@endif
+                    <td>{{ $p->id }}</td>
+                    <td class="cni-question-table__text">{{ \Illuminate\Support\Str::limit($p->enunciado ?: ('Pregunta '.($p->codigo ?: $p->id)), 150) }}
+                        @if($p->imagen)<small>Imagen adjunta</small>@endif
                     </td>
-                    <td><span class="cni-tag cni-tag--neutral">{{ $p->asignatura }}</span></td>
-                    <td class="cni-td-muted">{{ $p->tema }}</td>
-                    <td><span @class(['cni-tag','cni-tag--low' => $p->nivel === 'basico','cni-tag--medium' => $p->nivel === 'intermedio','cni-tag--high' => $p->nivel === 'avanzado'])>{{ ucfirst($p->nivel) }}</span></td>
-                    <td><div class="cni-table-actions">
-                        <a class="cni-action-link" href="{{ route('admin.preguntas.edit', $p->id) }}">Editar <span aria-hidden="true">↗</span></a>
-                        <form action="{{ route('admin.preguntas.destroy', $p->id) }}" method="POST" onsubmit="return confirm('¿Desactivar esta pregunta?');">@csrf @method('DELETE')
-                            <button class="cni-action-link cni-action-link--danger" type="submit">Desactivar</button>
+                    <td><span @class(['cni-question-status', 'is-active' => $p->activo])><span aria-hidden="true">●</span> {{ $p->activo ? 'Activa' : 'Inactiva' }}</span></td>
+                    <td class="cni-question-date">
+                        @if($p->created_at)<time datetime="{{ \Illuminate\Support\Carbon::parse($p->created_at)->toIso8601String() }}">{{ \Illuminate\Support\Carbon::parse($p->created_at)->format('d/m/Y, H:i') }}</time>@else — @endif
+                    </td>
+                    <td><div class="cni-question-row-actions">
+                        <a class="cni-question-view" href="{{ route('admin.preguntas.show', $p->id) }}" aria-label="Ver pregunta {{ $p->id }}">Ver</a>
+                        @if($p->activo)
+                        <form action="{{ route('admin.preguntas.destroy', $p->id) }}" method="POST" onsubmit="return confirm('¿Desactivar esta pregunta?');">
+                            @csrf @method('DELETE')
+                            <button class="cni-question-deactivate" type="submit" aria-label="Desactivar pregunta {{ $p->id }}">Desactivar</button>
                         </form>
+                        @endif
                     </div></td>
                 </tr>
             @empty
-                <tr><td colspan="5"><div class="cni-empty"><span class="cni-empty__icon" aria-hidden="true">✎</span>
-                    <h3>Tu banco está listo para comenzar</h3><p>Aún no se han registrado preguntas. Puedes registrar una pregunta o cargar el banco desde «Importar Excel».</p>
-                    <a class="cni-button cni-button--primary" href="{{ route('admin.preguntas.create') }}">Crear primera pregunta <span aria-hidden="true">→</span></a>
-                </div></td></tr>
+                <tr><td colspan="5" class="cni-bank-vacio">No hay preguntas para mostrar.</td></tr>
             @endforelse
             </tbody>
         </table>

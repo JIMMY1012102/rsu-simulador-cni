@@ -365,3 +365,46 @@
 .cni-template-download span{text-align:left}
 .cni-template-download small{display:block;margin-top:3px;font-size:11px;font-weight:500;opacity:.85}
 @media(max-width:640px){.cni-template-download{justify-content:center;white-space:normal}}
+
+/* Banco de preguntas: filtros y tabla compacta. */
+.cni-questions{padding:24px 26px}
+.cni-questions h1{margin:0;padding:0 0 14px;border-bottom:1px solid #ffffff26;color:#fff;font-size:20px;line-height:1.4}
+.cni-question-filters{padding:18px 0;border-bottom:1px solid #ffffff26;margin-bottom:20px}
+.cni-question-filters label{display:flex;flex-direction:column;gap:5px;min-width:0;color:#c4d1df;font-size:13px;font-weight:600}
+.cni-question-filters__selects{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(0,1fr) 130px;gap:20px}
+.cni-question-filters :where(select,input){box-sizing:border-box;width:100%;min-width:0;height:35px;margin:0;border:1px solid #9aabbc;border-radius:7px;background:#d8dde3;color:#172332;padding:6px 10px;font:13px 'Segoe UI',Arial,sans-serif}
+.cni-question-filters__actions{display:flex;align-items:flex-end;gap:18px;flex-wrap:wrap;margin-top:16px}
+.cni-question-filters__actions label{width:210px}
+.cni-question-filters__actions .cni-button{min-height:35px;padding:7px 16px;font-size:13px}
+.cni-question-filters__actions .cni-button--primary{border-radius:22px}
+.cni-question-clear{background:transparent;border-color:#6c8299;color:#fff}
+.cni-question-new{background:#ffffff16;border-color:#7a90a7;color:#fff}
+.cni-question-clear:hover,.cni-question-new:hover{background:#ffffff24;color:#fff}
+.cni-question-table{width:100%;min-width:650px;border-collapse:collapse}
+.cni-question-table th,.cni-question-table td{border:1px solid #ffffff25;padding:12px 10px;text-align:left}
+.cni-question-table th{font-size:12px;text-transform:uppercase;letter-spacing:.025em}
+.cni-question-table td{font-size:14px}
+.cni-question-table td:first-child{width:55px}
+.cni-question-table__text{width:54%;overflow-wrap:anywhere}
+.cni-question-table__text small{display:block;margin-top:5px;font-size:11px;color:#adc3d8}
+.cni-question-status{color:#b9c7d6;white-space:nowrap;font-weight:600}
+.cni-question-status.is-active{color:#40dfb3}
+.cni-question-status>span{margin-right:4px}
+.cni-question-date{min-width:145px}
+.cni-question-row-actions{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.cni-question-row-actions form{margin:0}
+.cni-question-view,.cni-question-deactivate{display:inline-flex;align-items:center;min-height:28px;padding:4px 11px;border:1px solid #9fb3c8;border-radius:6px;background:#ffffff18;color:#fff;font:600 12px 'Segoe UI',Arial,sans-serif;text-decoration:none;cursor:pointer}
+.cni-question-view:hover{background:#ffffff2c;color:#fff}
+.cni-question-deactivate{background:#db6b75;border-color:#ed8a92;color:#25151b}
+.cni-question-deactivate:hover{background:#ed8991}
+.cni-question-detail img{display:block;max-width:100%;height:auto;margin:16px 0}
+.cni-question-detail p{white-space:pre-wrap}
+.cni-question-detail ul{list-style:none;padding:0}
+.cni-question-detail li{padding:12px;border:1px solid #ffffff26;border-radius:8px;margin-bottom:10px}
+.cni-question-detail h2{margin-top:20px}
+@media(max-width:700px){
+.cni-questions{padding:18px}
+.cni-question-filters__selects{grid-template-columns:1fr;gap:12px}
+.cni-question-filters__actions{gap:10px}
+.cni-question-filters__actions label{width:100%}
+}
