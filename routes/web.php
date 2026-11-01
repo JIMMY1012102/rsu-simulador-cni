@@ -59,11 +59,7 @@ Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class
         Route::post('/catalogo/temas', [CatalogoController::class, 'tema'])->name('tema.guardar');
         Route::post('/catalogo/carreras', [CatalogoController::class, 'carrera'])->name('carrera.guardar');
         Route::get('/preguntas', [BancoPreguntasController::class, 'index'])->name('preguntas.index');
-        Route::get('/preguntas/nueva', [BancoPreguntasController::class, 'create'])->name('preguntas.create');
-        Route::post('/preguntas', [BancoPreguntasController::class, 'store'])->name('preguntas.store');
         Route::get('/preguntas/{pregunta}', [BancoPreguntasController::class, 'show'])->whereNumber('pregunta')->name('preguntas.show');
-        Route::get('/preguntas/{pregunta}/editar', [BancoPreguntasController::class, 'edit'])->whereNumber('pregunta')->name('preguntas.edit');
-        Route::put('/preguntas/{pregunta}', [BancoPreguntasController::class, 'update'])->whereNumber('pregunta')->name('preguntas.update');
         Route::delete('/preguntas/{pregunta}', [BancoPreguntasController::class, 'destroy'])->whereNumber('pregunta')->name('preguntas.destroy');
         Route::get('/simulacros', [SimulacrosController::class, 'index'])->name('simulacros.index');
         Route::get('/simulacros/nuevo', [SimulacrosController::class, 'create'])->name('simulacros.create');

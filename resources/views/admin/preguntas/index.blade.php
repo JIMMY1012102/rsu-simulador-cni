@@ -31,7 +31,6 @@
             </label>
             <button class="cni-button cni-button--primary" type="submit">Filtrar</button>
             <a class="cni-button cni-question-clear" href="{{ route('admin.preguntas.index') }}">Limpiar</a>
-            <a class="cni-button cni-question-new" href="{{ route('admin.preguntas.create') }}"><span aria-hidden="true">＋</span> Nueva pregunta</a>
         </div>
     </form>
     <div class="cni-table-scroll">

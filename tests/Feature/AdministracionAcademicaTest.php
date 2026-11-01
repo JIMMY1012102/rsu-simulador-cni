@@ -5,9 +5,7 @@ namespace Tests\Feature;
 use App\Models\Usuario;
 use Database\Seeders\AreaPostulacionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AdministracionAcademicaTest extends TestCase
@@ -60,14 +58,14 @@ class AdministracionAcademicaTest extends TestCase
             ->assertRedirect(route('admin.inicio'));
         $this->get(route('admin.inicio'))->assertRedirect(route('admin.subtemas.index'));
         $this->get(route('admin.subtemas.index'))->assertOk()->assertSee('Categorías');
-        $this->get(route('admin.preguntas.create'))->assertOk();
+        $this->get(route('admin.preguntas.index'))->assertOk()->assertDontSee('Nueva pregunta');
         $this->get(route('admin.simulacros.create'))->assertOk();
 
         foreach (['estudiante', 'docente'] as $rol) {
             $this->actingAs($this->usuario($rol), 'web');
             $this->get(route('admin.inicio'))->assertForbidden();
             $this->get(route('admin.preguntas.index'))->assertForbidden();
-            $this->post(route('admin.preguntas.store'), $this->datosPregunta())->assertForbidden();
+            $this->post(route('admin.importar.cargar'), [])->assertForbidden();
         }
         $this->post(route('admin.simulacros.store'), [])->assertForbidden();
     }
@@ -101,58 +99,16 @@ class AdministracionAcademicaTest extends TestCase
         $this->assertDatabaseHas('temas', ['area_id' => $asignatura, 'nombre' => 'Independencia']);
     }
 
-    public function test_imagen_valida_se_guarda_y_su_ruta_se_vincula_a_la_pregunta(): void
+    public function test_solo_excel_permite_cargar_o_modificar_el_banco(): void
     {
-        Storage::fake('public');
         $this->actingAs($this->usuario('admin'), 'web');
-        $datos = $this->datosPregunta([
-            'imagen_archivo' => UploadedFile::fake()->image('figura.png', 300, 200),
-        ]);
-        $this->post(route('admin.preguntas.store'), $datos)->assertRedirect();
-        $pregunta = DB::table('preguntas')->first();
-        $this->assertStringStartsWith('storage/preguntas/', $pregunta->imagen);
-        Storage::disk('public')->assertExists(substr($pregunta->imagen, strlen('storage/')));
-        $this->assertDatabaseHas('alternativas', ['pregunta_id' => $pregunta->id, 'letra' => 'C', 'es_correcta' => true]);
-        $this->assertSame(4, DB::table('alternativas')->where('pregunta_id', $pregunta->id)->count());
-        $this->get(route('admin.preguntas.edit', $pregunta->id))->assertOk()->assertSee('Imagen actual');
-    }
-
-    public function test_archivos_peligrosos_y_alternativas_incompletas_se_rechazan(): void
-    {
-        Storage::fake('public');
-        $this->actingAs($this->usuario('admin'), 'web');
-        $this->post(route('admin.preguntas.store'), $this->datosPregunta([
-            'imagen_archivo' => UploadedFile::fake()->create('ejecutable.php', 2, 'application/x-php'),
-        ]))->assertSessionHasErrors('imagen_archivo');
-        $this->post(route('admin.preguntas.store'), $this->datosPregunta([
-            'alternativas' => ['A' => '1', 'B' => '2'],
-        ]))->assertSessionHasErrors('alternativas');
+        $this->get('/administracion/preguntas/nueva')->assertNotFound();
+        $this->get('/administracion/preguntas/1/editar')->assertNotFound();
+        $this->post('/administracion/preguntas', $this->datosPregunta())->assertStatus(405);
+        $this->put('/administracion/preguntas/1', $this->datosPregunta())->assertStatus(405);
+        $this->post('/api/preguntas', $this->datosPregunta())->assertStatus(405);
+        $this->put('/api/preguntas/1', $this->datosPregunta())->assertStatus(405);
         $this->assertDatabaseCount('preguntas', 0);
-    }
-
-    public function test_no_se_puede_editar_una_pregunta_ya_utilizada(): void
-    {
-        $this->actingAs($admin = $this->usuario('admin'), 'web');
-        $this->post(route('admin.preguntas.store'), $this->datosPregunta());
-        $id = DB::table('preguntas')->value('id');
-        // La regla de inmutabilidad se prueba al usar una respuesta vinculada.
-        $simulacro = DB::table('simulacros')->insertGetId([
-            'nombre' => 'Simulacro de prueba', 'tiempo_limite' => 60, 'total_preguntas' => 1,
-            'fecha_inicio' => now()->subDay(), 'fecha_fin' => now()->addDay(),
-            'activo' => true, 'creado_por' => $admin->id,
-        ]);
-        $intento = DB::table('intentos')->insertGetId([
-            'usuario_id' => $admin->id, 'simulacro_id' => $simulacro,
-            'tipo' => 'simulacro', 'fecha_inicio' => now(), 'estado' => 'en_curso',
-            'total_preguntas' => 1,
-        ]);
-        DB::table('respuestas_estudiante')->insert([
-            'intento_id' => $intento, 'pregunta_id' => $id, 'orden' => 1,
-        ]);
-        $this->post(route('admin.preguntas.update', $id), $this->datosPregunta([
-            'enunciado' => 'No se debe modificar',
-            '_method' => 'PUT',
-        ]))->assertSessionHasErrors('pregunta');
-        $this->assertDatabaseHas('preguntas', ['id' => $id, 'enunciado' => 'Calcula 2 + 2']);
+        $this->get(route('admin.importar.index'))->assertOk()->assertSee('Importar preguntas');
     }
 }

@@ -19,6 +19,5 @@
         @endforeach
     </ul>
     @if($pregunta->solucion)<h2>Solución</h2><p>{{ $pregunta->solucion }}</p>@endif
-    @if($pregunta->activo)<a class="cni-button cni-button--secondary" href="{{ route('admin.preguntas.edit', $pregunta->id) }}">Editar pregunta</a>@endif
 </section>
 @endsection
