@@ -50,7 +50,7 @@
 
     <div class="cni-alumno-workspace">
         <header class="cni-alumno-topbar">
-            <div class="cni-alumno-top-title"><span class="cni-alumno-topicon" aria-hidden="true">{{ $temaArea['icono'] }}</span><span><strong>{{ $area->nombre }}</strong><small>Simulador de Examen de Admisión CNI</small></span></div>
+            <div class="cni-alumno-top-title"><span class="cni-alumno-topicon" data-panel-header-icon aria-hidden="true">♙</span><span><strong data-panel-header-title>Mi perfil</strong></span></div>
             <div class="cni-alumno-top-profile"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante</small></span></div>
         </header>
 
@@ -215,6 +215,15 @@
     const destinos = ['#perfil', '#progreso', '#historial', '#intentos'];
     const mostrarSeccion = (destino, navegar = false) => {
         const seleccion = destinos.includes(destino) ? destino : '#perfil';
+        const encabezados = {
+            '#perfil': ['Mi perfil', '♙'],
+            '#progreso': ['Mi progreso', '▤'],
+            '#historial': ['Historial', '◷'],
+            '#intentos': ['Elegir simulacro', '▤'],
+        };
+        const [titulo, icono] = encabezados[seleccion];
+        panel.querySelector('[data-panel-header-title]').textContent = titulo;
+        panel.querySelector('[data-panel-header-icon]').textContent = icono;
         vistas.forEach((vista) => {
             vista.hidden = '#' + vista.id !== seleccion;
         });
