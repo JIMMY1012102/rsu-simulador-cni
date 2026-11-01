@@ -51,7 +51,10 @@
     <div class="cni-alumno-workspace">
         <header class="cni-alumno-topbar">
             <div class="cni-alumno-top-title"><span class="cni-alumno-topicon" data-panel-header-icon aria-hidden="true">♙</span><span><strong data-panel-header-title>Mi perfil</strong></span></div>
-            <div class="cni-alumno-top-profile"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante</small></span></div>
+            <div class="cni-alumno-top-actions">
+                <button type="button" class="cni-alumno-header-examen" data-go-panel="#intentos"><span aria-hidden="true">▶</span> Dar examen</button>
+                <div class="cni-alumno-top-profile"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante</small></span></div>
+            </div>
         </header>
 
         <main class="cni-alumno-content">

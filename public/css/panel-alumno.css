@@ -876,3 +876,19 @@ body:has(.cni-alumno){background:#f8f9fe}
     .cni-historial-cabecera{grid-template-columns:minmax(0,1fr)}
     .cni-alumno .cni-historial-filtros{grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
 }
+
+/* Acceso al examen junto a la identidad del alumno. */
+.cni-alumno-top-actions{display:flex;align-items:center;gap:20px;min-width:0}
+.cni-alumno .cni-alumno-header-examen{
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    min-height:40px;padding:10px 16px;border:0;border-radius:9px;
+    background:var(--accent);color:#fff;font-size:13px;font-weight:800;
+    white-space:nowrap;cursor:pointer;flex-shrink:0;
+}
+.cni-alumno .cni-alumno-header-examen:hover{background:var(--accent-dark)}
+@media(max-width:680px){
+    .cni-alumno .cni-alumno-topbar{height:auto;min-height:100px;flex-wrap:wrap;gap:10px;padding-top:12px;padding-bottom:12px}
+    .cni-alumno-top-actions{width:100%;gap:12px;justify-content:space-between}
+    .cni-alumno .cni-alumno-header-examen{min-height:36px;padding:8px 10px;font-size:12px}
+    .cni-alumno-top-actions .cni-alumno-top-profile{flex:0 1 auto}
+}
