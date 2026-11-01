@@ -111,16 +111,6 @@
 
             <section class="cni-alumno-vista cni-alumno-vista-progreso" id="progreso" data-panel-view="progreso" aria-labelledby="progreso-titulo" hidden>
                 @include('alumno.partials.progreso')
-                <section class="cni-alumno-progress-card">
-                    <div class="cni-alumno-card-heading"><span class="cni-alumno-circle" aria-hidden="true">▥</span><div><h2>Tu progreso en {{ $area->nombre }}</h2><p>Simulacros disponibles completados</p></div><strong class="cni-alumno-metric-value">{{ $d['progreso'] }}%</strong></div>
-                    <div class="cni-alumno-progress-track" role="progressbar" aria-label="Progreso de simulacros" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ $d['progreso'] }}"><span style="width:{{ $d['progreso'] }}%"></span></div>
-                    <p class="cni-alumno-progress-note">{{ $d['simulacrosCompletados'] }} de {{ $d['simulacrosDisponibles'] }} simulacros abiertos completados</p>
-                    <div class="cni-alumno-mini-stats">
-                        <div><span class="blue" aria-hidden="true">▤</span><strong>{{ $d['resueltas'] }}</strong><small>Preguntas evaluadas</small></div>
-                        <div><span class="mint" aria-hidden="true">★</span><strong>{{ $d['correctas'] }}</strong><small>Respuestas correctas</small></div>
-                        <div><span class="indigo" aria-hidden="true">▥</span><strong>{{ $d['porcentajeAcierto'] }}%</strong><small>Porcentaje de acierto</small></div>
-                    </div>
-                </section>
             </section>
 
             <section class="cni-alumno-vista cni-alumno-exams" id="intentos" data-panel-view="intentos" aria-labelledby="simulacros-titulo" hidden>
