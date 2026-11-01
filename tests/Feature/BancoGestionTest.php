@@ -52,6 +52,37 @@ class BancoGestionTest extends TestCase
         }
     }
 
+    public function test_catalogo_registra_todos_los_cursos_sin_preguntas_ni_duplicados(): void
+    {
+        $areaId = DB::table('areas')->insertGetId([
+            'nombre' => 'Habilidad Verbal', 'bloque' => 'habilidad_verbal', 'activo' => true,
+        ]);
+        $temaId = DB::table('temas')->insertGetId([
+            'area_id' => $areaId, 'nombre' => 'Comprensión de lectura', 'activo' => false,
+        ]);
+        $this->seed(\Database\Seeders\CatalogoBancoCniSeeder::class);
+        $this->seed(\Database\Seeders\CatalogoBancoCniSeeder::class);
+        $this->assertDatabaseCount('areas', count(\App\Support\PerfilExamenCni::CURSOS) + 1);
+        $this->assertDatabaseCount('temas', count(\App\Support\PerfilExamenCni::CURSOS) + 1);
+        $this->assertDatabaseCount('preguntas', 0);
+        $this->assertDatabaseCount('simulacros', 0);
+        $this->assertDatabaseHas('temas', ['id' => $temaId, 'activo' => false]);
+        foreach (\App\Support\PerfilExamenCni::CURSOS as [$curso, $bloque]) {
+            $id = DB::table('areas')->where('nombre', $curso)->value('id');
+            $this->assertDatabaseHas('areas', ['id' => $id, 'bloque' => $bloque]);
+            $this->assertDatabaseHas('temas', ['area_id' => $id, 'nombre' => $curso]);
+        }
+        $this->actingAs($this->usuario(), 'web')->get(route('admin.subtemas.index'))
+            ->assertOk()->assertSee('Habilidad Matemática')->assertSee('Sin preguntas');
+        $areas = DB::table('areas')->count();
+        $temas = DB::table('temas')->count();
+        $this->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])
+            ->assertRedirect(route('admin.importar.index'));
+        $this->assertDatabaseCount('areas', $areas);
+        $this->assertDatabaseCount('temas', $temas);
+        $this->assertDatabaseCount('preguntas', 2);
+    }
+
     public function test_descarga_la_plantilla_vacia_compatible_con_el_importador(): void
     {
         $this->actingAs($this->usuario(), 'web');

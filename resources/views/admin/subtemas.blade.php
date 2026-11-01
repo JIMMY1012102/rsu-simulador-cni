@@ -18,7 +18,7 @@
                     </span></td>
                 </tr>
             @empty
-                <tr><td colspan="4" class="cni-bank-vacio">Aún no hay categorías. Al importar el Excel se registrarán los cursos y sus temas.</td></tr>
+                <tr><td colspan="4" class="cni-bank-vacio">Aún no hay categorías registradas.</td></tr>
             @endforelse
             </tbody>
         </table>
