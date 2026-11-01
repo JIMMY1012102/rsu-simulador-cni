@@ -31,6 +31,7 @@
                 <span class="cni-alumno-marca-icon" aria-hidden="true">✦</span>
                 <span><strong>Simulador</strong><small>CNI · Imperial</small></span>
             </a>
+            <span class="cni-alumno-area-chip"><span aria-hidden="true">{{ $temaArea['icono'] }}</span> {{ $area->nombre }}</span>
             <nav class="cni-alumno-menu" aria-label="Navegación del alumno">
                 <a href="#perfil" class="is-active" aria-current="location"><span aria-hidden="true">♙</span> Mi perfil</a>
                 <a href="#progreso"><span aria-hidden="true">▤</span> Mi progreso</a>
