@@ -35,7 +35,7 @@
             <div class="cni-topbar__right">
                 <div class="cni-account" title="{{ auth('web')->user()->usuario }}">
                     <span class="cni-account__avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth('web')->user()->nombres, 0, 1)) }}</span>
-                    <span class="cni-account__text"><strong>{{ auth('web')->user()->nombres }}</strong><small>{{ auth('web')->user()->usuario }}</small></span>
+                    <span class="cni-account__text"><strong>admin</strong></span>
                 </div>
                 <form action="{{ route('logout') }}" method="POST" class="cni-signout-form">@csrf<button type="submit" class="cni-signout" title="Cerrar sesión">Salir <span aria-hidden="true">↗</span></button></form>
             </div>
