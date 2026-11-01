@@ -806,3 +806,26 @@ body:has(.cni-alumno){background:#f8f9fe}
     .cni-alumno-datos h2{font-size:16px}
     .cni-alumno-datos-grid{grid-template-columns:1fr;gap:15px;margin-top:18px}
 }
+
+/* Bienvenida compacta en escritorio para acercar los datos del alumno. */
+.cni-alumno-exam-cta:empty{display:none}
+@media(min-width:681px){
+    .cni-alumno .cni-alumno-vista-perfil>.cni-alumno-banner{
+        min-height:210px;
+        padding-top:22px;
+        padding-bottom:22px;
+    }
+    .cni-alumno-vista-perfil .cni-alumno-banner .cni-alumno-mascota{
+        height:220px;
+        max-height:100%;
+        bottom:0;
+    }
+    .cni-alumno-vista-perfil .cni-alumno-datos{
+        margin-top:18px;
+        padding:20px 24px;
+    }
+    .cni-alumno-vista-perfil .cni-alumno-datos-grid{
+        margin-top:18px;
+        row-gap:16px;
+    }
+}
