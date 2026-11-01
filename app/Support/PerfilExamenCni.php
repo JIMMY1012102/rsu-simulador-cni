@@ -6,7 +6,7 @@ namespace App\Support;
 final class PerfilExamenCni
 {
     public const CURSOS = [
-        'AM' => ['Razonamiento Matemático', 'habilidad_logico_matematica'],
+        'AM' => ['Habilidad Matemática', 'habilidad_logico_matematica'],
         'AV' => ['Razonamiento Verbal', 'habilidad_verbal'],
         'IN' => ['Inglés', 'habilidad_verbal'],
         'AR' => ['Aritmética', 'conocimientos'],
@@ -58,6 +58,10 @@ final class PerfilExamenCni
 
     public static function posicion(string $asignatura): int
     {
+        // Compatibilidad con bancos anteriores sin alterar sus preguntas ni intentos.
+        if (in_array($asignatura, ['Razonamiento Matemático', 'Habilidad Lógico-Matemática'], true)) {
+            $asignatura = 'Habilidad Matemática';
+        }
         foreach (self::ORDEN as $indice => $prefijo) {
             if (self::CURSOS[$prefijo][0] === $asignatura) {
                 return $indice;
