@@ -47,7 +47,7 @@ class ImportarBancoExcelTest extends TestCase
         $this->assertSame(['B'], $alternativas->where('es_correcta', true)->pluck('letra')->values()->all());
 
         $tema = DB::table('temas')->where('id', $pregunta->tema_id)->first();
-        $this->assertSame('Razonamiento Matemático', $tema->nombre);
+        $this->assertSame('Habilidad Matemática', $tema->nombre);
 
         $sinRespuesta = DB::table('preguntas')->where('codigo', 'LE_1')->value('id');
         $this->assertSame(0, DB::table('alternativas')->where('pregunta_id', $sinRespuesta)->where('es_correcta', true)->count());
