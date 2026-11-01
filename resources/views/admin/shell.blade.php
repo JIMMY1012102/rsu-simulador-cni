@@ -34,8 +34,8 @@
             <div class="cni-topbar__context"><button type="button" class="cni-admin-menu-toggle" data-admin-menu-toggle aria-controls="cni-admin-sidebar" aria-expanded="true" aria-label="Ocultar menú lateral"><span aria-hidden="true">☰</span></button><span class="cni-topbar__section">Banco de preguntas</span><span class="cni-topbar__separator">/</span><strong>@yield('admin-page', 'Resumen')</strong></div>
             <div class="cni-topbar__right">
                 <div class="cni-account" title="{{ auth('web')->user()->usuario }}">
-                    <span class="cni-account__avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth('web')->user()->nombres, 0, 1)) }}</span>
-                    <span class="cni-account__text"><strong>admin</strong></span>
+                    <span class="cni-account__avatar" aria-hidden="true">A</span>
+                    <span class="cni-account__text"><strong>Admin</strong></span>
                 </div>
                 <form action="{{ route('logout') }}" method="POST" class="cni-signout-form">@csrf<button type="submit" class="cni-signout" title="Cerrar sesión">Salir <span aria-hidden="true">↗</span></button></form>
             </div>
