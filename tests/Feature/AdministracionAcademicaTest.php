@@ -109,6 +109,6 @@ class AdministracionAcademicaTest extends TestCase
         $this->post('/api/preguntas', $this->datosPregunta())->assertStatus(405);
         $this->put('/api/preguntas/1', $this->datosPregunta())->assertStatus(405);
         $this->assertDatabaseCount('preguntas', 0);
-        $this->get(route('admin.importar.index'))->assertOk()->assertSee('Importar preguntas');
+        $this->get(route('admin.importar.index'))->assertOk()->assertSee('Confirmar importación');
     }
 }

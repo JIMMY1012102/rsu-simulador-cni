@@ -76,7 +76,7 @@ class BancoGestionTest extends TestCase
             ->assertOk()->assertSee('Habilidad Matemática')->assertSee('Sin preguntas');
         $areas = DB::table('areas')->count();
         $temas = DB::table('temas')->count();
-        $this->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])
+        $this->importarArchivo()
             ->assertRedirect(route('admin.importar.index'));
         $this->assertDatabaseCount('areas', $areas);
         $this->assertDatabaseCount('temas', $temas);
@@ -104,7 +104,7 @@ class BancoGestionTest extends TestCase
     {
         $this->actingAs($this->usuario(), 'web');
         foreach ([1, 2] as $vez) {
-            $this->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])
+            $this->importarArchivo()
                 ->assertRedirect(route('admin.importar.index'))->assertSessionHas('importacion');
         }
         $this->assertDatabaseCount('preguntas', 2);
@@ -118,8 +118,10 @@ class BancoGestionTest extends TestCase
     public function test_no_reemplaza_preguntas_que_ya_se_usaron_en_un_examen(): void
     {
         $admin = $this->usuario();
-        $this->actingAs($admin, 'web')->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])
+        $this->actingAs($admin, 'web')->importarArchivo()
             ->assertRedirect(route('admin.importar.index'));
+        $archivo = $this->archivo();
+        $token = $this->postJson(route('admin.importar.validar'), ['archivo' => $archivo])->assertOk()->json('validacion');
         $p = DB::table('preguntas')->where('codigo', 'AM_1')->first();
         $simulacro = DB::table('simulacros')->insertGetId([
             'nombre' => 'Prueba historial', 'tiempo_limite' => 60, 'total_preguntas' => 1,
@@ -133,7 +135,7 @@ class BancoGestionTest extends TestCase
             'intento_id' => $intento, 'pregunta_id' => $p->id, 'orden' => 1,
         ]);
         $this->from(route('admin.importar.index'))
-            ->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])
+            ->post(route('admin.importar.cargar'), ['archivo' => $archivo, 'validacion' => $token])
             ->assertRedirect(route('admin.importar.index'))->assertSessionHasErrors('archivo');
         $this->assertDatabaseHas('preguntas', ['id' => $p->id, 'imagen' => $p->imagen]);
         $this->assertDatabaseCount('respuestas_estudiante', 1);
@@ -151,13 +153,14 @@ class BancoGestionTest extends TestCase
             $this->get(route('admin.importar.index'))->assertForbidden();
             $this->get(route('admin.importar.plantilla'))->assertForbidden();
             $this->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])->assertForbidden();
+            $this->postJson(route('admin.importar.validar'), ['archivo' => $this->archivo()])->assertForbidden();
         }
     }
 
     public function test_filtra_preguntas_y_permite_ver_las_inactivas(): void
     {
         $this->actingAs($this->usuario(), 'web')
-            ->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])
+            ->importarArchivo()
             ->assertRedirect(route('admin.importar.index'));
         $am = DB::table('preguntas')->where('codigo', 'AM_1')->first();
         $le = DB::table('preguntas')->where('codigo', 'LE_1')->first();
@@ -180,6 +183,54 @@ class BancoGestionTest extends TestCase
             $this->actingAs($this->usuario($rol), 'web')
                 ->get(route('admin.preguntas.show', $am->id))->assertForbidden();
         }
+    }
+
+    private function importarArchivo(): \Illuminate\Testing\TestResponse
+    {
+        $archivo = $this->archivo();
+        $token = $this->postJson(route('admin.importar.validar'), ['archivo' => $archivo])
+            ->assertOk()->json('validacion');
+
+        return $this->post(route('admin.importar.cargar'), ['archivo' => $archivo, 'validacion' => $token]);
+    }
+
+    public function test_validacion_no_guarda_y_confirmacion_exige_el_mismo_archivo_validado(): void
+    {
+        $this->actingAs($this->usuario(), 'web');
+        $archivo = $this->archivo();
+        $respuesta = $this->postJson(route('admin.importar.validar'), ['archivo' => $archivo])
+            ->assertOk()->assertJsonPath('total', 2)->assertJsonPath('sin_clave', 1)->assertJsonPath('incompletas', 1);
+        $token = $respuesta->json('validacion');
+        $this->assertDatabaseCount('preguntas', 0);
+        $this->assertSame([], Storage::disk('public')->allFiles());
+        $this->from(route('admin.importar.index'))->post(route('admin.importar.cargar'), ['archivo' => $archivo])
+            ->assertSessionHasErrors('archivo');
+        $diferente = UploadedFile::fake()->createWithContent('otro.xlsx', file_get_contents($archivo->getRealPath()).'modificado')
+            ->mimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->post(route('admin.importar.cargar'), ['archivo' => $diferente, 'validacion' => $token])
+            ->assertSessionHasErrors('archivo');
+        $this->travel(16)->minutes();
+        $this->post(route('admin.importar.cargar'), ['archivo' => $archivo, 'validacion' => $token])
+            ->assertSessionHasErrors('archivo');
+        $this->travelBack();
+        $this->assertDatabaseCount('preguntas', 0);
+        $this->post(route('admin.importar.cargar'), ['archivo' => $archivo, 'validacion' => $token])
+            ->assertRedirect(route('admin.importar.index'))->assertSessionHas('importacion');
+        $this->assertDatabaseCount('preguntas', 2);
+    }
+
+    public function test_validacion_rechaza_archivo_invalido_y_plantilla_vacia(): void
+    {
+        $this->actingAs($this->usuario(), 'web');
+        $this->postJson(route('admin.importar.validar'), [
+            'archivo' => UploadedFile::fake()->create('banco.txt', 1, 'text/plain'),
+        ])->assertUnprocessable()->assertJsonValidationErrors('archivo');
+        $plantilla = UploadedFile::fake()->createWithContent('plantilla.xlsx',
+            file_get_contents(resource_path('templates/plantilla-banco-cni.xlsx')))
+            ->mimeType('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $this->postJson(route('admin.importar.validar'), ['archivo' => $plantilla])
+            ->assertUnprocessable()->assertJsonValidationErrors('archivo');
+        $this->assertDatabaseCount('preguntas', 0);
     }
 
     private function crearExcel(): string
