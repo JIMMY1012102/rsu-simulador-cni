@@ -47,7 +47,7 @@ class BancoGestionTest extends TestCase
             ->get(route('admin.inicio'))->assertRedirect(route('admin.subtemas.index'));
         foreach (['admin.subtemas.index', 'admin.preguntas.index', 'admin.importar.index'] as $ruta) {
             $this->get(route($ruta))->assertOk()
-                ->assertSee('Subtemas')->assertSee('Preguntas')->assertSee('Importar Excel')
+                ->assertSee('Categorías')->assertSee('Preguntas')->assertSee('Importar Excel')
                 ->assertDontSee('Resumen general')->assertDontSee('Nuevo simulacro')->assertDontSee('Catálogos');
         }
     }

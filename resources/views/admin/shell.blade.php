@@ -15,7 +15,7 @@
             <div class="cni-nav-caption">BANCO DE PREGUNTAS</div>
             <nav class="cni-nav" aria-label="Secciones del banco">
                 @foreach([
-                    ['admin.subtemas.index', 'Subtemas', '▤', 'admin.subtemas.*'],
+                    ['admin.subtemas.index', 'Categorías', '▤', 'admin.subtemas.*'],
                     ['admin.preguntas.index', 'Preguntas', '▢', 'admin.preguntas.*'],
                     ['admin.importar.index', 'Importar Excel', '⇧', 'admin.importar.*'],
                 ] as [$ruta, $texto, $icono, $patron])
