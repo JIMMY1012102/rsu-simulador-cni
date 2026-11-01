@@ -841,11 +841,11 @@ body:has(.cni-alumno){background:#f8f9fe}
 
 /* Historial: una tarjeta con filtros y tabla. */
 .cni-historial-tarjeta{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 6px 18px #243e5c0a}
-.cni-historial-cabecera{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.cni-historial-cabecera{display:grid;grid-template-columns:minmax(220px,1fr) auto;align-items:center;gap:16px;margin-bottom:10px}
 .cni-historial-cabecera h2{font-size:18px;font-weight:850;color:var(--ink)}
-.cni-historial-filtros{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.cni-alumno .cni-historial-filtros{display:grid;grid-template-columns:185px 175px 207px;align-items:center;gap:8px;margin:0;min-width:0}
 .cni-alumno .cni-historial-filtros :where(input,select,button){min-height:36px;border:1px solid #cddbef;border-radius:7px;padding:7px 10px;background:#fff;color:var(--ink);font:inherit;font-size:12px}
-.cni-historial-filtros input{width:175px;min-width:0}
+.cni-alumno .cni-historial-filtros :where(input,select){width:100%;min-width:0;max-width:none;height:34px}
 .cni-historial-filtros input::placeholder{color:#64748b}
 .cni-alumno .cni-historial-aplicar{background:var(--pale);border-color:var(--accent);color:var(--accent-dark);font-weight:750;cursor:pointer}
 .cni-historial-tabla-marco{overflow-x:auto}
@@ -865,9 +865,14 @@ body:has(.cni-alumno){background:#f8f9fe}
 .cni-alumno .cni-historial-filtros input:focus-visible,.cni-historial-tabla-marco:focus-visible{outline:3px solid #ffbe3f;outline-offset:3px}
 @media(max-width:680px){
     .cni-historial-tarjeta{padding:14px}
-    .cni-historial-cabecera{align-items:stretch}
-    .cni-historial-filtros{width:100%;display:grid;grid-template-columns:1fr 1fr}
+    .cni-historial-cabecera{align-items:stretch;grid-template-columns:minmax(0,1fr)}
+    .cni-alumno .cni-historial-filtros{width:100%;grid-template-columns:1fr 1fr}
     .cni-historial-filtros input{width:100%;grid-column:1 / -1}
     .cni-historial-filtros select{min-width:0;width:100%}
     .cni-historial-aplicar{grid-column:1 / -1}
+}
+
+@media(min-width:681px) and (max-width:1150px){
+    .cni-historial-cabecera{grid-template-columns:minmax(0,1fr)}
+    .cni-alumno .cni-historial-filtros{grid-template-columns:repeat(3,minmax(0,1fr));width:100%}
 }

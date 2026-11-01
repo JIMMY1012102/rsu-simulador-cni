@@ -15,7 +15,7 @@
                 <option value="antiguo" @selected(request('orden') === 'antiguo')>Ordenar: más antiguo</option>
                 <option value="puntaje" @selected(request('orden') === 'puntaje')>Ordenar: mayor puntaje</option>
             </select>
-            <button type="submit" class="cni-historial-aplicar">Filtrar</button>
+            <noscript><button type="submit" class="cni-historial-aplicar">Filtrar</button></noscript>
         </form>
     </div>
     <div class="cni-historial-tabla-marco" tabindex="0" role="region" aria-label="Tabla del historial de simulacros">
@@ -67,3 +67,14 @@
         </nav>
     @endif
 </div>
+
+<script>
+(() => {
+    const form = document.querySelector('.cni-historial-filtros');
+    if (!form) return;
+    form.querySelectorAll('select').forEach(select => {
+        select.addEventListener('change', () => form.requestSubmit());
+    });
+    form.querySelector('input[type="search"]').addEventListener('search', () => form.requestSubmit());
+})();
+</script>
