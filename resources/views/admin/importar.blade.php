@@ -3,6 +3,10 @@
 @section('admin-content')
 <section class="cni-page-title cni-page-title--compact">
     <div><h1>Importar Excel</h1><p>Carga las preguntas y sus imágenes al banco del CNI.</p></div>
+    <a href="{{ route('admin.importar.plantilla') }}" class="cni-button cni-template-download">
+        <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg>
+        <span>Descargar plantilla Excel<small>.xlsx · Lista para completar</small></span>
+    </a>
 </section>
 <section class="cni-card cni-form-section cni-bank-importar" aria-labelledby="importar-titulo">
     <h2 id="importar-titulo">Cargar banco de preguntas</h2>

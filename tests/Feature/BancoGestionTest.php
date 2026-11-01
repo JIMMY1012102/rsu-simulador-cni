@@ -52,6 +52,23 @@ class BancoGestionTest extends TestCase
         }
     }
 
+    public function test_descarga_la_plantilla_vacia_compatible_con_el_importador(): void
+    {
+        $this->actingAs($this->usuario(), 'web');
+        $this->get(route('admin.importar.index'))->assertOk()
+            ->assertSee('Descargar plantilla Excel')
+            ->assertSee(route('admin.importar.plantilla'), false);
+        $respuesta = $this->get(route('admin.importar.plantilla'));
+        $respuesta->assertOk()->assertDownload('Plantilla_Banco_Preguntas_CNI.xlsx');
+        $ruta = $respuesta->baseResponse->getFile()->getPathname();
+        $zip = new ZipArchive;
+        $this->assertTrue($zip->open($ruta));
+        $this->assertStringContainsString('Banco de preguntas', $zip->getFromName('xl/workbook.xml'));
+        $this->assertStringContainsString('Instrucciones', $zip->getFromName('xl/workbook.xml'));
+        $zip->close();
+        $this->assertSame([], app(\App\Services\LectorBancoExcel::class)->leer($ruta));
+    }
+
     public function test_importa_desde_el_panel_sin_crear_simulacros_y_reimportar_no_duplica(): void
     {
         $this->actingAs($this->usuario(), 'web');
@@ -101,6 +118,7 @@ class BancoGestionTest extends TestCase
             $this->actingAs($this->usuario($rol), 'web');
             $this->get(route('admin.subtemas.index'))->assertForbidden();
             $this->get(route('admin.importar.index'))->assertForbidden();
+            $this->get(route('admin.importar.plantilla'))->assertForbidden();
             $this->post(route('admin.importar.cargar'), ['archivo' => $this->archivo()])->assertForbidden();
         }
     }

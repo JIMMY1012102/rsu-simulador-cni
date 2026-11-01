@@ -356,3 +356,12 @@
     .cni-topbar__context{flex:1;min-width:0}
     .cni-topbar__context strong{font-size:12px}
 }
+
+/* Descarga de la plantilla del banco de preguntas. */
+.cni-template-download{display:inline-flex;align-items:center;gap:12px;padding:13px 20px;border:1px solid #80dcff;border-radius:12px;background:linear-gradient(135deg,#8de4ff,#55c6ee);color:#082b42;box-shadow:0 6px 20px #03132140;transition:transform .18s ease,box-shadow .18s ease;white-space:nowrap}
+.cni-template-download:hover{transform:translateY(-2px);box-shadow:0 9px 24px #03132160;background:linear-gradient(135deg,#aff0ff,#76d8fa);color:#082b42}
+.cni-template-download:focus-visible{outline:3px solid #fff;outline-offset:4px}
+.cni-template-download svg{width:24px;height:24px;flex:none}
+.cni-template-download span{text-align:left}
+.cni-template-download small{display:block;margin-top:3px;font-size:11px;font-weight:500;opacity:.85}
+@media(max-width:640px){.cni-template-download{justify-content:center;white-space:normal}}

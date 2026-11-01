@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Throwable;
 use ZipArchive;
 
@@ -33,6 +34,15 @@ class BancoGestionController extends Controller
     public function importar(): View
     {
         return view('admin.importar');
+    }
+
+    public function plantilla(): BinaryFileResponse
+    {
+        return response()->download(
+            resource_path('templates/plantilla-banco-cni.xlsx'),
+            'Plantilla_Banco_Preguntas_CNI.xlsx',
+            ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']
+        );
     }
 
     public function cargar(Request $request, LectorBancoExcel $lector): RedirectResponse

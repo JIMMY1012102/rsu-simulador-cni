@@ -53,6 +53,7 @@ Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class
         Route::get('/', fn () => redirect()->route('admin.subtemas.index'))->name('inicio');
         Route::get('/subtemas', [BancoGestionController::class, 'subtemas'])->name('subtemas.index');
         Route::get('/importar-excel', [BancoGestionController::class, 'importar'])->name('importar.index');
+        Route::get('/importar-excel/plantilla', [BancoGestionController::class, 'plantilla'])->name('importar.plantilla');
         Route::post('/importar-excel', [BancoGestionController::class, 'cargar'])->middleware('throttle:6,1')->name('importar.cargar');
         Route::post('/catalogo/asignaturas', [CatalogoController::class, 'asignatura'])->name('asignatura.guardar');
         Route::post('/catalogo/temas', [CatalogoController::class, 'tema'])->name('tema.guardar');
