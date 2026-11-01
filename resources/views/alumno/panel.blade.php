@@ -88,10 +88,6 @@
                                 <span class="cni-alumno-exam-button-arrow" aria-hidden="true">→</span>
                             </button>
                             <small>{{ $simulacros->count() }} simulacros disponibles de tu área</small>
-                        @else
-                            <span class="cni-alumno-exam-unavailable" role="status">
-                                Aún no hay simulacros disponibles para tu área.
-                            </span>
                         @endif
                     </div>
                 </div>
