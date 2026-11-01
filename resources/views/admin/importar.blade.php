@@ -16,8 +16,10 @@
             <div class="cni-import-step">
                 <span class="cni-import-step__number" aria-hidden="true">1</span>
                 <div class="cni-import-step__content">
-                    <label for="banco-excel">Seleccionar archivo</label>
-                    <input id="banco-excel" type="file" name="archivo" accept=".xlsx" required>
+                    <label for="cni-import-select">Seleccionar archivo</label>
+                    <input id="banco-excel" class="cni-import-file" type="file" name="archivo" accept=".xlsx" required tabindex="-1" aria-label="Archivo Excel" aria-describedby="cni-import-filename">
+                    <button type="button" id="cni-import-select" class="cni-import-action" aria-controls="banco-excel" aria-describedby="cni-import-filename">Seleccionar</button>
+                    <p id="cni-import-filename" class="cni-import-filename" role="status">No se ha seleccionado ningún archivo.</p>
                 </div>
             </div>
             <div class="cni-import-step">
@@ -49,6 +51,8 @@
 (() => {
     const form = document.getElementById('cni-import-form');
     const file = document.getElementById('banco-excel');
+    const select = document.getElementById('cni-import-select');
+    const filename = document.getElementById('cni-import-filename');
     const validate = document.getElementById('cni-import-validate');
     const confirm = document.getElementById('cni-import-confirm');
     const token = document.getElementById('cni-import-token');
@@ -60,7 +64,9 @@
         message.hidden = !text;
         message.classList.toggle('is-error', error);
     }
+    select.addEventListener('click', () => { if (!busy) file.click(); });
     file.addEventListener('change', () => {
+        filename.textContent = file.files[0]?.name || 'No se ha seleccionado ningún archivo.';
         clearTimeout(expires);
         token.value = '';
         confirm.disabled = true;
@@ -74,6 +80,7 @@
         validate.disabled = true;
         confirm.disabled = true;
         file.disabled = true;
+        select.disabled = true;
         token.value = '';
         tell('Validando archivo…');
         const data = new FormData();
@@ -104,6 +111,7 @@
         } finally {
             busy = false;
             file.disabled = false;
+            select.disabled = false;
             validate.disabled = !file.files.length;
         }
     });
@@ -116,6 +124,7 @@
         busy = true;
         validate.disabled = true;
         confirm.disabled = true;
+        select.disabled = true;
         confirm.textContent = 'Importando…';
     });
 })();
