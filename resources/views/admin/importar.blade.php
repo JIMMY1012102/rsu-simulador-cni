@@ -19,16 +19,6 @@
         <p id="excel-formato">Columnas: Código, Curso, Pregunta (imagen), A, B, C, D, E y Respuesta correcta.</p>
         <button type="submit" class="cni-button cni-button--primary">Importar preguntas</button>
     </form>
-    <details class="cni-bank-formato">
-        <summary>Ver formato y códigos de curso</summary>
-        <p>Usa códigos únicos como AM_1 o LE_12. Coloca la imagen del enunciado en «Pregunta (imagen)» y marca la clave con una letra de A a E. Las alternativas pueden contener texto o imagen.</p>
-        <p>Las filas sin clave o con contenido incompleto se señalarán en el resultado de la importación.</p>
-        <div class="cni-table-scroll"><table class="cni-table"><thead><tr><th>Código</th><th>Curso</th></tr></thead><tbody>
-            @foreach(\App\Support\PerfilExamenCni::CURSOS as $codigo => [$curso, $bloque])
-                <tr><td>{{ $codigo }}_…</td><td>{{ $curso }}</td></tr>
-            @endforeach
-        </tbody></table></div>
-    </details>
 </section>
 @if(session('importacion'))
 <section class="cni-card cni-form-section" aria-labelledby="resultado-importacion">

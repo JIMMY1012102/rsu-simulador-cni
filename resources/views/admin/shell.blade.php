@@ -26,10 +26,6 @@
                 @endforeach
             </nav>
         </div>
-        <div class="cni-sidebar__footer">
-            <div class="cni-sidebar__notice"><span class="cni-live-dot"></span> Panel administrativo <strong>activo</strong></div>
-            <div class="cni-sidebar__meta">Centro de preparación · CNI</div>
-        </div>
     </aside>
 
     <button type="button" class="cni-admin-backdrop" data-admin-menu-backdrop aria-label="Cerrar menú lateral" hidden></button>
@@ -37,7 +33,6 @@
         <header class="cni-topbar">
             <div class="cni-topbar__context"><button type="button" class="cni-admin-menu-toggle" data-admin-menu-toggle aria-controls="cni-admin-sidebar" aria-expanded="true" aria-label="Ocultar menú lateral"><span aria-hidden="true">☰</span></button><span class="cni-topbar__section">Banco de preguntas</span><span class="cni-topbar__separator">/</span><strong>@yield('admin-page', 'Resumen')</strong></div>
             <div class="cni-topbar__right">
-                <span class="cni-role">Superadministrador</span>
                 <div class="cni-account" title="{{ auth('web')->user()->usuario }}">
                     <span class="cni-account__avatar" aria-hidden="true">{{ mb_strtoupper(mb_substr(auth('web')->user()->nombres, 0, 1)) }}</span>
                     <span class="cni-account__text"><strong>{{ auth('web')->user()->nombres }}</strong><small>{{ auth('web')->user()->usuario }}</small></span>
