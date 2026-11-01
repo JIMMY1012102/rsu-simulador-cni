@@ -45,7 +45,6 @@
                 <div class="cni-toast" role="status"><span aria-hidden="true">✓</span> {{ session('status') }}</div>
             @endif
             @yield('admin-content')
-            <footer class="cni-footer"><span>© {{ date('Y') }} · Simulador CNI</span><span>Panel de gestión académica</span></footer>
         </main>
     </div>
 </div>
