@@ -416,7 +416,7 @@
 .cni-import-heading .cni-template-download{padding:8px 13px;gap:8px;font-size:12px}
 .cni-import-heading .cni-template-download svg{width:20px;height:20px}
 .cni-import-heading .cni-template-download small{display:none}
-.cni-import-steps{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(0,1fr) minmax(0,1fr);gap:16px}
+.cni-import-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .cni-import-step{display:flex;align-items:flex-start;gap:12px;min-width:0;padding:16px;border:1px solid #ffffff26;border-radius:12px;background:#ffffff06;min-height:92px;box-sizing:border-box}
 .cni-import-step__number{display:grid;place-items:center;flex:none;width:30px;height:30px;border-radius:50%;background:#69d3ff;color:#fff;font-size:16px;font-weight:700}
 .cni-import-step__content{min-width:0;flex:1}
@@ -429,5 +429,5 @@
 .cni-import-message{margin-top:16px;padding:12px 15px;border:1px solid #ffffff26;border-radius:9px;background:#ffffff08;color:#c9eaf9;font-size:13px;line-height:1.5}
 .cni-import-message[hidden]{display:none}
 .cni-import-message.is-error{color:#ffd0d5;border-color:#dc8893}
-@media(max-width:1000px){.cni-import-steps{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr) minmax(0,1.3fr);gap:10px}.cni-import-step{padding:14px 10px;gap:9px}}
+@media(max-width:1000px){.cni-import-steps{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.cni-import-step{padding:14px 10px;gap:9px}}
 @media(max-width:720px){.cni-import-steps{grid-template-columns:1fr}.cni-import-step{min-height:90px;padding:16px}.cni-import-heading h1{font-size:20px}.cni-import-heading .cni-template-download{width:auto}}
