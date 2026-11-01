@@ -31,7 +31,7 @@ class ExamenIndependienteService
 
             $cuotas = PerfilExamenCni::DISTRIBUCION[$area->codigo];
             // Una configuración nueva obtiene otra plantilla; no altera exámenes anteriores.
-            $version = substr(hash('sha256', json_encode([$cuotas, PerfilExamenCni::ORDEN, 180, 5])), 0, 10);
+            $version = substr(hash('sha256', json_encode([$cuotas, PerfilExamenCni::ORDEN, 60, 5])), 0, 10);
             $nombre = 'Examen independiente CNI · Área '.$area->codigo.' · '.$version;
             $simulacro = DB::table('simulacros')->where('nombre', $nombre)->first();
             if ($simulacro) {
@@ -52,10 +52,10 @@ class ExamenIndependienteService
 
                 $ahora = now();
                 $simulacroId = DB::table('simulacros')->insertGetId([
-                    'nombre' => $nombre, 'tiempo_limite' => 180,
+                    'nombre' => $nombre, 'tiempo_limite' => 60,
                     'total_preguntas' => array_sum($cuotas), 'cantidad_alternativas' => 5,
                     'puntaje_correcta' => 20, 'puntaje_incorrecta' => -1.125, 'puntaje_blanco' => 0,
-                    // Disponibilidad permanente; cada intento conserva su propio límite de 180 minutos.
+                    // Disponibilidad permanente; cada intento conserva su propio límite de 60 minutos.
                     'fecha_inicio' => '2000-01-01 00:00:00', 'fecha_fin' => '2099-12-31 23:59:59',
                     'activo' => true, 'carrera_id' => null, 'creado_por' => null,
                     'created_at' => $ahora, 'updated_at' => $ahora,

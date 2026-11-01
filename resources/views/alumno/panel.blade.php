@@ -75,7 +75,7 @@
                     <p>{{ $temaArea['descripcion'] }}</p>
 
                     <div class="cni-alumno-exam-cta">
-                        <p>100 preguntas de tu área · 180 minutos · Preguntas aleatorias en cada nuevo intento.</p>
+                        <p>100 preguntas de tu área · 60 minutos · Preguntas aleatorias en cada nuevo intento.</p>
                     </div>
                 </div>
                 <div class="cni-alumno-banner-pattern" aria-hidden="true"></div>

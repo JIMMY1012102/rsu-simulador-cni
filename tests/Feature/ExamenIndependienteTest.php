@@ -68,7 +68,7 @@ class ExamenIndependienteTest extends TestCase
             $this->assertNotNull($intento);
             $this->assertSame(100, (int) $intento->total_preguntas);
             $this->assertEquals(
-                \Illuminate\Support\Carbon::parse($intento->fecha_inicio)->addMinutes(180),
+                \Illuminate\Support\Carbon::parse($intento->fecha_inicio)->addMinutes(60),
                 \Illuminate\Support\Carbon::parse($intento->fecha_limite)
             );
             $preguntas = app(IntentoService::class)->preguntas($intento->id);
@@ -152,7 +152,8 @@ class ExamenIndependienteTest extends TestCase
             ->assertRedirect(route('examen.vacio'));
         $this->get(route('examen.vacio'))->assertOk()
             ->assertSee('Simulador de examen')->assertSee('Aún no hay preguntas disponibles.')
-            ->assertSee('Ver preguntas')->assertSee('Colegio Nacional de Imperial')->assertDontSee('Intento 00');
+            ->assertSee('Ver preguntas')->assertSee('Colegio Nacional de Imperial')
+            ->assertSee('01:00:00')->assertDontSee('Intento 00');
         $this->assertDatabaseCount('intentos', 0);
         $this->assertDatabaseCount('respuestas_estudiante', 0);
 
@@ -186,6 +187,19 @@ class ExamenIndependienteTest extends TestCase
         $docente = $this->alumno('C');
         $docente->update(['rol' => 'docente']);
         $this->actingAs($docente, 'web')->get(route('examen.vacio'))->assertForbidden();
+    }
+
+    public function test_el_examen_independiente_se_cierra_al_cumplir_una_hora(): void
+    {
+        $this->banco();
+        $alumno = $this->alumno('C');
+        $primero = app(ExamenIndependienteService::class)->iniciar($alumno);
+        $this->travel(59)->minutes();
+        $this->assertSame('en_curso', app(IntentoService::class)->obtenerPropio($primero->id, $alumno->id)->estado);
+        $this->travel(1)->minutes();
+        $cerrado = app(IntentoService::class)->obtenerPropio($primero->id, $alumno->id);
+        $this->assertSame('enviado_auto', $cerrado->estado);
+        $this->assertNotNull($cerrado->puntaje_total);
     }
 
 }

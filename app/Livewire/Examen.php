@@ -169,10 +169,10 @@ class Examen extends Component
 
         return view('livewire.examen', [
             'intento' => null,
-            'simulacro' => (object) ['nombre' => 'Examen · '.($area?->nombre ?? ''), 'tiempo_limite' => 180],
+            'simulacro' => (object) ['nombre' => 'Examen · '.($area?->nombre ?? ''), 'tiempo_limite' => 60],
             'numeroIntento' => null,
             'preguntas' => collect(), 'pregunta' => null,
-            'total' => 0, 'respondidas' => 0, 'segundosRestantes' => null,
+            'total' => 0, 'respondidas' => 0, 'segundosRestantes' => 3600,
             'limiteMs' => null, 'ahoraMs' => now()->getTimestampMs(),
         ])->layout('layouts.examen-simple', ['migas' => 'Examen'])->title('Simulador de examen');
     }
