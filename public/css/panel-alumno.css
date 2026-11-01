@@ -829,3 +829,12 @@ body:has(.cni-alumno){background:#f8f9fe}
         row-gap:16px;
     }
 }
+
+/* Una sola tarjeta en Mi progreso, también cuando aún no hay resultados. */
+.cni-alumno-vista-progreso>.cni-progreso-grafica{margin-top:0}
+.cni-alumno-vista-progreso .cni-progreso-grafica>.cni-progreso-vacio{
+    min-height:250px;
+    margin-top:18px;
+    border:0;
+    border-radius:12px;
+}
