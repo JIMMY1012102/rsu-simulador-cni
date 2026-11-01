@@ -10,17 +10,8 @@
     // Orden de las tarjetas de izquierda a derecha según la referencia.
     $ordenVisual = ['B' => 1, 'A' => 2, 'C' => 3, 'D' => 4, 'E' => 5];
     $areasOrdenadas = $areas->sortBy(fn ($area) => $ordenVisual[$area->codigo] ?? 99);
+    // Mascotas individuales con canal alfa (sin escenarios).
     $mascotas = [
-        'B' => 'mascota-basicas.svg',
-        'A' => 'mascota-salud.svg',
-        'C' => 'mascota-ingenierias.svg',
-        'D' => 'mascota-economicas.svg',
-        'E' => 'mascota-humanidades.svg',
-    ];
-
-    // Preferir mascotas individuales con canal alfa (sin escenarios).
-    // Si aún no están instaladas, usar los SVG ya incluidos en GitHub.
-    $mascotasOriginales = [
         'B' => 'cni-mascota-basicas.webp',
         'A' => 'cni-mascota-salud.webp',
         'C' => 'cni-mascota-ingenierias.webp',
@@ -81,9 +72,7 @@
                 <div class="area-opcion__ilustracion" aria-hidden="true">
                     @if (isset($mascotas[$area->codigo]))
                         @php
-                            $webp = 'images/mascotas/'.$mascotasOriginales[$area->codigo];
-                            $svg = 'images/mascotas/'.$mascotas[$area->codigo];
-                            $imagenMascota = is_file(public_path($webp)) ? $webp : $svg;
+                            $imagenMascota = 'images/mascotas/'.$mascotas[$area->codigo];
                         @endphp
                         <div class="area-opcion__mascota">
                             <img src="{{ asset($imagenMascota) }}"
