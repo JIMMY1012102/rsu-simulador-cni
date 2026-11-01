@@ -1,18 +1,13 @@
 @extends('admin.shell')
-@section('admin-page', 'Banco de preguntas')
+@section('admin-page', 'Preguntas')
 @section('admin-content')
 <section class="cni-page-title">
     <div>
-        <span class="cni-eyebrow">CONTENIDO ACADÉMICO</span>
-        <h1>Banco de preguntas</h1>
+        <h1>Preguntas</h1>
         <p>Organiza, revisa y administra las preguntas que alimentarán cada simulacro.</p>
     </div>
     <a class="cni-button cni-button--primary" href="{{ route('admin.preguntas.create') }}"><span aria-hidden="true">＋</span> Nueva pregunta</a>
 </section>
-<div class="cni-mini-overview">
-    <span class="cni-mini-overview__icon" aria-hidden="true">✎</span>
-    <span><strong>{{ number_format($preguntas->total()) }} preguntas activas</strong><small>Las preguntas están agrupadas por asignatura y tema.</small></span>
-</div>
 <section class="cni-card cni-table-card" aria-label="Listado de preguntas">
     <div class="cni-table-card__head">
         <div><h2>Preguntas registradas</h2><p>Consulta el contenido disponible en tu banco.</p></div>
@@ -40,7 +35,7 @@
                 </tr>
             @empty
                 <tr><td colspan="5"><div class="cni-empty"><span class="cni-empty__icon" aria-hidden="true">✎</span>
-                    <h3>Tu banco está listo para comenzar</h3><p>Aún no se han registrado preguntas. Empieza creando la primera y agrega sus cuatro alternativas.</p>
+                    <h3>Tu banco está listo para comenzar</h3><p>Aún no se han registrado preguntas. Puedes registrar una pregunta o cargar el banco desde «Importar Excel».</p>
                     <a class="cni-button cni-button--primary" href="{{ route('admin.preguntas.create') }}">Crear primera pregunta <span aria-hidden="true">→</span></a>
                 </div></td></tr>
             @endforelse

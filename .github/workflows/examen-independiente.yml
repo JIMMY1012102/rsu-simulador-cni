@@ -44,4 +44,4 @@ jobs:
       - run: php artisan key:generate
       - run: php artisan route:list
       - run: php artisan view:cache
-      - run: php artisan test --filter='ExamenIndependienteTest|ExamenServiceTest|ExamenPantallaTest|ImportarBancoExcelTest'
+      - run: php artisan test --filter='ExamenIndependienteTest|ExamenServiceTest|ExamenPantallaTest|ImportarBancoExcelTest|BancoGestionTest|AdministracionAcademicaTest'

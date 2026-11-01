@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Admin\BancoPreguntasController;
+use App\Http\Controllers\Admin\BancoGestionController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\SimulacrosController;
 use App\Http\Middleware\SoloAdministrador;
@@ -49,7 +50,10 @@ require __DIR__.'/alumno-humanidades.php';
 // Herramientas internas de administración; nunca disponibles para estudiantes/docentes.
 Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class])
     ->prefix('administracion')->name('admin.')->group(function () {
-        Route::get('/', [CatalogoController::class, 'index'])->name('inicio');
+        Route::get('/', fn () => redirect()->route('admin.subtemas.index'))->name('inicio');
+        Route::get('/subtemas', [BancoGestionController::class, 'subtemas'])->name('subtemas.index');
+        Route::get('/importar-excel', [BancoGestionController::class, 'importar'])->name('importar.index');
+        Route::post('/importar-excel', [BancoGestionController::class, 'cargar'])->middleware('throttle:6,1')->name('importar.cargar');
         Route::post('/catalogo/asignaturas', [CatalogoController::class, 'asignatura'])->name('asignatura.guardar');
         Route::post('/catalogo/temas', [CatalogoController::class, 'tema'])->name('tema.guardar');
         Route::post('/catalogo/carreras', [CatalogoController::class, 'carrera'])->name('carrera.guardar');

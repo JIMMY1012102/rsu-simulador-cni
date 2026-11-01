@@ -58,7 +58,8 @@ class AdministracionAcademicaTest extends TestCase
         $admin = $this->usuario('admin');
         $this->post('/login', ['usuario' => $admin->usuario, 'password' => 'ClaveCNI2026!'])
             ->assertRedirect(route('admin.inicio'));
-        $this->get(route('admin.inicio'))->assertOk()->assertSee('Panel del administrador');
+        $this->get(route('admin.inicio'))->assertRedirect(route('admin.subtemas.index'));
+        $this->get(route('admin.subtemas.index'))->assertOk()->assertSee('Subtemas');
         $this->get(route('admin.preguntas.create'))->assertOk();
         $this->get(route('admin.simulacros.create'))->assertOk();
 
