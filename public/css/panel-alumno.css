@@ -892,3 +892,6 @@ body:has(.cni-alumno){background:#f8f9fe}
     .cni-alumno .cni-alumno-header-examen{min-height:36px;padding:8px 10px;font-size:12px}
     .cni-alumno-top-actions .cni-alumno-top-profile{flex:0 1 auto}
 }
+
+.cni-alumno-header-examen-form{margin:0;flex-shrink:0}
+.cni-alumno .cni-alumno-header-examen:disabled{opacity:.6;cursor:default}

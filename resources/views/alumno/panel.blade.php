@@ -52,7 +52,10 @@
         <header class="cni-alumno-topbar">
             <div class="cni-alumno-top-title"><span class="cni-alumno-topicon" data-panel-header-icon aria-hidden="true">♙</span><span><strong data-panel-header-title>Mi perfil</strong></span></div>
             <div class="cni-alumno-top-actions">
-                <button type="button" class="cni-alumno-header-examen" data-go-panel="#intentos"><span aria-hidden="true">▶</span> Dar examen</button>
+                <form method="POST" action="{{ route('examen.independiente') }}" class="cni-alumno-header-examen-form">
+                    @csrf
+                    <button type="submit" class="cni-alumno-header-examen" @disabled($esVistaPrevia)><span aria-hidden="true">▶</span> Dar examen</button>
+                </form>
                 <div class="cni-alumno-top-profile"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante</small></span></div>
             </div>
         </header>
@@ -71,27 +74,8 @@
                     <h2>Bienvenido a {{ $area->nombre }}</h2>
                     <p>{{ $temaArea['descripcion'] }}</p>
 
-                    {{-- Botón real hacia el examen. Se habilita sólo para simulacros de su área. --}}
                     <div class="cni-alumno-exam-cta">
-                        @if($esVistaPrevia)
-                            <span class="cni-alumno-exam-unavailable">Los exámenes están disponibles al iniciar sesión.</span>
-                        @elseif($simulacros->count() === 1)
-                            @php $simulacroDirecto = $simulacros->first(); @endphp
-                            <form method="POST" action="{{ route('examen.iniciar', ['simulacro' => $simulacroDirecto['id']]) }}">
-                                @csrf
-                                <button type="submit" class="cni-alumno-exam-button">
-                                    <span aria-hidden="true">▶</span> Dar examen
-                                    <span class="cni-alumno-exam-button-arrow" aria-hidden="true">→</span>
-                                </button>
-                                <small>{{ $simulacroDirecto['nombre'] }} · {{ $simulacroDirecto['total_preguntas'] }} preguntas</small>
-                            </form>
-                        @elseif($simulacros->isNotEmpty())
-                            <button type="button" class="cni-alumno-exam-button" data-go-panel="#intentos">
-                                <span aria-hidden="true">▶</span> Elegir simulacro
-                                <span class="cni-alumno-exam-button-arrow" aria-hidden="true">→</span>
-                            </button>
-                            <small>{{ $simulacros->count() }} simulacros disponibles de tu área</small>
-                        @endif
+                        <p>100 preguntas de tu área · 180 minutos · Preguntas aleatorias en cada nuevo intento.</p>
                     </div>
                 </div>
                 <div class="cni-alumno-banner-pattern" aria-hidden="true"></div>
@@ -114,45 +98,6 @@
 
             <section class="cni-alumno-vista cni-alumno-vista-progreso" id="progreso" data-panel-view="progreso" aria-labelledby="progreso-titulo" hidden>
                 @include('alumno.partials.progreso')
-            </section>
-
-            <section class="cni-alumno-vista cni-alumno-exams" id="intentos" data-panel-view="intentos" aria-labelledby="simulacros-titulo" hidden>
-                <span id="simulacros-disponibles" class="cni-alumno-anchor" aria-hidden="true"></span>
-                <div class="cni-alumno-section-head"><div><span class="cni-alumno-section-kicker">PREPARACIÓN</span><h2 id="simulacros-titulo">Mis intentos · Iniciar Simulador CNI</h2></div><span class="cni-alumno-count">{{ $simulacros->count() }} disponibles</span></div>
-                <p class="cni-alumno-section-description">Exámenes de tu área · Dar examen simulador. Elige una evaluación activa de {{ $area->nombre }} para comenzar.</p>
-                @forelse($simulacros as $simulacro)
-                    <article class="cni-alumno-exam"><span class="cni-alumno-exam-icon" aria-hidden="true">▤</span><div><strong>{{ $simulacro['nombre'] }}</strong><small>{{ $simulacro['total_preguntas'] }} preguntas · {{ $simulacro['tiempo_limite'] }} minutos</small></div>
-                        @if($esVistaPrevia)
-                            <span class="cni-alumno-disabled">Solo en sesión real</span>
-                        @else
-                            <form method="POST" action="{{ route('examen.iniciar', ['simulacro' => $simulacro['id']]) }}">@csrf<button type="submit" class="cni-alumno-primary">Iniciar examen <span aria-hidden="true">→</span></button></form>
-                        @endif
-                    </article>
-                @empty
-                    <div class="cni-alumno-empty">No hay simulacros abiertos en este momento. Cuando el docente habilite uno, podrás iniciarlo desde aquí.</div>
-                @endforelse
-
-                @unless($carrera)
-                    <div class="cni-alumno-profile cni-alumno-carrera-opcional" aria-label="Carrera de interés">
-                        <h3>Carrera de interés</h3>
-                        <p>Si tu simulacro requiere una carrera, puedes elegirla aquí. La elección es opcional para los exámenes generales del área.</p>
-                        @unless($esVistaPrevia)
-                            <form method="POST" action="{{ route('alumno.carrera.guardar') }}">@csrf
-                                <label for="carrera_id">Selecciona una carrera de {{ $area->nombre }}</label>
-                                <div class="cni-alumno-form-row">
-                                    <select id="carrera_id" name="carrera_id" required>
-                                        <option value="">Selecciona una carrera</option>
-                                        @foreach($carreras as $opcion)
-                                            <option value="{{ $opcion->id }}" @selected(old('carrera_id') == $opcion->id)>{{ $opcion->nombre }}</option>
-                                        @endforeach
-                                    </select>
-                                    <button type="submit" class="cni-alumno-primary" @disabled($carreras->isEmpty())>Guardar carrera</button>
-                                </div>
-                                @error('carrera_id')<p class="cni-alumno-error" role="alert">{{ $message }}</p>@enderror
-                            </form>
-                        @endunless
-                    </div>
-                @endunless
             </section>
 
             <section class="cni-alumno-vista cni-alumno-history" id="historial" data-panel-view="historial" aria-labelledby="historial-titulo" hidden>
@@ -202,15 +147,13 @@
     });
     // Sólo una sección visible a la vez. Por defecto: bienvenida y acceso al examen.
     const vistas = [...panel.querySelectorAll('[data-panel-view]')];
-    // #intentos es una vista secundaria accesible desde el botón "Rendir simulacro".
-    const destinos = ['#perfil', '#progreso', '#historial', '#intentos'];
+    const destinos = ['#perfil', '#progreso', '#historial'];
     const mostrarSeccion = (destino, navegar = false) => {
         const seleccion = destinos.includes(destino) ? destino : '#perfil';
         const encabezados = {
             '#perfil': ['Mi perfil', '♙'],
             '#progreso': ['Mi progreso', '▤'],
             '#historial': ['Historial', '◷'],
-            '#intentos': ['Elegir simulacro', '▤'],
         };
         const [titulo, icono] = encabezados[seleccion];
         panel.querySelector('[data-panel-header-title]').textContent = titulo;

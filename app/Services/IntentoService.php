@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\PerfilExamenCni;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -63,7 +64,7 @@ class IntentoService
                         throw ValidationException::withMessages(['carrera_id' => 'Tu área no está habilitada para este simulacro.']);
                     }
                 }
-                $preguntas = $this->sortearPreguntas($simulacro);
+                $preguntas = $this->sortearPreguntas($simulacro, (bool) ($datos['orden_por_curso'] ?? false));
             }
 
             $intentoId = DB::table('intentos')->insertGetId([
@@ -95,7 +96,7 @@ class IntentoService
     }
 
     /** Cuotas específicas primero, luego mixtas, sin repetir preguntas. */
-    private function sortearPreguntas(object $simulacro): Collection
+    private function sortearPreguntas(object $simulacro, bool $ordenPorCurso = false): Collection
     {
         $cuotas = DB::table('simulacro_area')->where('simulacro_id', $simulacro->id)
             ->orderByRaw("CASE WHEN nivel = 'mixto' THEN 1 ELSE 0 END")->orderBy('id')->get();
@@ -116,13 +117,17 @@ class IntentoService
                 // Una clave; o ninguna si es del banco del Excel (codigo) y aún no tiene respuesta: se muestra pero no se califica.
                 ->whereRaw('((SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 1
                     OR (p.codigo IS NOT NULL AND (SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 0))')
-                ->inRandomOrder()->limit(max(0, $cantidad))->lockForUpdate()->get(['p.id', 'a.bloque']);
+                ->inRandomOrder()->limit(max(0, $cantidad))->lockForUpdate()->get(['p.id', 'a.bloque', 'a.nombre as asignatura']);
             if ($cantidad < 1 || $preguntas->count() !== $cantidad) {
                 throw ValidationException::withMessages([
-                    'preguntas' => 'No hay suficientes preguntas válidas para el área y nivel configurados.',
+                    'preguntas' => 'Banco insuficiente: '.DB::table('areas')->where('id', $cuota->area_id)->value('nombre')
+                        .' requiere '.$cantidad.' preguntas con '.(int) $simulacro->cantidad_alternativas.' alternativas; se encontraron '.$preguntas->count().'.',
                 ]);
             }
             $seleccionadas = $seleccionadas->concat($preguntas);
+        }
+        if ($ordenPorCurso) {
+            return $seleccionadas->sortBy(fn ($p) => PerfilExamenCni::posicion($p->asignatura))->values();
         }
         // Orden de bloques documentado; sorteo independiente dentro de cada bloque.
         $grupos = $seleccionadas->groupBy('bloque');
