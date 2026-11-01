@@ -49,6 +49,10 @@
     </aside>
 
     <div class="cni-alumno-workspace">
+        <header class="cni-alumno-topbar">
+            <div class="cni-alumno-top-title"><span class="cni-alumno-topicon" aria-hidden="true">{{ $temaArea['icono'] }}</span><span><strong>{{ $area->nombre }}</strong><small>Simulador de Examen de Admisión CNI</small></span></div>
+            <div class="cni-alumno-top-profile"><span class="cni-alumno-avatar">{{ $iniciales }}</span><span><strong>{{ $nombreCompleto }}</strong><small>Estudiante</small></span></div>
+        </header>
 
         <main class="cni-alumno-content">
             @if($esVistaPrevia)
