@@ -895,3 +895,27 @@ body:has(.cni-alumno){background:#f8f9fe}
 
 .cni-alumno-header-examen-form{margin:0;flex-shrink:0}
 .cni-alumno .cni-alumno-header-examen:disabled{opacity:.6;cursor:default}
+
+/* Mascotas actuales ampliadas y encuadradas de medio cuerpo. */
+.cni-alumno .cni-alumno-banner .cni-alumno-mascota{
+    top:8px;
+    bottom:auto;
+    right:clamp(12px,3%,40px);
+    width:40%;
+    height:calc(100% - 8px);
+    max-width:440px;
+    max-height:none;
+    object-fit:cover;
+    object-position:center top;
+}
+@media(max-width:680px){
+    .cni-alumno .cni-alumno-banner .cni-alumno-mascota{
+        top:auto;
+        bottom:0;
+        right:0;
+        width:48%;
+        height:185px;
+        max-width:230px;
+        object-position:center top;
+    }
+}

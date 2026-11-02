@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/selector-areas.css') }}">
+<link rel="stylesheet" href="{{ asset('css/selector-areas.css') }}?v={{ filemtime(public_path('css/selector-areas.css')) }}">
 @endpush
 
 @section('content')

@@ -424,3 +424,24 @@
         transform: none;
     }
 }
+
+/* Medio cuerpo: ampliar la inserción sin modificar los PNG. */
+.area-opcion__mascota{
+    padding:0;
+    overflow:hidden;
+}
+.area-opcion__mascota img{
+    position:absolute;
+    top:10px;
+    left:50%;
+    width:150%;
+    max-width:none;
+    height:180%;
+    object-fit:contain;
+    object-position:center top;
+    transform:translateX(-50%);
+}
+.area-opcion:hover .area-opcion__mascota img,
+.area-opcion:focus-within .area-opcion__mascota img{
+    transform:translateX(-50%);
+}
