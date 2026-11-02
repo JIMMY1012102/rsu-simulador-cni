@@ -1,6 +1,6 @@
 <div class="cni-notas" id="cni-notas">
     <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=35">
-    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=1">
+    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=2">
     @php
         $esPreview = app()->environment('local') && (request()->is('docente-preview') || request()->is('preview-docente'));
         $seccionActual = isset($seccion) && $seccion && $seccion->activo ? '5.º '.$seccion->nombre : 'Sin sección';
@@ -30,17 +30,17 @@
     <header class="cni-notas-header cni-notas-header--v2">
         <img class="cni-notas-foto" src="{{ asset('images/foto-personal-cni.png') }}" alt="Personal docente del Colegio Nacional de Imperial">
         <div class="cni-notas-brand">
-            <span class="cni-notas-brand-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="4.5" y="4" width="15" height="18" rx="2"/><path d="M9 4V2h6v2M8.5 10h7M8.5 14h7M8.5 18h4"/></svg></span>
             <img src="{{ asset('img/escudo-cni.png') }}" alt="Escudo del Colegio Nacional de Imperial">
             <div>
                 <span class="cni-notas-school">COLEGIO NACIONAL DE IMPERIAL</span>
                 <h1>Calificaciones del salón</h1>
-                <p>{{ $seccionActual }} · Resultados académicos de tus estudiantes</p>
+                <p class="cni-notas-contexto">{{ $seccionActual }}</p>
+                <p class="cni-notas-subfrase">Resultados académicos de tus estudiantes</p>
             </div>
         </div>
         <div class="cni-notas-docente">
             <span class="cni-notas-docente-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></span>
-            <span><strong>{{ $nombreDocente }}</strong><small>Docente · {{ $seccionActual }}</small></span>
+            <span><strong>{{ $esPreview ? 'Enseñar es inspirar' : $nombreDocente }}</strong><small>{{ $esPreview ? 'Panel docente · Vista previa' : 'Docente · '.$seccionActual }}</small></span>
             @unless($esPreview)
                 <form action="{{ route('logout') }}" method="POST">@csrf<button type="submit" class="cni-notas-exit" title="Cerrar sesión">Salir</button></form>
             @endunless
@@ -49,7 +49,7 @@
 
     <div class="cni-notas-body">
         @if($esPreview)
-            <div class="cni-notas-demo" role="status">Vista previa de diseño: sin estudiantes ni calificaciones de ejemplo. Los datos reales aparecerán al ingresar con una cuenta docente.</div>
+            <div class="cni-notas-demo" role="status">Consulta calificaciones, identifica oportunidades de mejora y acompaña el progreso académico de tu sección. Esta vista previa no muestra datos de alumnos.</div>
         @elseif(!isset($seccion) || !$seccion || !$seccion->activo)
             <div class="cni-notas-demo" role="status">Tu cuenta no tiene una sección activa asignada. Solicita la asignación al administrador.</div>
         @endif

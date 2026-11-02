@@ -15,3 +15,14 @@
 @media(max-width:1200px){.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:10px}.cni-notas .cni-notas-header--v2 .cni-notas-brand>img{width:70px;height:78px}.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon{width:46px;height:50px}.cni-notas .cni-notas-header--v2 .cni-notas-brand h1{font-size:30px}.cni-notas .cni-notas-header--v2 .cni-notas-foto{opacity:.62}}
 @media(max-width:930px){.cni-notas .cni-notas-header--v2{flex-wrap:wrap}.cni-notas .cni-notas-header--v2 .cni-notas-brand{flex:1 1 100%;width:100%}.cni-notas .cni-notas-header--v2 .cni-notas-docente{margin-left:0}.cni-notas .cni-notas-header--v2 .cni-notas-foto{left:67%!important;opacity:.35}.cni-notas .cni-notas-header--v2:before{left:66%}.cni-notas .cni-notas-header--v2:after{left:95%}}
 @media(max-width:760px){.cni-notas .cni-notas-header--v2{gap:12px;min-height:0;padding:17px 16px}.cni-notas .cni-notas-header--v2:before,.cni-notas .cni-notas-header--v2:after,.cni-notas .cni-notas-header--v2 .cni-notas-foto{display:none!important}.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:9px}.cni-notas .cni-notas-header--v2 .cni-notas-brand>img{width:55px;height:63px}.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon{width:40px;height:44px;border-radius:10px}.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon svg{width:25px;height:25px}.cni-notas .cni-notas-header--v2 .cni-notas-brand h1{font-size:clamp(22px,5vw,29px)}.cni-notas .cni-notas-header--v2 .cni-notas-docente{width:100%;max-width:none}.cni-notas .cni-notas-header--v2 .cni-notas-brand p{font-size:11px}}
+
+
+/* Ajuste 02/11: solo encabezado docente, sin cambios en tarjetas ni tabla. */
+.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:19px}
+.cni-notas .cni-notas-header--v2 .cni-notas-brand>div{order:initial;min-width:0}
+.cni-notas .cni-notas-header--v2 .cni-notas-contexto{display:block;color:#e7f2ff;font-size:12px;font-weight:600;line-height:1.35;margin:7px 0 8px}
+.cni-notas .cni-notas-header--v2 .cni-notas-subfrase{display:inline-block;max-width:100%;margin:0;padding:8px 14px;border:1.5px solid #f0c15e;border-radius:9px;background:rgba(255,255,255,.07);color:#fff5da;font-size:13px;font-weight:700;line-height:1.35;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.cni-notas .cni-notas-header--v2 .cni-notas-foto{left:52%!important;width:27%!important;object-position:center 43%}
+.cni-notas .cni-notas-header--v2 .cni-notas-docente{border:1px solid rgba(240,193,94,.55)}
+@media(max-width:1200px){.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:12px}.cni-notas .cni-notas-header--v2 .cni-notas-subfrase{font-size:12px;padding:7px 10px}}
+@media(max-width:760px){.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:10px}.cni-notas .cni-notas-header--v2 .cni-notas-contexto{font-size:11px}.cni-notas .cni-notas-header--v2 .cni-notas-subfrase{font-size:11px;padding:7px 9px}}
