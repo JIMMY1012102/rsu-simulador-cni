@@ -75,7 +75,7 @@
                             $imagenMascota = 'images/mascotas/'.$mascotas[$area->codigo];
                         @endphp
                         <div class="area-opcion__mascota">
-                            <img src="{{ asset($imagenMascota) }}"
+                            <img src="{{ asset($imagenMascota).'?v='.filemtime(public_path($imagenMascota)) }}"
                                  alt="" loading="eager" decoding="async"
                                  width="520" height="520">
                         </div>

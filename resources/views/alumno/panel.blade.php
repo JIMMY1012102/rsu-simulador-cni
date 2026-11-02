@@ -78,7 +78,7 @@
                 </div>
                 <div class="cni-alumno-banner-pattern" aria-hidden="true"></div>
                 <img class="cni-alumno-mascota"
-                     src="{{ asset($rutaMascota) }}"
+                     src="{{ asset($rutaMascota).'?v='.filemtime(public_path($rutaMascota)) }}"
                      width="520" height="520"
                      alt="Mascota del área de {{ $area->nombre }}">
                 </div>
