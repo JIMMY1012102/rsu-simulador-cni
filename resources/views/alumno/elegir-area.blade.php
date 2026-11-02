@@ -12,11 +12,11 @@
     $areasOrdenadas = $areas->sortBy(fn ($area) => $ordenVisual[$area->codigo] ?? 99);
     // Mascotas individuales con canal alfa (sin escenarios).
     $mascotas = [
-        'B' => 'cni-mascota-basicas.webp',
-        'A' => 'cni-mascota-salud.webp',
-        'C' => 'cni-mascota-ingenierias.webp',
-        'D' => 'cni-mascota-economicas.webp',
-        'E' => 'cni-mascota-humanidades.webp',
+        'B' => 'cni-mascota-basicas.png',
+        'A' => 'cni-mascota-salud.png',
+        'C' => 'cni-mascota-ingenierias.png',
+        'D' => 'cni-mascota-economicas.png',
+        'E' => 'cni-mascota-humanidades.png',
     ];
 
     $presentaciones = [

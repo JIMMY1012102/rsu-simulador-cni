@@ -8,7 +8,7 @@
     $esVistaPrevia = $esVistaPrevia ?? false;
     // Una sola plantilla para cinco áreas; los datos y la carrera vienen de MariaDB.
     $temaArea = config('panel_alumno.areas.'.$area->codigo);
-    $rutaMascota = $temaArea['mascota_webp'];
+    $rutaMascota = $temaArea['mascota_png'];
     $nombreCompleto = trim($usuario->nombres.' '.($usuario->apellidos ?? ''));
     $iniciales = mb_strtoupper(mb_substr($usuario->nombres, 0, 1).mb_substr($usuario->apellidos ?? '', 0, 1));
     $primeraPalabra = explode(' ', trim($usuario->nombres))[0];
