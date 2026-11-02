@@ -432,11 +432,11 @@
 }
 .area-opcion__mascota img{
     position:absolute;
-    top:10px;
+    top:0;
     left:50%;
-    width:150%;
+    width:135%;
     max-width:none;
-    height:180%;
+    height:165%;
     object-fit:contain;
     object-position:center top;
     transform:translateX(-50%);
