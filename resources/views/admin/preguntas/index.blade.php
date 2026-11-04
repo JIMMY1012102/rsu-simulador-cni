@@ -14,7 +14,7 @@
                 </summary>
                 <div class="cni-delete-all__panel">
                     <strong>Vaciar banco de preguntas ({{ number_format($totalPreguntas) }})</strong>
-                    <p>Las preguntas que no se hayan usado se eliminarán. Las utilizadas en exámenes se archivarán para conservar los resultados de los alumnos. Después podrás importar un nuevo banco desde Excel.</p>
+                    <p>Reinicio de demo: se vacía el banco, se reinician los IDs y se eliminan intentos y resultados de prueba. La operación es irreversible.</p>
                     @if($totalPreguntas > 0)
                         <form action="{{ route('admin.preguntas.destroy-all') }}" method="POST">
                             @csrf
@@ -22,7 +22,7 @@
                             <label for="banco-borrar-confirmacion">Para confirmar, escribe <strong>BORRAR TODO</strong>
                                 <input id="banco-borrar-confirmacion" name="confirmacion" type="text" required pattern="BORRAR TODO" maxlength="11" autocomplete="off" placeholder="BORRAR TODO" aria-describedby="banco-borrar-aviso">
                             </label>
-                            <p id="banco-borrar-aviso">Esta acción no se puede deshacer. Si hay exámenes en curso, el sistema impedirá el borrado.</p>
+                            <p id="banco-borrar-aviso">Esta acción no se puede deshacer. También se eliminan los intentos de examen y sus resultados.</p>
                             @error('confirmacion')<p class="cni-delete-all__error" role="alert">{{ $message }}</p>@enderror
                             <button class="cni-delete-all__confirm" type="submit">Confirmar borrado del banco</button>
                         </form>
