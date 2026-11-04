@@ -100,7 +100,7 @@ class ExamenPantallaTest extends TestCase
         $this->get(route('examen', $this->iniciar()))->assertRedirect(route('login'));
     }
 
-    public function test_un_intento_cerrado_redirige_al_historial_con_aviso(): void
+    public function test_un_intento_cerrado_redirige_a_resultados_con_aviso(): void
     {
         $intento = $this->iniciar();
         app(IntentoService::class)->finalizar($intento, $this->alumno->id);
@@ -182,7 +182,7 @@ class ExamenPantallaTest extends TestCase
             ->assertSet('actual', 2)->assertSee('2 de 40 respondidas');
     }
 
-    public function test_finalizar_envia_el_examen_y_vuelve_al_historial(): void
+    public function test_finalizar_envia_el_examen_y_muestra_resultados(): void
     {
         $intento = $this->iniciar();
 
@@ -210,7 +210,8 @@ class ExamenPantallaTest extends TestCase
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->get(route('examen.resultados', $intento))->assertOk()
             ->assertSee('Resultados de tu examen')->assertSee('Intento #1 · Juan Carlos')
-            ->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas')->assertDontSee('role="alert"', false);
+            ->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas; abajo verás tu puntaje.')
+            ->assertDontSee('role="alert"', false);
     }
 
     /** Regresión: si x-data cambia entre renders, Alpine reinicia el estado y el reloj se congela. */
@@ -267,5 +268,25 @@ class ExamenPantallaTest extends TestCase
             ->assertSee('Regresar a mi panel')->assertSee(route('alumno.inicio'), false);
 
         $this->actingAs($this->crearAlumno('otro'), 'web')->get(route('examen.resultados', $intento))->assertNotFound();
+    }
+
+    public function test_resultados_suma_la_doble_marca_a_en_blanco(): void
+    {
+        $intento = $this->iniciar();
+        app(IntentoService::class)->finalizar($intento, $this->alumno->id);
+        DB::table('intentos')->where('id', $intento)->update(['en_blanco' => 37, 'doble_marca' => 2]);
+
+        $this->actingAs($this->alumno, 'web')->get(route('examen.resultados', $intento))->assertOk()
+            ->assertSeeInOrder(['En blanco o doble marca', '<strong>39</strong>'], false);
+    }
+
+    public function test_una_practica_sin_calificar_no_muestra_ceros(): void
+    {
+        $intento = app(IntentoService::class)->iniciar($this->alumno->id, ['tipo' => 'practica'])->id;
+        app(IntentoService::class)->finalizar($intento, $this->alumno->id);
+
+        $this->actingAs($this->alumno, 'web')->get(route('examen.resultados', $intento))->assertOk()
+            ->assertSeeInOrder(['Correctas', '<strong>—</strong>', 'Incorrectas', '<strong>—</strong>'], false)
+            ->assertSee('Este examen todavía no tiene calificación.')->assertDontSee('<strong>0</strong>', false);
     }
 }

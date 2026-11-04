@@ -6,6 +6,10 @@
 
 @php
     $puntos = fn ($valor) => $valor === null ? '—' : number_format((float) $valor, 3);
+    // Las prácticas no se califican: sin puntaje no hay cifras que mostrar (no son ceros).
+    $calificado = $intento->puntaje_total !== null;
+    $cifra = fn ($valor) => $calificado ? (int) $valor : '—';
+    $dobleMarca = (int) $intento->doble_marca;
     // Dos tablas lado a lado, como en el diseño.
     $columnas = $areas->isEmpty() ? collect() : $areas->chunk((int) ceil($areas->count() / 2));
     // Íconos de línea estilo Lucide (licencia ISC).
@@ -58,15 +62,15 @@
         </li>
         <li class="is-correctas">
             <span class="resultados-cifras__icono">{!! $icono('<path d="M20 6 9 17l-5-5"/>', 26) !!}</span>
-            <span><small>Correctas</small><strong>{{ (int) $intento->correctas }}</strong></span>
+            <span><small>Correctas</small><strong>{{ $cifra($intento->correctas) }}</strong></span>
         </li>
         <li class="is-incorrectas">
             <span class="resultados-cifras__icono">{!! $icono('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 26) !!}</span>
-            <span><small>Incorrectas</small><strong>{{ (int) $intento->incorrectas }}</strong></span>
+            <span><small>Incorrectas</small><strong>{{ $cifra($intento->incorrectas) }}</strong></span>
         </li>
         <li class="is-blanco">
             <span class="resultados-cifras__icono">{!! $icono('<path d="M5 12h14"/>', 26) !!}</span>
-            <span><small>En blanco</small><strong>{{ (int) $intento->en_blanco }}</strong></span>
+            <span><small>{{ $dobleMarca > 0 ? 'En blanco o doble marca' : 'En blanco' }}</small><strong>{{ $calificado ? (int) $intento->en_blanco + $dobleMarca : '—' }}</strong></span>
         </li>
     </ul>
 
@@ -80,7 +84,7 @@
         </header>
 
         @if ($areas->isEmpty())
-            <p class="resultados-vacio">Este examen no tiene detalle por asignatura.</p>
+            <p class="resultados-vacio">{{ $calificado ? 'Este examen no tiene detalle por asignatura.' : 'Este examen todavía no tiene calificación.' }}</p>
         @else
             <div class="resultados-tablas">
                 @foreach ($columnas as $columna)

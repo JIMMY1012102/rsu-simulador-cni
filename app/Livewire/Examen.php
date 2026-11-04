@@ -170,8 +170,8 @@ class Examen extends Component
             ? 'El tiempo terminó y tu examen se envió automáticamente.'
             : 'Tu examen fue enviado.';
 
-        return "{$inicio} Respondiste {$respondidas} de {$intento->total_preguntas} preguntas; "
-            .'revisa tu puntaje en «Mis intentos y resultados».';
+        return "{$inicio} Respondiste {$respondidas} de {$intento->total_preguntas} preguntas"
+            .($intento->tipo === 'simulacro' ? '; abajo verás tu puntaje.' : '. Las prácticas no se califican.');
     }
 
     private function servicio(): IntentoService
