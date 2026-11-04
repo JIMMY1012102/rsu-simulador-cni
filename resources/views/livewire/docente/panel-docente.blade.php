@@ -1,6 +1,6 @@
 <div class="cni-notas" id="cni-notas">
     <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=35">
-    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=4">
+    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=5">
     @php
         $esPreview = app()->environment('local') && (request()->is('docente-preview') || request()->is('preview-docente'));
         $seccionActual = isset($seccion) && $seccion && $seccion->activo ? '5.º '.$seccion->nombre : 'Sin sección';

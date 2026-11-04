@@ -60,3 +60,49 @@
     object-position: 50% 42%;
   }
 }
+
+
+/* Edición visual final: solamente el fondo y la cabecera institucional. */
+body:has(.cni-notas) {
+    background: #eff5fd;
+}
+.cni-notas {
+    background: linear-gradient(180deg, #e9f3ff 0%, #f8fbff 75%);
+}
+.cni-notas .cni-notas-header--v2 {
+    background:
+        radial-gradient(ellipse at 15% 0%, rgba(32, 100, 184, .24) 0%, transparent 44%),
+        linear-gradient(106deg, #051f4f 0%, #073875 47%, #075398 74%, #d2e5f5 100%);
+    box-shadow: 0 7px 22px rgba(9, 50, 99, .12);
+}
+/* Foto institucional entre dos diagonales doradas; sin alterar su imagen original. */
+@media (min-width: 931px) {
+    .cni-notas .cni-notas-header--v2 .cni-notas-foto {
+        left: 52% !important;
+        width: 27% !important;
+        height: 100% !important;
+        object-fit: cover;
+        object-position: center 43%;
+        opacity: 1;
+        clip-path: polygon(16% 0, 100% 0, 84% 100%, 0 100%);
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+    .cni-notas .cni-notas-header--v2::before {
+        left: 53.5%;
+        width: 11px;
+        background: linear-gradient(90deg, #c49136, #f6d77f 55%, #bd8423);
+    }
+    .cni-notas .cni-notas-header--v2::after {
+        left: 76.5%;
+        width: 11px;
+        background: linear-gradient(90deg, #c49136, #f6d77f 55%, #bd8423);
+    }
+}
+@media (min-width: 761px) and (max-width: 930px) {
+    .cni-notas .cni-notas-header--v2 .cni-notas-foto {
+        opacity: .55;
+        -webkit-mask-image: none;
+        mask-image: none;
+    }
+}
