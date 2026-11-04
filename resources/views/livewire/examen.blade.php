@@ -7,8 +7,9 @@
 @push('scripts')
     <script src="{{ asset('js/examen.js').'?v='.filemtime(public_path('js/examen.js')) }}"></script>
 @endpush
-<div class="examen" x-data="examen({{ $intentoId }}, @js($limiteMs))" data-ahora="{{ $ahoraMs }}"
+<div class="examen-distribucion" :class="{ 'is-mapa-abierto': mapaAbierto }" x-data="examen({{ $intentoId }}, @js($limiteMs))" data-ahora="{{ $ahoraMs }}"
      @keydown.escape.window="confirmar = false; mapaAbierto = false">
+    <div class="examen">
     <div class="examen-superior">
         <strong class="examen-reloj" wire:ignore x-text="tiempo || @js($tiempoInicial)" role="timer" aria-label="Tiempo restante" aria-live="off">{{ $tiempoInicial }}</strong>
         <button type="button" class="examen-finalizar" @click="confirmar = true" @disabled($sinBanco)>Finalizar examen</button>
@@ -24,24 +25,9 @@
         <span>{{ $pregunta ? 'Pregunta '.($actual + 1).' de '.$total : 'Preguntas' }}</span>
         <button type="button" class="examen-ver" @click="mapaAbierto = !mapaAbierto"
                 :aria-expanded="String(mapaAbierto)" aria-controls="mapa-preguntas">
-            <span aria-hidden="true">▦</span> Ver preguntas
+            <span aria-hidden="true">▦</span><span x-text="mapaAbierto ? 'Ocultar preguntas' : 'Ver preguntas'">Ver preguntas</span>
         </button>
     </div>
-
-    <section class="examen-mapa" id="mapa-preguntas" x-show="mapaAbierto" x-cloak aria-label="Mapa de preguntas">
-        <div class="examen-mapa-titulo">
-            <h2>Mapa de preguntas</h2>
-            <button type="button" @click="mapaAbierto = false" aria-label="Cerrar mapa de preguntas">×</button>
-        </div>
-        <div class="examen-mapa-numeros">
-            @foreach($preguntas as $indice => $item)
-                <button type="button" wire:key="mapa-{{ $item->id }}" wire:click="ir({{ $indice }})" @click="mapaAbierto = false"
-                        @class(['examen-mapa-numero', 'is-respondida' => ($respuestas[$item->id] ?? null) !== null, 'is-actual' => $indice === $actual])
-                        @if($indice === $actual) aria-current="step" @endif
-                        aria-label="Pregunta {{ $indice + 1 }}{{ ($respuestas[$item->id] ?? null) !== null ? ', respondida' : ', sin responder' }}">{{ $indice + 1 }}</button>
-            @endforeach
-        </div>
-    </section>
 
     <section class="examen-pregunta" wire:key="pregunta-{{ $pregunta?->id ?? 'vacia' }}" aria-label="Pregunta del examen">
         @if($pregunta)
@@ -92,6 +78,29 @@
             <button type="button" class="examen-boton" wire:click="siguiente" @disabled($sinBanco)>Siguiente &nbsp; ›</button>
         @endif
     </footer>
+
+    </div>
+
+    <aside class="examen-mapa" id="mapa-preguntas" x-show="mapaAbierto" x-cloak aria-label="Mapa de preguntas">
+        <div class="examen-mapa-titulo">
+            <h2>Preguntas</h2>
+            <button type="button" @click="mapaAbierto = false" aria-label="Cerrar mapa de preguntas">×</button>
+        </div>
+        <p class="examen-mapa-ayuda">Selecciona un número para ir directamente.</p>
+        <div class="examen-mapa-numeros">
+            @foreach($preguntas as $indice => $item)
+                <button type="button" wire:key="mapa-{{ $item->id }}" wire:click="ir({{ $indice }})" @click="if (window.innerWidth < 1200) mapaAbierto = false"
+                        @class(['examen-mapa-numero', 'is-respondida' => ($respuestas[$item->id] ?? null) !== null, 'is-actual' => $indice === $actual])
+                        @if($indice === $actual) aria-current="step" @endif
+                        aria-label="Pregunta {{ $indice + 1 }}{{ ($respuestas[$item->id] ?? null) !== null ? ', respondida' : ', sin responder' }}">{{ $indice + 1 }}</button>
+            @endforeach
+        </div>
+        <ul class="examen-mapa-leyenda" aria-label="Estados de las preguntas">
+            <li><span class="examen-estado-actual" aria-hidden="true"></span>Actual</li>
+            <li><span class="examen-estado-respondida" aria-hidden="true"></span>Respondida</li>
+            <li><span class="examen-estado-pendiente" aria-hidden="true"></span>Pendiente</li>
+        </ul>
+    </aside>
 
     @unless($sinBanco)
     <div class="examen-modal" x-show="confirmar" x-cloak @click.self="confirmar = false">
