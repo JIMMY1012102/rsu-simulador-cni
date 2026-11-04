@@ -1,108 +1,215 @@
-/* Encabezado renovado del docente. Solo afecta .cni-notas-header--v2; no toca tablas ni lógica. */
-.cni-notas .cni-notas-header--v2{position:relative;isolation:isolate;min-height:166px;overflow:hidden;gap:18px;padding:24px clamp(20px,3vw,44px);background:linear-gradient(103deg,#052b62 0%,#063d7d 50%,#1466b0 77%,#d5e7f6 100%);border-bottom:4px solid #f0c15e;border-radius:0 0 16px 16px;box-shadow:0 8px 23px #073f7920}
-.cni-notas .cni-notas-header--v2:before,.cni-notas .cni-notas-header--v2:after{content:"";position:absolute;top:-30px;height:calc(100% + 60px);width:10px;z-index:1;transform:skewX(-25deg);background:linear-gradient(90deg,#c58a26,#f6d47f 65%,#c78a29);pointer-events:none}
-.cni-notas .cni-notas-header--v2:before{left:51%}.cni-notas .cni-notas-header--v2:after{left:77%}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand{z-index:2;gap:15px;flex:1 1 60%;min-width:0}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand>img{height:100px;width:94px;flex:none;object-fit:contain}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon{order:2;display:grid;place-items:center;width:58px;height:62px;flex:none;border-radius:15px;color:#fff;background:linear-gradient(150deg,#288add,#0d4d97);border:1px solid #ffffff4d;box-shadow:0 8px 20px #001c4055}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon svg{height:36px;width:36px}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand>div{order:3;min-width:0}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand h1{font-size:clamp(28px,3vw,40px);letter-spacing:-.04em;color:white}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand p{max-width:430px;font-size:13px;color:#dcecff}
-.cni-notas .cni-notas-header--v2 .cni-notas-foto{display:block!important;position:absolute!important;top:0!important;left:52%!important;right:auto!important;bottom:auto!important;width:25%!important;height:100%!important;object-fit:cover;object-position:center 45%;opacity:.95;z-index:0!important;clip-path:polygon(12% 0,100% 0,88% 100%,0 100%);mask-image:linear-gradient(90deg,transparent,#000 14%,#000 85%,transparent);pointer-events:none}
-.cni-notas .cni-notas-header--v2 .cni-notas-docente{position:relative;z-index:2;flex:0 0 auto;min-width:225px;max-width:290px;margin-left:auto;background:#fffffff0;border-radius:16px;box-shadow:0 8px 23px #072c6033}
-.cni-notas .cni-notas-header--v2 .cni-notas-docente-icon{background:#e6f2ff;color:#0b569a}
-@media(max-width:1200px){.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:10px}.cni-notas .cni-notas-header--v2 .cni-notas-brand>img{width:70px;height:78px}.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon{width:46px;height:50px}.cni-notas .cni-notas-header--v2 .cni-notas-brand h1{font-size:30px}.cni-notas .cni-notas-header--v2 .cni-notas-foto{opacity:.62}}
-@media(max-width:930px){.cni-notas .cni-notas-header--v2{flex-wrap:wrap}.cni-notas .cni-notas-header--v2 .cni-notas-brand{flex:1 1 100%;width:100%}.cni-notas .cni-notas-header--v2 .cni-notas-docente{margin-left:0}.cni-notas .cni-notas-header--v2 .cni-notas-foto{left:67%!important;opacity:.35}.cni-notas .cni-notas-header--v2:before{left:66%}.cni-notas .cni-notas-header--v2:after{left:95%}}
-@media(max-width:760px){.cni-notas .cni-notas-header--v2{gap:12px;min-height:0;padding:17px 16px}.cni-notas .cni-notas-header--v2:before,.cni-notas .cni-notas-header--v2:after,.cni-notas .cni-notas-header--v2 .cni-notas-foto{display:none!important}.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:9px}.cni-notas .cni-notas-header--v2 .cni-notas-brand>img{width:55px;height:63px}.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon{width:40px;height:44px;border-radius:10px}.cni-notas .cni-notas-header--v2 .cni-notas-brand-icon svg{width:25px;height:25px}.cni-notas .cni-notas-header--v2 .cni-notas-brand h1{font-size:clamp(22px,5vw,29px)}.cni-notas .cni-notas-header--v2 .cni-notas-docente{width:100%;max-width:none}.cni-notas .cni-notas-header--v2 .cni-notas-brand p{font-size:11px}}
-
-
-/* Ajuste 02/11: cabecera conservada; el borde dorado pertenece a los indicadores. */
-.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:19px}
-.cni-notas .cni-notas-header--v2 .cni-notas-brand>div{order:initial;min-width:0}
-.cni-notas .cni-notas-header--v2 .cni-notas-contexto{display:block;color:#e7f2ff;font-size:12px;font-weight:600;line-height:1.35;margin:7px 0 8px}
-.cni-notas .cni-notas-header--v2 .cni-notas-subfrase{display:block;max-width:100%;margin:0;padding:0;border:0;border-radius:0;background:transparent;color:#e8f2ff;font-size:13px;font-weight:600;line-height:1.35;box-shadow:none}
-.cni-notas .cni-notas-header--v2 .cni-notas-foto{left:52%!important;width:27%!important;object-position:center 43%}
-.cni-notas .cni-notas-header--v2 .cni-notas-docente{border:1px solid rgba(240,193,94,.55)}
-@media(max-width:1200px){.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:12px}.cni-notas .cni-notas-header--v2 .cni-notas-subfrase{font-size:12px;padding:7px 10px}}
-@media(max-width:760px){.cni-notas .cni-notas-header--v2 .cni-notas-brand{gap:10px}.cni-notas .cni-notas-header--v2 .cni-notas-contexto{font-size:11px}.cni-notas .cni-notas-header--v2 .cni-notas-subfrase{font-size:11px;padding:7px 9px}}
-
-/* El borde dorado corresponde a las CUATRO tarjetas de resumen (no al subtítulo). */
-.cni-notas .cni-notas-resumen .cni-notas-kpi{
-  border:2px solid #e6bf63;
-  border-radius:16px;
-  background:#fff;
-  box-shadow:0 5px 16px rgba(137,93,14,.08);
-}
-.cni-notas .cni-notas-resumen .cni-notas-kpi:hover{border-color:#d5a743;box-shadow:0 7px 18px rgba(137,93,14,.12)}
-
-/* Marco fotográfico: dos franjas doradas visibles a ambos lados de los docentes. */
-@media (min-width: 931px) {
-  .cni-notas .cni-notas-header--v2::before {
-    left: 53.5%;
-  }
-  .cni-notas .cni-notas-header--v2::after {
-    display: block; /* La hoja original ocultaba el pseudoelemento derecho. */
-    left: 77%;
-  }
-  .cni-notas .cni-notas-header--v2 .cni-notas-foto {
-    left: 52% !important;
-    width: 27% !important;
-    object-position: 50% 42%;
-  }
-}
-@media (min-width: 761px) and (max-width: 930px) {
-  .cni-notas .cni-notas-header--v2::before { left: 68%; }
-  .cni-notas .cni-notas-header--v2::after { display: block; left: 96%; }
-  .cni-notas .cni-notas-header--v2 .cni-notas-foto {
-    left: 67% !important;
-    width: 29% !important;
-    object-position: 50% 42%;
-  }
-}
-
-
-/* Edición visual final: solamente el fondo y la cabecera institucional. */
-body:has(.cni-notas) {
-    background: #eff5fd;
-}
-.cni-notas {
-    background: linear-gradient(180deg, #e9f3ff 0%, #f8fbff 75%);
-}
+/*
+ * CNI – Cabecera institucional del panel docente
+ * Una única capa de estilos, sin reglas contradictorias de versiones anteriores.
+ * El resto del panel utiliza panel-docente-nuevo.css sin modificaciones.
+ */
 .cni-notas .cni-notas-header--v2 {
+    --cni-dorado: #e6b54f;
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 186px;
+    padding: 22px clamp(18px, 2.8vw, 42px);
+    overflow: hidden;
+    border-radius: 0 0 18px 18px;
+    border-bottom: 4px solid var(--cni-dorado);
     background:
-        radial-gradient(ellipse at 15% 0%, rgba(32, 100, 184, .24) 0%, transparent 44%),
-        linear-gradient(106deg, #051f4f 0%, #073875 47%, #075398 74%, #d2e5f5 100%);
-    box-shadow: 0 7px 22px rgba(9, 50, 99, .12);
+        radial-gradient(ellipse at 11% 10%, rgba(51, 115, 193, .22), transparent 46%),
+        linear-gradient(105deg, #052456 0%, #083d7a 52%, #145da0 78%, #b3d2eb 100%);
+    box-shadow: 0 8px 25px rgba(4, 35, 83, .17);
 }
-/* Foto institucional entre dos diagonales doradas; sin alterar su imagen original. */
-@media (min-width: 931px) {
-    .cni-notas .cni-notas-header--v2 .cni-notas-foto {
-        left: 52% !important;
-        width: 27% !important;
-        height: 100% !important;
-        object-fit: cover;
-        object-position: center 43%;
-        opacity: 1;
-        clip-path: polygon(16% 0, 100% 0, 84% 100%, 0 100%);
-        -webkit-mask-image: none;
-        mask-image: none;
-    }
-    .cni-notas .cni-notas-header--v2::before {
-        left: 53.5%;
-        width: 11px;
-        background: linear-gradient(90deg, #c49136, #f6d77f 55%, #bd8423);
-    }
-    .cni-notas .cni-notas-header--v2::after {
-        left: 76.5%;
-        width: 11px;
-        background: linear-gradient(90deg, #c49136, #f6d77f 55%, #bd8423);
-    }
+
+/* Reflejo muy sutil; es una capa ambiental, no una segunda franja. */
+.cni-notas .cni-notas-header--v2::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background: linear-gradient(115deg, transparent 0%, rgba(255,255,255,.045) 46%, transparent 67%);
+    pointer-events: none;
+    animation: cni-reflejo-docente 10s ease-in-out infinite alternate;
 }
-@media (min-width: 761px) and (max-width: 930px) {
-    .cni-notas .cni-notas-header--v2 .cni-notas-foto {
-        opacity: .55;
-        -webkit-mask-image: none;
-        mask-image: none;
+.cni-notas .cni-notas-header--v2::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Escudo y textos a la izquierda. */
+.cni-notas .cni-notas-header--v2 .cni-notas-brand {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 1.4vw, 20px);
+    flex: 0 1 49%;
+    max-width: 49%;
+    min-width: 0;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-brand > img {
+    flex: 0 0 auto;
+    width: clamp(67px, 7.2vw, 102px);
+    height: 102px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 10px rgba(0, 15, 44, .28));
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-brand > div {
+    min-width: 0;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-school {
+    color: #fff;
+    font-size: clamp(10px, .85vw, 12px);
+    letter-spacing: .075em;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-brand h1 {
+    margin: 4px 0 3px;
+    color: #fff;
+    font-size: clamp(27px, 3.05vw, 42px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -.043em;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-contexto {
+    display: block;
+    margin: 6px 0 0;
+    color: #e8ca78;
+    font-size: 12px;
+    font-weight: 750;
+    line-height: 1.4;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-subfrase {
+    display: inline-block;
+    max-width: 100%;
+    margin: 8px 0 0;
+    padding: 7px 12px;
+    border: 1px solid rgba(232, 192, 94, .64);
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .055);
+    box-shadow: none;
+    color: #fff2d4;
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.35;
+}
+
+/* La imagen es un paralelogramo, no una fotografía rectangular. */
+.cni-notas .cni-notas-header--v2 .cni-notas-foto {
+    display: block !important;
+    position: absolute !important;
+    inset: 0 auto auto 52% !important;
+    width: 28% !important;
+    height: 100% !important;
+    object-fit: cover;
+    object-position: 50% 42%;
+    opacity: 1 !important;
+    z-index: 1 !important;
+    clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%);
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    filter: saturate(1.07) contrast(1.04);
+    pointer-events: none;
+}
+
+/* Dos bordes pegados al recorte real de la foto. */
+.cni-notas .cni-notas-header--v2 .cni-notas-foto-marco {
+    position: absolute;
+    left: 52%;
+    top: 0;
+    width: 28%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-foto-marco::before,
+.cni-notas .cni-notas-header--v2 .cni-notas-foto-marco::after {
+    content: "";
+    display: block;
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, #b17a20, #f7dc92 54%, #c68e31);
+    filter: drop-shadow(0 0 4px rgba(230, 180, 67, .24));
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-foto-marco::before {
+    clip-path: polygon(14% 0, 17% 0, 3% 100%, 0 100%);
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-foto-marco::after {
+    clip-path: polygon(97% 0, 100% 0, 86% 100%, 83% 100%);
+}
+
+/* Identidad del docente, a la derecha de la foto. */
+.cni-notas .cni-notas-header--v2 .cni-notas-docente {
+    position: relative;
+    z-index: 3;
+    flex: 0 0 auto;
+    width: min(260px, 24%);
+    min-width: 215px;
+    max-width: 275px;
+    margin-left: auto;
+    padding: 13px 15px;
+    background: rgba(255, 255, 255, .96);
+    border: 1px solid rgba(230, 181, 79, .8);
+    border-radius: 16px;
+    box-shadow: 0 9px 24px rgba(2, 32, 75, .18);
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-docente-icon {
+    background: #e6f2ff;
+    color: #145b9d;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-docente strong { color: #123b72; }
+.cni-notas .cni-notas-header--v2 .cni-notas-docente small { color: #59799d; }
+
+/* Se mantienen los cuatro indicadores con sus bordes dorados existentes. */
+.cni-notas .cni-notas-resumen .cni-notas-kpi {
+    border: 2px solid #e6bf63;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 5px 16px rgba(137, 93, 14, .08);
+}
+.cni-notas .cni-notas-resumen .cni-notas-kpi:hover {
+    border-color: #d5a743;
+    box-shadow: 0 7px 18px rgba(137, 93, 14, .12);
+}
+body:has(.cni-notas) { background: #eff5fd; }
+.cni-notas { background: linear-gradient(180deg, #e9f3ff, #f8fbff 75%); }
+
+@keyframes cni-reflejo-docente {
+    from { opacity: .25; }
+    to { opacity: .65; }
+}
+
+@media (max-width: 1200px) {
+    .cni-notas .cni-notas-header--v2 .cni-notas-brand { gap: 10px; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-brand > img { width: 74px; height: 87px; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-brand h1 { font-size: clamp(25px, 3vw, 35px); }
+    .cni-notas .cni-notas-header--v2 .cni-notas-docente { width: 230px; min-width: 210px; }
+}
+
+/* Tablet: priorizar lectura y la tarjeta del docente. */
+@media (max-width: 930px) {
+    .cni-notas .cni-notas-header--v2 { flex-wrap: wrap; gap: 14px; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-brand { flex: 1 1 100%; width: 100%; max-width: 100%; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-foto { display: none !important; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-foto-marco { display: none !important; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-docente { margin: 0; max-width: 100%; width: min(100%, 330px); }
+}
+
+/* Móvil: distribución de dos filas sin foto superpuesta. */
+@media (max-width: 760px) {
+    .cni-notas .cni-notas-header--v2 {
+        min-height: 0;
+        padding: 17px 16px 20px;
+        border-radius: 0 0 14px 14px;
+        gap: 14px;
     }
+    .cni-notas .cni-notas-header--v2 .cni-notas-brand > img { width: 58px; height: 70px; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-brand h1 { font-size: clamp(23px, 5vw, 29px); }
+    .cni-notas .cni-notas-header--v2 .cni-notas-school { font-size: 9px; letter-spacing: .025em; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-contexto { font-size: 11px; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-subfrase { padding: 6px 9px; font-size: 11px; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-docente { width: 100%; min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .cni-notas .cni-notas-header--v2::before { animation: none; }
 }

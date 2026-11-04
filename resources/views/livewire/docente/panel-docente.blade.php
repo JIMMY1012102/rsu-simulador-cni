@@ -1,6 +1,6 @@
 <div class="cni-notas" id="cni-notas">
     <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=36">
-    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=5">
+    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=6">
     @php
         $esPreview = app()->environment('local') && (request()->is('docente-preview') || request()->is('preview-docente'));
         $seccionActual = isset($seccion) && $seccion && $seccion->activo ? '5.º '.$seccion->nombre : 'Sin sección';
@@ -29,6 +29,7 @@
 
     <header class="cni-notas-header cni-notas-header--v2">
         <img class="cni-notas-foto" src="{{ asset('images/foto-personal-cni.png') }}" alt="Personal docente del Colegio Nacional de Imperial">
+        <div class="cni-notas-foto-marco" aria-hidden="true"></div>
         <div class="cni-notas-brand">
             <img src="{{ asset('img/escudo-cni.png') }}" alt="Escudo del Colegio Nacional de Imperial">
             <div>
