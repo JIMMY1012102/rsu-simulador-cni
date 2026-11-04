@@ -36,14 +36,14 @@ class LectorAlumnosExcel
             $libro = $xml('xl/workbook.xml');
             $id = null;
             foreach ($libro->children(self::NS)->sheets->sheet as $hoja) {
-                if ((string) $hoja['name'] === 'Alumnos') {
+                if ((string) $hoja->attributes()['name'] === 'Alumnos') {
                     $id = (string) $hoja->attributes('http://schemas.openxmlformats.org/officeDocument/2006/relationships')['id'];
                 }
             }
             $rutaHoja = null;
             foreach ($xml('xl/_rels/workbook.xml.rels')->children('http://schemas.openxmlformats.org/package/2006/relationships')->Relationship as $rel) {
-                if ($id !== null && (string) $rel['Id'] === $id && (string) $rel['TargetMode'] !== 'External') {
-                    $destino = (string) $rel['Target'];
+                if ($id !== null && (string) $rel->attributes()['Id'] === $id && (string) $rel->attributes()['TargetMode'] !== 'External') {
+                    $destino = (string) $rel->attributes()['Target'];
                     $rutaHoja = str_starts_with($destino, '/') ? ltrim($destino, '/') : 'xl/'.$destino;
                 }
             }
@@ -63,17 +63,17 @@ class LectorAlumnosExcel
             $filas = [];
             $columnas = [];
             foreach ($xml($rutaHoja)->children(self::NS)->sheetData->row as $row) {
-                $numero = (int) $row['r'];
+                $numero = (int) $row->attributes()['r'];
                 $celdas = [];
                 foreach ($row->children(self::NS)->c as $celda) {
-                    if (!preg_match('/^([A-Z]+)[0-9]+$/', (string) $celda['r'], $ref)) {
+                    if (!preg_match('/^([A-Z]+)[0-9]+$/', (string) $celda->attributes()['r'], $ref)) {
                         throw new RuntimeException('El Excel contiene referencias inválidas.');
                     }
                     $hijos = $celda->children(self::NS);
                     if (isset($hijos->f)) {
                         throw new RuntimeException("Fila {$numero}: usa valores de texto, sin fórmulas.");
                     }
-                    $celdas[$ref[1]] = trim(match ((string) $celda['t']) {
+                    $celdas[$ref[1]] = trim(match ((string) $celda->attributes()['t']) {
                         's' => $strings[(int) $hijos->v] ?? '',
                         'inlineStr' => $texto($hijos->is),
                         default => (string) $hijos->v,

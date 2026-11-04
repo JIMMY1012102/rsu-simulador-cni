@@ -10,6 +10,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Throwable;
@@ -113,7 +114,7 @@ class AlumnosImportacionController extends Controller
                 }
                 foreach ($filas as $fila) {
                     Usuario::create([
-                        'usuario' => $fila['usuario'], 'password' => $fila['contrasena'],
+                        'usuario' => $fila['usuario'], 'password' => Hash::make($fila['contrasena']),
                         'apellidos' => $fila['apellidos'], 'nombres' => $fila['nombres'],
                         'seccion_id' => $fila['seccion_id'], 'rol' => 'estudiante', 'activo' => true,
                     ]);
