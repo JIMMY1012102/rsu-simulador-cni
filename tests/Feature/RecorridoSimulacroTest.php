@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Seccion;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -30,11 +31,13 @@ class RecorridoSimulacroTest extends TestCase
     {
         parent::setUp();
         $this->travelTo(Carbon::parse('2026-10-20 10:00:00'));
+        $seccion = Seccion::create(['nombre' => 'A', 'grado' => '5to', 'activo' => true]);
         foreach (['docente', 'estudiante', 'otro'] as $nombre) {
             $this->$nombre = Usuario::create([
                 'nombres' => $nombre, 'apellidos' => 'Integración', 'usuario' => $nombre,
                 'password' => 'PruebaIntegracion123!', 'rol' => $nombre === 'docente' ? 'docente' : 'estudiante',
                 'activo' => true,
+                'seccion_id' => $seccion->id,
             ]);
         }
         $this->area = DB::table('areas')->insertGetId([
@@ -65,9 +68,8 @@ class RecorridoSimulacroTest extends TestCase
 
     private function ingresar(string $usuario): void
     {
-        // Los alumnos entran a su inicio; el docente, al panel.
         $this->post('/login', ['usuario' => $usuario, 'password' => 'PruebaIntegracion123!'])
-            ->assertRedirect($usuario === 'docente' ? '/panel' : '/alumno/inicio');
+            ->assertRedirect($usuario === 'docente' ? '/docente' : '/alumno/elegir-area');
     }
 
     private function iniciar(): int
@@ -283,7 +285,7 @@ class RecorridoSimulacroTest extends TestCase
 
     public function test_area_de_postulacion_se_comprueba_con_el_perfil_y_no_con_un_id_enviado(): void
     {
-        $area = DB::table('areas_postulacion')->insertGetId(['codigo' => 'A', 'nombre' => 'Ingenierías', 'activo' => true]);
+        $area = DB::table('areas_postulacion')->insertGetId(['codigo' => 'C', 'nombre' => 'Ingenierías', 'activo' => true]);
         $carrera = DB::table('carreras')->insertGetId(['area_postulacion_id' => $area, 'nombre' => 'Sistemas', 'activo' => true]);
         DB::table('area_postulacion_simulacro')->insert(['simulacro_id' => $this->simulacro, 'area_postulacion_id' => $area]);
         $this->postJson('/api/intentos', [

@@ -2,7 +2,7 @@
     Inicio del alumno (diseño "Simulador CNI · Derecho").
     Datos: App\Http\Controllers\Alumno\InicioController. Colores e íconos: config/alumno.php.
 --}}
-@extends('layouts.alumno', [
+@extends('layouts.alumno-derecho', [
     'variante' => 'derecho',
     'title' => 'Inicio',
 ])

@@ -78,3 +78,42 @@ Los cambios se proponen mediante Pull Request a `develop`; no se modifica `main`
 `php artisan test --filter=RecorridoSimulacroTest` comprueba el recorrido usando SQLite en memoria. El inicio asigna preguntas, la finalización califica y los resultados se consultan con la misma sesión web. No requiere nuevas migraciones ni seeders.
 
 El cierre de intentos vencidos está definido cada minuto en Laravel Scheduler; al desplegar hay que activar el scheduler. En desarrollo puede mantenerse `php artisan schedule:work` en otra terminal. Las preguntas y configuraciones ya usadas no se editan; se crean nuevas versiones para proteger los intentos existentes.
+
+## Banco de preguntas desde Excel
+
+El banco del colegio (`Banco_preguntas_completo.xlsx`, hoja «Banco de preguntas») se carga con:
+
+```bash
+php artisan migrate
+php artisan storage:link
+php artisan banco:importar "C:\ruta\Banco_preguntas_completo.xlsx" --simulacros
+```
+
+- Cada pregunta se identifica por su código (`AM_1`, `LE_12`…), así que el comando se puede repetir cada vez que se actualice el Excel sin duplicar nada.
+- Cada curso (Álgebra, Física, Lenguaje…) queda como asignatura propia, para poder sortear por curso.
+- Las imágenes de preguntas y alternativas se guardan en `storage/app/public/banco` y el examen las muestra desde `/storage/banco/…`.
+- La columna «Respuesta correcta» se guarda en `alternativas.es_correcta`; el examen nunca la envía al navegador.
+- Las preguntas del Excel que aún no tienen respuesta también salen en el examen, pero no suman ni restan puntos hasta completar su respuesta y volver a importar.
+- `--simulacros` crea o actualiza «Simulacro CNI · Área A» … «Área E»: 100 preguntas cada uno, 180 minutos, con la distribución por curso de `ImportarBancoExcel::DISTRIBUCION` (20 de Habilidades comunes y el resto según el área).
+- Para probar cada área en local: `php artisan db:seed --class=EstudiantesPorAreaDemoSeeder` crea `estudiante_a_demo` … `estudiante_e_demo`.
+- El Excel no se sube al repositorio: el repositorio es público y el archivo contiene las respuestas.
+
+## Nuevo flujo del estudiante: despliegue seguro (PR #18)
+
+El flujo de primera elección de cinco áreas, panel personalizado y exámenes por área ya está integrado en el código, pero **permanece apagado por defecto** al integrarse en `develop`:
+
+```dotenv
+CNI_ALUMNO_AREAS_ENABLED=false
+```
+
+Así, las instalaciones que todavía utilizan el esquema o catálogo anterior mantienen el login y `/panel` clásicos. Las rutas nuevas devuelven 404 mientras esté desactivado. No se han cambiado las reglas de login del docente.
+
+Antes de activar, **en copia de desarrollo con respaldo**:
+
+1. `php artisan migrate:status` y `php artisan cni:auditar-areas`; si hay códigos distintos de A-E, detenerse y acordar la migración de datos. El catálogo legado de cuatro áreas NO debe transformarse automáticamente.
+2. Una vez corregido el catálogo sin pérdida de relaciones históricas, aplicar la nueva migración `usuarios.area_postulacion_id` con `php artisan migrate --force`. Si la base se creó desde un SQL importado, sincronizar cuidadosamente el historial de migraciones antes de usar `migrate` (ver advertencia anterior).
+3. Cargar y aprobar los exámenes reales con asociaciones en `area_postulacion_simulacro` y cuotas de preguntas en `simulacro_area`. Los cinco exámenes demo no son oficiales.
+4. Validar en navegador el ingreso de alumno nuevo, selección única, panel, examen, resultados y un segundo inicio de sesión. Probar docentes y administradores también.
+5. **Solo entonces** modificar la configuración local de esa instalación a `CNI_ALUMNO_AREAS_ENABLED=true` y aplicar `php artisan config:clear` (o regenerar config cache según despliegue). Si se detecta un problema, regresar a `false` y limpiar caché: no cambia ni elimina registros por sí solo.
+
+GitHub Actions ejecuta la suite completa tanto en SQLite como en MariaDB 11.4 **temporales**. Una CI verde prueba el código, no el estado de la MariaDB del equipo. Consultar `docs/validacion-mariadb-areas.md`.

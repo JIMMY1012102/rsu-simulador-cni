@@ -26,6 +26,7 @@ class Usuario extends Authenticatable
         'rol',
         'seccion_id',
         'carrera_id',
+        'area_postulacion_id',
         'activo',
     ];
 
@@ -45,6 +46,11 @@ class Usuario extends Authenticatable
     public function seccion(): BelongsTo
     {
         return $this->belongsTo(Seccion::class, 'seccion_id');
+    }
+
+    public function areaPostulacion(): BelongsTo
+    {
+        return $this->belongsTo(AreaPostulacion::class, 'area_postulacion_id');
     }
 
     public function carrera(): BelongsTo

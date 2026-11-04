@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Support\PerfilExamenCni;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -26,19 +27,44 @@ class IntentoService
                         'simulacro_id' => 'El simulacro no está disponible en este momento.',
                     ]);
                 }
+                $perfilCarreraId = DB::table('usuarios')->where('id', $usuarioId)->value('carrera_id');
+                if ($simulacro->carrera_id !== null && (int) $simulacro->carrera_id !== (int) $perfilCarreraId) {
+                    throw ValidationException::withMessages([
+                        'carrera_id' => 'Este simulacro está reservado para la carrera configurada.',
+                    ]);
+                }
                 $areasPermitidas = DB::table('area_postulacion_simulacro')
                     ->where('simulacro_id', $simulacro->id)->pluck('area_postulacion_id');
                 $perfil = DB::table('usuarios')->where('id', $usuarioId)->first();
+                // Un alumno que ya eligió área solo puede iniciar simulacros publicados
+                // y asociados expresamente a un área. Sin asociación no hay autorización.
+                // Cuentas de prueba antiguas sin área guardada mantienen compatibilidad API.
+                if ($perfil->rol === 'estudiante' && $perfil->area_postulacion_id !== null
+                    && $areasPermitidas->isEmpty()) {
+                    throw ValidationException::withMessages([
+                        'simulacro_id' => 'El simulacro no tiene un área de postulación habilitada.',
+                    ]);
+                }
                 if ($perfil->rol === 'estudiante' && $areasPermitidas->isNotEmpty()) {
-                    $habilitado = DB::table('carreras as c')
-                        ->join('areas_postulacion as ap', 'ap.id', '=', 'c.area_postulacion_id')
-                        ->where('c.id', $perfil->carrera_id)->where('c.activo', true)->where('ap.activo', true)
-                        ->whereIn('ap.id', $areasPermitidas)->exists();
+                    // Selección primaria por área; la carrera es opcional.
+                    $areaId = $perfil->area_postulacion_id;
+                    if ($perfil->carrera_id !== null) {
+                        $carrera = DB::table('carreras')->where('id', $perfil->carrera_id)
+                            ->where('activo', true)->first();
+                        if (! $carrera || ($areaId !== null && (int) $carrera->area_postulacion_id !== (int) $areaId)) {
+                            throw ValidationException::withMessages(['carrera_id' => 'La carrera no pertenece a tu área de preparación.']);
+                        }
+                        $areaId ??= $carrera->area_postulacion_id;
+                    }
+                    $habilitado = $areaId !== null
+                        && DB::table('areas_postulacion')->where('id', $areaId)
+                            ->where('activo', true)->exists()
+                        && $areasPermitidas->contains($areaId);
                     if (! $habilitado) {
-                        throw ValidationException::withMessages(['carrera_id' => 'Tu carrera no está habilitada para este simulacro.']);
+                        throw ValidationException::withMessages(['carrera_id' => 'Tu área no está habilitada para este simulacro.']);
                     }
                 }
-                $preguntas = $this->sortearPreguntas($simulacro);
+                $preguntas = $this->sortearPreguntas($simulacro, (bool) ($datos['orden_por_curso'] ?? false));
             }
 
             $intentoId = DB::table('intentos')->insertGetId([
@@ -70,7 +96,7 @@ class IntentoService
     }
 
     /** Cuotas específicas primero, luego mixtas, sin repetir preguntas. */
-    private function sortearPreguntas(object $simulacro): Collection
+    private function sortearPreguntas(object $simulacro, bool $ordenPorCurso = false): Collection
     {
         $cuotas = DB::table('simulacro_area')->where('simulacro_id', $simulacro->id)
             ->orderByRaw("CASE WHEN nivel = 'mixto' THEN 1 ELSE 0 END")->orderBy('id')->get();
@@ -88,14 +114,20 @@ class IntentoService
                 ->when($cuota->nivel !== 'mixto', fn ($q) => $q->where('p.nivel', $cuota->nivel))
                 ->whereNotIn('p.id', $seleccionadas->pluck('id')->all())
                 ->whereRaw('(SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id) = ?', [(int) $simulacro->cantidad_alternativas])
-                ->whereRaw('(SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 1')
-                ->inRandomOrder()->limit(max(0, $cantidad))->lockForUpdate()->get(['p.id', 'a.bloque']);
+                // Una clave; o ninguna si es del banco del Excel (codigo) y aún no tiene respuesta: se muestra pero no se califica.
+                ->whereRaw('((SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 1
+                    OR (p.codigo IS NOT NULL AND (SELECT COUNT(*) FROM alternativas WHERE pregunta_id = p.id AND es_correcta = 1) = 0))')
+                ->inRandomOrder()->limit(max(0, $cantidad))->lockForUpdate()->get(['p.id', 'a.bloque', 'a.nombre as asignatura']);
             if ($cantidad < 1 || $preguntas->count() !== $cantidad) {
                 throw ValidationException::withMessages([
-                    'preguntas' => 'No hay suficientes preguntas válidas para el área y nivel configurados.',
+                    'preguntas' => 'Banco insuficiente: '.DB::table('areas')->where('id', $cuota->area_id)->value('nombre')
+                        .' requiere '.$cantidad.' preguntas con '.(int) $simulacro->cantidad_alternativas.' alternativas; se encontraron '.$preguntas->count().'.',
                 ]);
             }
             $seleccionadas = $seleccionadas->concat($preguntas);
+        }
+        if ($ordenPorCurso) {
+            return $seleccionadas->sortBy(fn ($p) => PerfilExamenCni::posicion($p->asignatura))->values();
         }
         // Orden de bloques documentado; sorteo independiente dentro de cada bloque.
         $grupos = $seleccionadas->groupBy('bloque');
@@ -140,7 +172,7 @@ class IntentoService
             ->get(['p.id', 'p.enunciado', 'p.imagen', 'p.nivel', 'r.orden',
                 't.nombre as tema', 'a.nombre as area', 'a.bloque']);
         $alternativas = DB::table('alternativas')->whereIn('pregunta_id', $preguntas->pluck('id'))
-            ->orderBy('letra')->get(['id', 'pregunta_id', 'letra', 'texto'])->groupBy('pregunta_id');
+            ->orderBy('letra')->get(['id', 'pregunta_id', 'letra', 'texto', 'imagen'])->groupBy('pregunta_id');
 
         return $preguntas->map(function ($pregunta) use ($alternativas) {
             $pregunta->alternativas = $alternativas->get($pregunta->id, collect());

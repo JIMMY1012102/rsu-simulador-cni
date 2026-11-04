@@ -9,6 +9,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
@@ -22,7 +24,10 @@ use Livewire\Component;
 class Examen extends Component
 {
     #[Locked]
-    public int $intentoId;
+    public int $intentoId = 0;
+
+    #[Locked]
+    public bool $sinBanco = false;
 
     /** Índice (desde 0) de la pregunta visible. */
     public int $actual = 0;
@@ -31,13 +36,29 @@ class Examen extends Component
     #[Locked]
     public array $respuestas = [];
 
-    public function mount(int $intento): void
+    public function mount(?int $intento = null): void
     {
+        $usuario = Auth::guard('web')->user();
+        abort_unless($usuario && $usuario->activo && $usuario->rol === 'estudiante', 403);
+        if ($usuario->area_postulacion_id === null && $usuario->carrera_id === null) {
+            throw new HttpResponseException(new RedirectResponse(route('alumno.elegir-area')));
+        }
+        if (request()->routeIs('examen.vacio')) {
+            $carrera = $usuario->carrera;
+            $area = $usuario->areaPostulacion ?? $carrera?->areaPostulacion;
+            abort_unless($area?->activo, 403);
+            abort_if($carrera && (! $carrera->activo
+                || (int) $carrera->area_postulacion_id !== (int) $area->id), 403);
+            $this->sinBanco = true;
+
+            return;
+        }
+        abort_unless($intento !== null && $intento > 0, 404);
         $registro = $this->servicio()->obtenerPropio($intento, $this->usuarioId());
         if ($registro->estado !== 'en_curso') {
             // Livewire reemplaza redirect() durante mount; se responde con una redirección HTTP normal.
             $this->avisar($this->mensajeCierre($registro));
-            throw new HttpResponseException(new RedirectResponse(route('examen.resultados', $registro->id)));
+            throw new HttpResponseException(new RedirectResponse(route('alumno.resultados', ['intento' => $intento])));
         }
         $this->intentoId = $registro->id;
         $guardadas = $this->servicio()->respuestas($registro->id);
@@ -52,30 +73,29 @@ class Examen extends Component
     #[Computed]
     public function preguntas(): Collection
     {
-        return $this->servicio()->preguntas($this->intentoId)->values();
+        return $this->sinBanco ? collect() : $this->servicio()->preguntas($this->intentoId)->values();
     }
 
-    /**
-     * La pregunta viaja con el clic: si el alumno respondió antes de que llegara el render
-     * de "Siguiente", $actual ya no es la pregunta que estaba viendo.
-     */
-    public function responder(int $preguntaId, int $alternativaId): void
+    public function responder(int $alternativaId): void
     {
-        if (! array_key_exists($preguntaId, $this->respuestas)) {
-            throw ValidationException::withMessages(['pregunta_id' => 'La pregunta no pertenece a este intento.']);
+        if ($this->sinBanco) {
+            return;
         }
-        // IntentoService valida además que la alternativa sea de esa pregunta.
+        $pregunta = $this->preguntas->get($this->actual);
         $guardado = $this->mientrasSigaEnCurso(fn () => $this->servicio()->guardarRespuesta(
             $this->intentoId, $this->usuarioId(),
-            ['pregunta_id' => $preguntaId, 'alternativa_id' => $alternativaId],
+            ['pregunta_id' => $pregunta->id, 'alternativa_id' => $alternativaId],
         ));
         if ($guardado) {
-            $this->respuestas[$preguntaId] = $alternativaId;
+            $this->respuestas[$pregunta->id] = $alternativaId;
         }
     }
 
     public function ir(int $indice): void
     {
+        if ($this->sinBanco) {
+            return;
+        }
         $this->actual = max(0, min($indice, $this->preguntas->count() - 1));
     }
 
@@ -91,6 +111,9 @@ class Examen extends Component
 
     public function finalizar(): void
     {
+        if ($this->sinBanco) {
+            return;
+        }
         $intento = $this->servicio()->finalizar($this->intentoId, $this->usuarioId());
         $this->salir($this->mensajeCierre($intento));
     }
@@ -98,6 +121,9 @@ class Examen extends Component
     /** Lo llama el temporizador del navegador al llegar a cero; el servidor decide si de verdad venció. */
     public function tiempoAgotado(): void
     {
+        if ($this->sinBanco) {
+            return;
+        }
         $intento = $this->servicio()->obtenerPropio($this->intentoId, $this->usuarioId());
         if ($intento->estado !== 'en_curso') {
             $this->salir($this->mensajeCierre($intento));
@@ -106,6 +132,9 @@ class Examen extends Component
 
     public function render()
     {
+        if ($this->sinBanco) {
+            return $this->pantallaSinBanco();
+        }
         $intento = $this->servicio()->obtenerPropio($this->intentoId, $this->usuarioId());
         if ($intento->estado !== 'en_curso') {
             $this->salir($this->mensajeCierre($intento));
@@ -128,10 +157,27 @@ class Examen extends Component
             // Fijo durante todo el intento: el x-data de la vista no debe cambiar entre renders.
             'limiteMs' => $intento->fecha_limite ? Carbon::parse($intento->fecha_limite)->getTimestampMs() : null,
             'ahoraMs' => now()->getTimestampMs(),
-        ])->layout('layouts.alumno', ['migas' => 'Examen en curso'])->title('Simulador de examen');
+        ])->layout('layouts.examen-simple', ['migas' => 'Examen en curso'])->title('Simulador de examen');
     }
 
-    /** Ejecuta una escritura; si el intento ya se cerró (por tiempo u otra pestaña), sale del examen. */
+    /** La pantalla vacía no crea intentos, respuestas ni resultados. */
+    private function pantallaSinBanco()
+    {
+        $usuario = Auth::guard('web')->user();
+        abort_unless($usuario && $usuario->activo && $usuario->rol === 'estudiante', 403);
+        $area = $usuario->areaPostulacion ?? $usuario->carrera?->areaPostulacion;
+
+        return view('livewire.examen', [
+            'intento' => null,
+            'simulacro' => (object) ['nombre' => 'Examen · '.($area?->nombre ?? ''), 'tiempo_limite' => 60],
+            'numeroIntento' => null,
+            'preguntas' => collect(), 'pregunta' => null,
+            'total' => 0, 'respondidas' => 0, 'segundosRestantes' => 3600,
+            'limiteMs' => null, 'ahoraMs' => now()->getTimestampMs(),
+        ])->layout('layouts.examen-simple', ['migas' => 'Examen'])->title('Simulador de examen');
+    }
+
+    /** Ejecuta una escritura; si el intento ya se cerró (por tiempo u otra pestaña), vuelve al panel. */
     private function mientrasSigaEnCurso(callable $accion): bool
     {
         try {
@@ -152,14 +198,14 @@ class Examen extends Component
     private function salir(string $mensaje): void
     {
         $this->avisar($mensaje);
-        $this->redirectRoute('examen.resultados', $this->intentoId);
+        $this->redirectRoute('alumno.resultados', ['intento' => $this->intentoId]);
         $this->skipRender();
     }
 
-    /** Aviso informativo que muestra la pantalla de resultados. */
+    /** El panel muestra los avisos desde el bag de errores del layout común. */
     private function avisar(string $mensaje): void
     {
-        session()->flash('status', $mensaje);
+        session()->flash('errors', (new ViewErrorBag)->put('default', new MessageBag(['intento' => $mensaje])));
     }
 
     private function mensajeCierre(object $intento): string
@@ -170,8 +216,8 @@ class Examen extends Component
             ? 'El tiempo terminó y tu examen se envió automáticamente.'
             : 'Tu examen fue enviado.';
 
-        return "{$inicio} Respondiste {$respondidas} de {$intento->total_preguntas} preguntas"
-            .($intento->tipo === 'simulacro' ? '; abajo verás tu puntaje.' : '. Las prácticas no se califican.');
+        return "{$inicio} Respondiste {$respondidas} de {$intento->total_preguntas} preguntas; "
+            .'revisa tu puntaje en «Mis intentos y resultados».';
     }
 
     private function servicio(): IntentoService

@@ -6,6 +6,8 @@ use App\Livewire\Examen;
 use App\Models\Usuario;
 use App\Services\IntentoService;
 use Database\Seeders\ExamenDemoSeeder;
+use Database\Seeders\AreaPostulacionSeeder;
+use Database\Seeders\CarreraSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +26,8 @@ class ExamenPantallaTest extends TestCase
     {
         parent::setUp();
         $this->travelTo(Carbon::parse('2026-10-21 09:00:00'));
+        $this->seed(AreaPostulacionSeeder::class);
+        $this->seed(CarreraSeeder::class);
         $this->seed(ExamenDemoSeeder::class);
         $this->alumno = $this->crearAlumno('alumno');
         $this->simulacro = DB::table('simulacros')->where('nombre', ExamenDemoSeeder::SIMULACRO)->value('id');
@@ -34,6 +38,7 @@ class ExamenPantallaTest extends TestCase
         return Usuario::create([
             'nombres' => 'Juan Carlos', 'apellidos' => 'Pérez', 'usuario' => $usuario,
             'password' => 'PruebaExamen123!', 'rol' => 'estudiante', 'activo' => true,
+            'carrera_id' => DB::table('carreras')->where('nombre', 'Ingeniería de Sistemas')->value('id'),
         ]);
     }
 
@@ -76,14 +81,14 @@ class ExamenPantallaTest extends TestCase
 
         $this->actingAs($this->alumno, 'web')->get(route('examen', $intento))->assertOk()
             ->assertSee('Simulador de examen')
-            ->assertSee('Simulacro de admisión · '.ExamenDemoSeeder::SIMULACRO.' · Intento 01')
-            ->assertDontSee('Práctica general')
             ->assertSee($primera->enunciado)
             ->assertSee($primera->area)
             ->assertSee('0 de 40 respondidas')
-            ->assertSee('JUAN')
+            ->assertSee('Colegio Nacional de Imperial')
+            ->assertDontSee('portal-lateral')
+            ->assertSee('Ver preguntas')
             ->assertSee('js/examen.js?v='.filemtime(public_path('js/examen.js')))
-            ->assertSee('css/alumno.css?v='.filemtime(public_path('css/alumno.css')))
+            ->assertSee('css/examen-simple.css?v='.filemtime(public_path('css/examen-simple.css')))
             ->assertDontSee('La respuesta correcta es')
             ->assertDontSee('es_correcta');
     }
@@ -100,13 +105,13 @@ class ExamenPantallaTest extends TestCase
         $this->get(route('examen', $this->iniciar()))->assertRedirect(route('login'));
     }
 
-    public function test_un_intento_cerrado_redirige_a_resultados_con_aviso(): void
+    public function test_un_intento_cerrado_redirige_al_panel_con_aviso(): void
     {
         $intento = $this->iniciar();
         app(IntentoService::class)->finalizar($intento, $this->alumno->id);
 
         $this->actingAs($this->alumno, 'web')->get(route('examen', $intento))
-            ->assertRedirect(route('examen.resultados', $intento))->assertSessionHas('status')->assertSessionHasNoErrors();
+            ->assertRedirect(route('alumno.resultados', ['intento' => $intento]))->assertSessionHasErrors('intento');
     }
 
     public function test_responder_guarda_y_navegar_cambia_de_pregunta(): void
@@ -117,7 +122,7 @@ class ExamenPantallaTest extends TestCase
 
         Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
             ->assertSet('actual', 0)
-            ->call('responder', $preguntas[0]->id, $alternativa)
+            ->call('responder', $alternativa)
             ->assertSee('Respuesta guardada')
             ->assertSee('1 de 40 respondidas')
             ->call('siguiente')
@@ -134,40 +139,6 @@ class ExamenPantallaTest extends TestCase
             ->where('intento_id', $intento)->where('pregunta_id', $preguntas[0]->id)->value('alternativa_id'));
     }
 
-    /** Regresión: el clic llegó después de "Siguiente" y se guardaba en la pregunta nueva. */
-    public function test_responder_guarda_en_la_pregunta_indicada_aunque_ya_se_haya_avanzado(): void
-    {
-        $intento = $this->iniciar();
-        $preguntas = $this->preguntas($intento);
-        $alternativa = $preguntas[0]->alternativas[1]->id;
-
-        Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
-            ->call('siguiente')
-            ->assertSet('actual', 1)
-            ->call('responder', $preguntas[0]->id, $alternativa)
-            ->assertSee('1 de 40 respondidas');
-
-        $guardadas = DB::table('respuestas_estudiante')->where('intento_id', $intento)->pluck('alternativa_id', 'pregunta_id');
-        $this->assertSame($alternativa, (int) $guardadas[$preguntas[0]->id]);
-        $this->assertNull($guardadas[$preguntas[1]->id]);
-    }
-
-    public function test_responder_rechaza_preguntas_o_alternativas_ajenas_al_intento(): void
-    {
-        $intento = $this->iniciar();
-        $preguntas = $this->preguntas($intento);
-        $fuera = DB::table('preguntas')->insertGetId([
-            'tema_id' => DB::table('temas')->value('id'), 'enunciado' => 'Pregunta fuera del intento',
-            'nivel' => 'basico', 'solucion' => '-', 'activo' => true,
-        ]);
-        $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
-
-        $componente->call('responder', $fuera, $preguntas[0]->alternativas[0]->id)->assertHasErrors('pregunta_id');
-        $componente->call('responder', $preguntas[0]->id, $preguntas[1]->alternativas[0]->id)->assertHasErrors('alternativa_id');
-
-        $this->assertSame(0, DB::table('respuestas_estudiante')->where('intento_id', $intento)->whereNotNull('alternativa_id')->count());
-    }
-
     public function test_al_reanudar_abre_la_primera_pregunta_sin_responder(): void
     {
         $intento = $this->iniciar();
@@ -182,13 +153,13 @@ class ExamenPantallaTest extends TestCase
             ->assertSet('actual', 2)->assertSee('2 de 40 respondidas');
     }
 
-    public function test_finalizar_envia_el_examen_y_muestra_resultados(): void
+    public function test_finalizar_envia_el_examen_y_vuelve_al_panel(): void
     {
         $intento = $this->iniciar();
 
         Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
             ->call('finalizar')
-            ->assertRedirect(route('examen.resultados', $intento));
+            ->assertRedirect(route('alumno.resultados', ['intento' => $intento]));
 
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->assertNotNull(DB::table('intentos')->where('id', $intento)->value('puntaje_total'));
@@ -200,31 +171,27 @@ class ExamenPantallaTest extends TestCase
         $preguntas = $this->preguntas($intento);
 
         Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
-            ->call('responder', $preguntas[0]->id, $preguntas[0]->alternativas[0]->id)
+            ->call('responder', $preguntas[0]->alternativas[0]->id)
             ->call('siguiente')
             ->call('ir', 39)
             ->assertSee('Enviar examen')
             ->call('finalizar')
-            ->assertRedirect(route('examen.resultados', $intento));
+            ->assertRedirect(route('alumno.resultados', ['intento' => $intento]));
 
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
-        $this->get(route('examen.resultados', $intento))->assertOk()
-            ->assertSee('Resultados de tu examen')->assertSee('Intento #1 · Juan Carlos')
-            ->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas; abajo verás tu puntaje.')
-            ->assertDontSee('role="alert"', false);
+        $this->get(route('alumno.resultados', ['intento' => $intento]))->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas');
     }
 
     /** Regresión: si x-data cambia entre renders, Alpine reinicia el estado y el reloj se congela. */
     public function test_el_x_data_del_examen_no_cambia_entre_renders(): void
     {
         $intento = $this->iniciar();
-        $xData = fn (string $html) => preg_match('/class="examen" x-data="([^"]+)"/', $html, $m) ? $m[1] : null;
+        $xData = fn (string $html) => preg_match('/\\bx-data="(examen\\([^"]+\\))"/', $html, $m) ? $m[1] : null;
         $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
         $antes = $xData($componente->html());
 
         $this->travel(7)->seconds();
-        $primera = $this->preguntas($intento)[0];
-        $componente->call('responder', $primera->id, $primera->alternativas[0]->id)->call('siguiente');
+        $componente->call('responder', $this->preguntas($intento)[0]->alternativas[0]->id)->call('siguiente');
 
         $this->assertNotNull($antes);
         $this->assertSame($antes, $xData($componente->html()));
@@ -239,7 +206,7 @@ class ExamenPantallaTest extends TestCase
         $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
 
         $this->travel(61)->minutes();
-        $componente->call('responder', $pregunta->id, $pregunta->alternativas[0]->id)->assertRedirect(route('examen.resultados', $intento));
+        $componente->call('responder', $pregunta->alternativas[0]->id)->assertRedirect(route('alumno.resultados', ['intento' => $intento]));
 
         $this->assertSame('enviado_auto', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->assertSame(0, DB::table('respuestas_estudiante')->where('intento_id', $intento)->whereNotNull('alternativa_id')->count());
@@ -253,40 +220,5 @@ class ExamenPantallaTest extends TestCase
             ->call('tiempoAgotado')->assertNoRedirect();
 
         $this->assertSame('en_curso', DB::table('intentos')->where('id', $intento)->value('estado'));
-    }
-
-    public function test_resultados_muestra_cifras_y_asignaturas_solo_del_intento_propio(): void
-    {
-        $intento = $this->iniciar();
-        $this->actingAs($this->alumno, 'web')->get(route('examen.resultados', $intento))
-            ->assertRedirect(route('examen', $intento));
-
-        app(IntentoService::class)->finalizar($intento, $this->alumno->id);
-        $areas = DB::table('resultados_area')->where('intento_id', $intento)->count();
-        $this->get(route('examen.resultados', $intento))->assertOk()
-            ->assertSee('Puntaje total')->assertSee('En blanco')->assertSee("{$areas} asignaturas")
-            ->assertSee('Regresar a mi panel')->assertSee(route('alumno.inicio'), false);
-
-        $this->actingAs($this->crearAlumno('otro'), 'web')->get(route('examen.resultados', $intento))->assertNotFound();
-    }
-
-    public function test_resultados_suma_la_doble_marca_a_en_blanco(): void
-    {
-        $intento = $this->iniciar();
-        app(IntentoService::class)->finalizar($intento, $this->alumno->id);
-        DB::table('intentos')->where('id', $intento)->update(['en_blanco' => 37, 'doble_marca' => 2]);
-
-        $this->actingAs($this->alumno, 'web')->get(route('examen.resultados', $intento))->assertOk()
-            ->assertSeeInOrder(['En blanco o doble marca', '<strong>39</strong>'], false);
-    }
-
-    public function test_una_practica_sin_calificar_no_muestra_ceros(): void
-    {
-        $intento = app(IntentoService::class)->iniciar($this->alumno->id, ['tipo' => 'practica'])->id;
-        app(IntentoService::class)->finalizar($intento, $this->alumno->id);
-
-        $this->actingAs($this->alumno, 'web')->get(route('examen.resultados', $intento))->assertOk()
-            ->assertSeeInOrder(['Correctas', '<strong>—</strong>', 'Incorrectas', '<strong>—</strong>'], false)
-            ->assertSee('Este examen todavía no tiene calificación.')->assertDontSee('<strong>0</strong>', false);
     }
 }

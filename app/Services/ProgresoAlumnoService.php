@@ -25,7 +25,15 @@ class ProgresoAlumnoService
             ->whereNotNull('re.alternativa_id')->distinct()->count('re.pregunta_id');
         $correctas = $this->respuestasDe($usuario)
             ->where('re.estado_respuesta', 'correcta')->distinct()->count('re.pregunta_id');
-        $totalPreguntas = DB::table('preguntas')->where('activo', true)->count();
+        $areaId = $usuario->area_postulacion_id ?? $usuario->carrera?->area_postulacion_id;
+        $totalPreguntas = DB::table('preguntas as p')
+            ->join('temas as t', 't.id', '=', 'p.tema_id')
+            ->where('p.activo', true)->where('t.activo', true)
+            ->whereExists(fn (Builder $q) => $q->selectRaw('1')->from('simulacro_area as sa')
+                ->join('area_postulacion_simulacro as aps', 'aps.simulacro_id', '=', 'sa.simulacro_id')
+                ->whereColumn('sa.area_id', 't.area_id')
+                ->where('aps.area_postulacion_id', $areaId))
+            ->count();
 
         return [
             'resueltas' => $resueltas,
@@ -79,11 +87,16 @@ class ProgresoAlumnoService
     public function temas(Usuario $usuario, ?int $limite = null): Collection
     {
         $colores = config('alumno.colores_temas');
+        $areaId = $usuario->area_postulacion_id ?? $usuario->carrera?->area_postulacion_id;
 
         return DB::table('temas as t')
             ->join('areas as a', 'a.id', '=', 't.area_id')
             ->where('t.activo', true)
             ->where('a.activo', true)
+            ->whereExists(fn (Builder $q) => $q->selectRaw('1')->from('simulacro_area as sa')
+                ->join('area_postulacion_simulacro as aps', 'aps.simulacro_id', '=', 'sa.simulacro_id')
+                ->whereColumn('sa.area_id', 'a.id')
+                ->where('aps.area_postulacion_id', $areaId))
             ->orderBy('t.id')
             ->when($limite, fn (Builder $q) => $q->limit($limite))
             ->select('t.id', 't.nombre', 'a.nombre as area')

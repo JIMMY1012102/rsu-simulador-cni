@@ -27,6 +27,7 @@ class Simulacro extends Model
         'fecha_fin',
         'activo',
         'creado_por',
+        'carrera_id',
     ];
 
     protected function casts(): array
@@ -64,6 +65,11 @@ class Simulacro extends Model
             'simulacro_id',
             'area_postulacion_id'
         )->withTimestamps();
+    }
+
+    public function carrera(): BelongsTo
+    {
+        return $this->belongsTo(Carrera::class, 'carrera_id');
     }
 
     public function creador(): BelongsTo

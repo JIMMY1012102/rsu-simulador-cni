@@ -1,0 +1,316 @@
+// RSU-CNI. Documentacion, NO ejecutar como migracion. Fuente: develop 26/10/2026.
+// tokenable_type/tokenable_id son polimorficos, sin FK fisica.
+
+Enum usuarios_rol {
+  admin
+  docente
+  estudiante
+}
+
+Enum areas_bloque {
+  habilidad_verbal
+  habilidad_logico_matematica
+  conocimientos
+}
+
+Enum preguntas_nivel {
+  basico
+  intermedio
+  avanzado
+}
+
+Enum simulacro_area_nivel {
+  basico
+  intermedio
+  avanzado
+  mixto
+}
+
+Enum intentos_tipo {
+  simulacro
+  practica
+}
+
+Enum intentos_estado {
+  en_curso
+  finalizado
+  enviado_auto
+}
+
+Enum respuestas_estudiante_estado_respuesta {
+  correcta
+  incorrecta
+  en_blanco
+  doble_marca
+}
+
+Table secciones {
+  id bigint [pk, increment, not null]
+  nombre varchar(10) [not null]
+  grado varchar(20) [not null]
+  activo boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (nombre, grado) [unique]
+  }
+  Note: 'Salones (grado y sección) de docentes y estudiantes.'
+}
+
+Table areas_postulacion {
+  id bigint [pk, increment, not null]
+  codigo char(1) [not null, unique]
+  nombre varchar(100) [not null, unique]
+  activo boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  Note: 'Cinco áreas de postulación A–E, distintas de las asignaturas.'
+}
+
+Table carreras {
+  id bigint [pk, increment, not null]
+  area_postulacion_id bigint [not null]
+  nombre varchar(150) [not null, unique]
+  activo boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  Note: 'Carreras pertenecientes a un área A–E.'
+}
+
+Table usuarios {
+  id bigint [pk, increment, not null]
+  nombres varchar(100) [not null]
+  apellidos varchar(100) [not null]
+  usuario varchar(50) [not null, unique]
+  password varchar(255) [not null]
+  rol usuarios_rol [not null]
+  seccion_id bigint [null]
+  carrera_id bigint [null]
+  activo boolean [not null]
+  remember_token varchar(100) [null]
+  area_postulacion_id bigint [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (rol, activo)
+  }
+  Note: 'Identidades, hash de contraseña, rol y adscripción opcional.'
+}
+
+Table areas {
+  id bigint [pk, increment, not null]
+  nombre varchar(100) [not null, unique]
+  bloque areas_bloque [not null]
+  activo boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  Note: 'Asignaturas o áreas de contenido del examen, agrupadas por bloque.'
+}
+
+Table temas {
+  id bigint [pk, increment, not null]
+  area_id bigint [not null]
+  nombre varchar(150) [not null]
+  activo boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (area_id, nombre) [unique]
+  }
+  Note: 'Temas de una asignatura.'
+}
+
+Table preguntas {
+  id bigint [pk, increment, not null]
+  tema_id bigint [not null]
+  enunciado text [not null]
+  imagen varchar(255) [null]
+  nivel preguntas_nivel [not null]
+  solucion text [not null]
+  activo boolean [not null]
+  creado_por bigint [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (tema_id, nivel, activo)
+  }
+  Note: 'Enunciados, niveles, imágenes opcionales, soluciones y autor.'
+}
+
+Table alternativas {
+  id bigint [pk, increment, not null]
+  pregunta_id bigint [not null]
+  letra char(1) [not null]
+  texto varchar(500) [not null]
+  es_correcta boolean [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (pregunta_id, letra) [unique]
+  }
+  Note: 'Opciones de respuesta de una pregunta, con marca de correcta.'
+}
+
+Table simulacros {
+  id bigint [pk, increment, not null]
+  nombre varchar(150) [not null]
+  tiempo_limite smallint [not null]
+  total_preguntas smallint [not null]
+  cantidad_alternativas smallint [not null]
+  puntaje_correcta decimal(7,3) [not null]
+  puntaje_incorrecta decimal(7,3) [not null]
+  puntaje_blanco decimal(7,3) [not null]
+  puntaje_maximo decimal(12,3) [not null, note: 'Generada STORED: total_preguntas x puntaje_correcta']
+  fecha_inicio datetime [not null]
+  fecha_fin datetime [not null]
+  activo boolean [not null]
+  creado_por bigint [null]
+  carrera_id bigint [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (creado_por)
+  }
+  Note: 'Exámenes configurados: tiempo, puntajes, disponibilidad y autor.'
+}
+
+Table area_postulacion_simulacro {
+  id bigint [pk, increment, not null]
+  area_postulacion_id bigint [not null]
+  simulacro_id bigint [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (area_postulacion_id, simulacro_id) [unique]
+    (simulacro_id)
+  }
+  Note: 'Asociación N:M de simulacros con áreas de postulación.'
+}
+
+Table simulacro_area {
+  id bigint [pk, increment, not null]
+  simulacro_id bigint [not null]
+  area_id bigint [not null]
+  nivel simulacro_area_nivel [not null]
+  cantidad_preguntas smallint [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (simulacro_id, area_id, nivel) [unique]
+    (area_id)
+  }
+  Note: 'Cuotas de preguntas de un simulacro por asignatura y nivel.'
+}
+
+Table intentos {
+  id bigint [pk, increment, not null]
+  usuario_id bigint [not null]
+  carrera_id bigint [null]
+  simulacro_id bigint [null]
+  tipo intentos_tipo [not null]
+  area_id bigint [null]
+  tema_id bigint [null]
+  fecha_inicio datetime [not null]
+  fecha_limite datetime [null]
+  fecha_fin datetime [null]
+  estado intentos_estado [not null]
+  total_preguntas smallint [not null]
+  puntaje_total decimal(8,3) [null]
+  correctas smallint [null]
+  incorrectas smallint [null]
+  en_blanco smallint [null]
+  doble_marca smallint [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (usuario_id, fecha_inicio)
+    (simulacro_id, estado)
+    (estado, fecha_limite)
+    (carrera_id)
+    (area_id)
+    (tema_id)
+  }
+  Note: 'Historial de ejecuciones de un usuario, tiempos, estados y totales.'
+}
+
+Table respuestas_estudiante {
+  id bigint [pk, increment, not null]
+  intento_id bigint [not null]
+  pregunta_id bigint [not null]
+  orden smallint [not null]
+  alternativa_id bigint [null]
+  estado_respuesta respuestas_estudiante_estado_respuesta [null]
+  puntaje_obtenido decimal(7,3) [null]
+  respondida_en datetime [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (intento_id, pregunta_id) [unique]
+    (intento_id, orden) [unique]
+    (pregunta_id)
+    (alternativa_id)
+  }
+  Note: 'Preguntas sorteadas para un intento y respuestas individuales.'
+}
+
+Table resultados_area {
+  id bigint [pk, increment, not null]
+  intento_id bigint [not null]
+  area_id bigint [not null]
+  total_preguntas smallint [not null]
+  aciertos smallint [not null]
+  incorrectas smallint [not null]
+  en_blanco smallint [not null]
+  puntaje decimal(8,3) [not null]
+  porcentaje decimal(5,2) [not null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (intento_id, area_id) [unique]
+    (area_id)
+  }
+  Note: 'Acumulados de puntaje y aciertos por asignatura en un intento.'
+}
+
+Table personal_access_tokens {
+  id bigint [pk, increment, not null]
+  tokenable_type varchar(255) [not null]
+  tokenable_id bigint [not null]
+  name text [not null]
+  token varchar(64) [not null, unique]
+  abilities text [null]
+  last_used_at timestamp [null]
+  expires_at timestamp [null]
+  created_at timestamp [null]
+  updated_at timestamp [null]
+  indexes {
+    (tokenable_type, tokenable_id)
+    (expires_at)
+  }
+  Note: 'Tabla técnica heredada de autenticación con tokens polimórficos; no se usa en sesión web actual.'
+}
+
+Ref: carreras.area_postulacion_id > areas_postulacion.id [delete: restrict, update: cascade]
+Ref: usuarios.seccion_id > secciones.id [delete: restrict, update: cascade]
+Ref: usuarios.carrera_id > carreras.id [delete: set null, update: cascade]
+Ref: usuarios.area_postulacion_id > areas_postulacion.id [delete: restrict, update: cascade]
+Ref: temas.area_id > areas.id [delete: restrict, update: cascade]
+Ref: preguntas.tema_id > temas.id [delete: restrict, update: cascade]
+Ref: preguntas.creado_por > usuarios.id [delete: set null, update: cascade]
+Ref: alternativas.pregunta_id > preguntas.id [delete: cascade, update: cascade]
+Ref: simulacros.creado_por > usuarios.id [delete: set null, update: cascade]
+Ref: simulacros.carrera_id > carreras.id [delete: restrict, update: cascade]
+Ref: area_postulacion_simulacro.area_postulacion_id > areas_postulacion.id [delete: cascade, update: cascade]
+Ref: area_postulacion_simulacro.simulacro_id > simulacros.id [delete: cascade, update: cascade]
+Ref: simulacro_area.simulacro_id > simulacros.id [delete: cascade, update: cascade]
+Ref: simulacro_area.area_id > areas.id [delete: restrict, update: cascade]
+Ref: intentos.usuario_id > usuarios.id [delete: restrict, update: cascade]
+Ref: intentos.carrera_id > carreras.id [delete: set null, update: cascade]
+Ref: intentos.simulacro_id > simulacros.id [delete: restrict, update: cascade]
+Ref: intentos.area_id > areas.id [delete: set null, update: cascade]
+Ref: intentos.tema_id > temas.id [delete: set null, update: cascade]
+Ref: respuestas_estudiante.intento_id > intentos.id [delete: cascade, update: cascade]
+Ref: respuestas_estudiante.pregunta_id > preguntas.id [delete: restrict, update: cascade]
+Ref: respuestas_estudiante.alternativa_id > alternativas.id [delete: set null, update: cascade]
+Ref: resultados_area.intento_id > intentos.id [delete: cascade, update: cascade]
+Ref: resultados_area.area_id > areas.id [delete: restrict, update: cascade]

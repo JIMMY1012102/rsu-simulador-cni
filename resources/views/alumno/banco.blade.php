@@ -2,7 +2,7 @@
     "Banco de preguntas": cuántas preguntas hay por área, tema y nivel (sin enunciados ni respuestas).
     Datos: App\Http\Controllers\Alumno\BancoController.
 --}}
-@extends('layouts.alumno', ['variante' => 'derecho', 'title' => 'Banco de preguntas'])
+@extends('layouts.alumno-derecho', ['variante' => 'derecho', 'title' => 'Banco de preguntas'])
 
 @section('content')
 <div class="pagina">

@@ -2,7 +2,7 @@
     Detalle de un examen terminado: totales y resultado por área (tabla resultados_area).
     Datos: App\Http\Controllers\Alumno\HistorialController@show.
 --}}
-@extends('layouts.alumno', ['variante' => 'derecho', 'title' => 'Resultado del examen'])
+@extends('layouts.alumno-derecho', ['variante' => 'derecho', 'title' => 'Resultado del examen'])
 
 @section('content')
 <div class="pagina">

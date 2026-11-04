@@ -1,0 +1,19 @@
+flowchart LR
+  ID["Identidad y usuarios"] --> CAT["Catalogo academico"]
+  CAT --> BANK["Banco de preguntas"]
+  CAT --> SIM["Configuracion de simulacros"]
+  BANK --> SIM
+  ID --> HIST["Intentos e historial"]
+  SIM --> HIST
+  BANK --> HIST
+  TOK["Tokens historicos"] -. "Sin FK fisica" .-> ID
+  classDef blue fill:#DFECFF,stroke:#2365A4,color:#153C69
+  classDef green fill:#E2F4E6,stroke:#338358,color:#185333
+  classDef amber fill:#FFF0D8,stroke:#B87D2A,color:#65420A
+  classDef purple fill:#F0E6FF,stroke:#8153AC,color:#57337D
+  classDef gray fill:#EEEEEE,stroke:#888888,color:#444444
+  class ID blue
+  class CAT,BANK green
+  class SIM amber
+  class HIST purple
+  class TOK gray

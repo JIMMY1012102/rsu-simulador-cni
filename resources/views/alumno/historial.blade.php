@@ -2,7 +2,7 @@
     "Historial": exámenes terminados con su puntaje.
     Datos: App\Http\Controllers\Alumno\HistorialController@index.
 --}}
-@extends('layouts.alumno', ['variante' => 'derecho', 'title' => 'Historial'])
+@extends('layouts.alumno-derecho', ['variante' => 'derecho', 'title' => 'Historial'])
 
 @section('content')
 <div class="pagina">
