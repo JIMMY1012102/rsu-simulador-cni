@@ -933,9 +933,10 @@ body:has(.cni-alumno){background:#f8f9fe}
         height:calc(100% - 24px);
     }
     .cni-alumno[data-area="B"] .cni-alumno-banner .cni-alumno-mascota{
-        top:16px;
-        width:28%;
-        height:calc(100% - 32px);
+        top:10px;
+        width:32%;
+        height:calc(100% + 80px);
+        object-position:center top;
     }
 }
 @media(max-width:680px){
