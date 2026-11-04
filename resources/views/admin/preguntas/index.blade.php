@@ -1,8 +1,38 @@
 @extends('admin.shell')
+@push('styles')
+<link rel="stylesheet" href="{{ asset('css/vaciar-banco.css') }}?v={{ filemtime(public_path('css/vaciar-banco.css')) }}">
+@endpush
 @section('admin-page', 'Preguntas')
 @section('admin-content')
 <section class="cni-card cni-questions" aria-labelledby="preguntas-titulo">
-    <h1 id="preguntas-titulo">Preguntas</h1>
+    <div class="cni-questions-heading">
+        <h1 id="preguntas-titulo">Preguntas</h1>
+        @if($puedeVaciarBanco)
+            <details class="cni-delete-all">
+                <summary class="cni-delete-all__trigger" @if($totalPreguntas === 0) aria-disabled="true" @endif>
+                    <span aria-hidden="true">🗑</span> Borrar todas las preguntas
+                </summary>
+                <div class="cni-delete-all__panel">
+                    <strong>Vaciar banco de preguntas ({{ number_format($totalPreguntas) }})</strong>
+                    <p>Las preguntas que no se hayan usado se eliminarán. Las utilizadas en exámenes se archivarán para conservar los resultados de los alumnos. Después podrás importar un nuevo banco desde Excel.</p>
+                    @if($totalPreguntas > 0)
+                        <form action="{{ route('admin.preguntas.destroy-all') }}" method="POST">
+                            @csrf
+                            @method('DELETE')
+                            <label for="banco-borrar-confirmacion">Para confirmar, escribe <strong>BORRAR TODO</strong>
+                                <input id="banco-borrar-confirmacion" name="confirmacion" type="text" required pattern="BORRAR TODO" maxlength="11" autocomplete="off" placeholder="BORRAR TODO" aria-describedby="banco-borrar-aviso">
+                            </label>
+                            <p id="banco-borrar-aviso">Esta acción no se puede deshacer. Si hay exámenes en curso, el sistema impedirá el borrado.</p>
+                            @error('confirmacion')<p class="cni-delete-all__error" role="alert">{{ $message }}</p>@enderror
+                            <button class="cni-delete-all__confirm" type="submit">Confirmar borrado del banco</button>
+                        </form>
+                    @else
+                        <p>El banco ya está vacío.</p>
+                    @endif
+                </div>
+            </details>
+        @endif
+    </div>
     <form action="{{ route('admin.preguntas.index') }}" method="GET" class="cni-question-filters">
         <div class="cni-question-filters__selects">
             <label for="preguntas-categoria">Categoría
