@@ -921,7 +921,7 @@ body:has(.cni-alumno){background:#f8f9fe}
     }
 }
 
-/* Encuadre completo de las mascotas originales de Ciencias Básicas y Economía. */
+/* Encuadre de las mascotas originales de Ciencias Básicas y Economía. */
 .cni-alumno[data-area="B"] .cni-alumno-banner .cni-alumno-mascota,
 .cni-alumno[data-area="D"] .cni-alumno-banner .cni-alumno-mascota{
     object-fit:contain;
@@ -929,8 +929,10 @@ body:has(.cni-alumno){background:#f8f9fe}
 }
 @media(min-width:681px){
     .cni-alumno[data-area="D"] .cni-alumno-banner .cni-alumno-mascota{
-        top:12px;
-        height:calc(100% - 24px);
+        top:10px;
+        width:32%;
+        height:calc(100% + 80px);
+        object-position:center top;
     }
     .cni-alumno[data-area="B"] .cni-alumno-banner .cni-alumno-mascota{
         top:10px;
