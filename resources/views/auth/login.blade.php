@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=2">
+    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=3">
 @endpush
 
 @section('content')
