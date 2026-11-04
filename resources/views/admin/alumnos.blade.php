@@ -9,7 +9,7 @@
         <span>Descargar plantilla Excel<small>.xlsx · Lista para completar</small></span>
     </a>
     </div>
-    <p>Completa Usuario, Contraseña (8 a 72 caracteres), Apellidos, Nombres, Grado y Sección. Usa un usuario único (letras sin tildes, números, punto, guion o guion bajo). Se crearán cuentas de estudiante activas; las cuentas existentes no se modifican.</p>
+    <p>Completa Contraseña (8 a 72 caracteres), Apellidos, Nombres, Grado y Sección. El usuario se genera automáticamente con el primer nombre y primer apellido, sin tildes: <strong>José María Peña Huamán → Jose_Pena</strong>. Si ya está ocupado, se agrega un número: <strong>Jose_Pena_2</strong>.</p>
     <p>Conserva la hoja <strong>Alumnos</strong> y sus encabezados. Máximo 1000 alumnos y 5 MB por archivo. Las columnas tienen formato de texto para conservar ceros iniciales.</p>
     <p><strong>Grados y secciones disponibles:</strong>
         @forelse($secciones as $seccion)
@@ -50,6 +50,7 @@
                 </div>
             </div>
         </div>
+        <div id="cni-import-preview" class="cni-table-scroll" hidden></div>
         <p id="cni-import-message" class="cni-import-message" role="status" aria-live="polite" hidden></p>
         <noscript><p>Activa JavaScript para validar el archivo y confirmar su importación.</p></noscript>
     </form>
@@ -79,6 +80,7 @@
     const validate = document.getElementById('cni-import-validate');
     const confirm = document.getElementById('cni-import-confirm');
     const token = document.getElementById('cni-import-token');
+    const preview = document.getElementById('cni-import-preview');
     const message = document.getElementById('cni-import-message');
     let busy = false;
     let expires = null;
@@ -94,6 +96,8 @@
         token.value = '';
         confirm.disabled = true;
         validate.disabled = !file.files.length;
+        preview.replaceChildren();
+        preview.hidden = true;
         tell('');
     });
     validate.addEventListener('click', async () => {
@@ -105,6 +109,8 @@
         file.disabled = true;
         select.disabled = true;
         token.value = '';
+        preview.replaceChildren();
+        preview.hidden = true;
         tell('Validando archivo…');
         const data = new FormData();
         data.append('archivo', file.files[0]);
@@ -117,6 +123,24 @@
             if (!response.ok) {
                 throw new Error(result.errors?.archivo?.join('\n') || result.message || 'No se pudo validar el archivo.');
             }
+            const table = document.createElement('table');
+            table.className = 'cni-table';
+            const caption = table.createCaption();
+            caption.textContent = 'Usuarios que se crearán al confirmar';
+            const head = table.createTHead().insertRow();
+            for (const title of ['Apellidos', 'Nombres', 'Usuario']) {
+                const th = document.createElement('th');
+                th.scope = 'col';
+                th.textContent = title;
+                head.append(th);
+            }
+            const body = table.createTBody();
+            for (const alumno of result.usuarios) {
+                const row = body.insertRow();
+                for (const value of [alumno.apellidos, alumno.nombres, alumno.usuario]) row.insertCell().textContent = value;
+            }
+            preview.replaceChildren(table);
+            preview.hidden = false;
             token.value = result.validacion;
             confirm.disabled = false;
             let text = 'Archivo validado: ' + result.total + ' alumnos. Ya puedes confirmar la importación.';

@@ -75,9 +75,9 @@ class ImportarAlumnosExcelTest extends TestCase
         return new UploadedFile($ruta, 'alumnos.xlsx', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', null, true);
     }
 
-    private function fila(string $usuario = '00123456', string $seccion = 'A'): array
+    private function fila(string $nombres = 'José María', string $seccion = 'A'): array
     {
-        return [$usuario, 'ClaveAlumno2026!', 'Peña Huamán', 'José María', '5to', $seccion];
+        return ['ClaveAlumno2026!', 'Peña Huamán', $nombres, '5to', $seccion];
     }
 
     private function validar(UploadedFile $archivo): string
@@ -89,9 +89,9 @@ class ImportarAlumnosExcelTest extends TestCase
     {
         $archivo = $this->excel([$this->fila()], true);
         $token = $this->validar($archivo);
-        $this->assertDatabaseMissing('usuarios', ['usuario' => '00123456']);
+        $this->assertDatabaseMissing('usuarios', ['usuario' => 'Jose_Pena']);
         $this->post(route('admin.alumnos.cargar'), ['archivo' => $archivo, 'validacion' => $token])->assertRedirect(route('admin.alumnos.index'));
-        $alumno = Usuario::where('usuario', '00123456')->firstOrFail();
+        $alumno = Usuario::where('usuario', 'Jose_Pena')->firstOrFail();
         $this->assertSame('José María', $alumno->nombres);
         $this->assertSame('Peña Huamán', $alumno->apellidos);
         $this->assertSame($this->seccion->id, $alumno->seccion_id);
@@ -103,7 +103,7 @@ class ImportarAlumnosExcelTest extends TestCase
         $this->assertTrue($listado->contains('estudiante_id', $alumno->id));
         $this->get(route('admin.alumnos.index'))->assertOk()->assertSee('José María')->assertDontSee('ClaveAlumno2026!');
         $this->post('/logout');
-        $this->post('/login', ['usuario' => '00123456', 'password' => 'ClaveAlumno2026!'])->assertRedirect(route('alumno.elegir-area'));
+        $this->post('/login', ['usuario' => 'Jose_Pena', 'password' => 'ClaveAlumno2026!'])->assertRedirect(route('alumno.elegir-area'));
         $this->assertAuthenticatedAs($alumno, 'web');
     }
 
@@ -122,17 +122,19 @@ class ImportarAlumnosExcelTest extends TestCase
 
     public function test_rechaza_duplicados_del_archivo_y_cuentas_existentes_sin_modificarlas(): void
     {
-        $archivo = $this->excel([$this->fila('repetido'), $this->fila('REPETIDO')]);
+        $archivo = $this->excel([$this->fila(), $this->fila()]);
         $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])->assertUnprocessable()->assertJsonValidationErrors('archivo');
-        $archivo = $this->excel([$this->fila('ADMINISTRADOR')]);
+        $existente = $this->cuenta('Jose_Pena', 'estudiante');
+        $existente->update(['nombres' => 'José María', 'apellidos' => 'Peña Huamán']);
+        $archivo = $this->excel([$this->fila()]);
         $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])->assertUnprocessable();
         $this->assertSame('admin', $this->admin->fresh()->rol);
-        $this->assertDatabaseCount('usuarios', 1);
+        $this->assertDatabaseCount('usuarios', 2);
     }
 
     public function test_rechaza_filas_incompletas_secciones_inexistentes_inactivas_y_plantilla_vacia(): void
     {
-        foreach ([[], [$this->fila('nuevo', 'Z')], [['nuevo', 'corta', '', 'Ana', '5to', 'A']]] as $filas) {
+        foreach ([[], [$this->fila('nuevo', 'Z')], [['corta', '', 'Ana', '5to', 'A']]] as $filas) {
             $this->postJson(route('admin.alumnos.validar'), ['archivo' => $this->excel($filas)])->assertUnprocessable()->assertJsonValidationErrors('archivo');
         }
         $this->seccion->update(['activo' => false]);
@@ -142,12 +144,12 @@ class ImportarAlumnosExcelTest extends TestCase
 
     public function test_confirmacion_revalida_todo_y_no_deja_una_importacion_parcial(): void
     {
-        $archivo = $this->excel([$this->fila('nuevo'), $this->fila('ocupado')]);
+        $archivo = $this->excel([$this->fila('Ana'), $this->fila('Juan')]);
         $respuesta = $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])->assertOk();
-        $this->cuenta('ocupado', 'docente');
+        $this->cuenta('Juan_Pena', 'docente');
         $this->postJson(route('admin.alumnos.cargar'), ['archivo' => $archivo, 'validacion' => $respuesta->json('validacion')])->assertUnprocessable();
-        $this->assertDatabaseMissing('usuarios', ['usuario' => 'nuevo']);
-        $this->assertDatabaseHas('usuarios', ['usuario' => 'ocupado', 'rol' => 'docente']);
+        $this->assertDatabaseMissing('usuarios', ['usuario' => 'Ana_Pena']);
+        $this->assertDatabaseHas('usuarios', ['usuario' => 'Juan_Pena', 'rol' => 'docente']);
     }
 
     public function test_no_permite_importar_sin_validar_ni_cambiar_el_archivo_o_el_usuario(): void
@@ -159,7 +161,7 @@ class ImportarAlumnosExcelTest extends TestCase
         $this->postJson(route('admin.alumnos.cargar'), ['archivo' => $otro, 'validacion' => $token])->assertUnprocessable();
         $this->actingAs($this->cuenta('otro_admin', 'admin'), 'web');
         $this->postJson(route('admin.alumnos.cargar'), ['archivo' => $archivo, 'validacion' => $token])->assertUnprocessable();
-        $this->assertDatabaseMissing('usuarios', ['usuario' => '00123456']);
+        $this->assertDatabaseMissing('usuarios', ['usuario' => 'Jose_Pena']);
     }
 
     public function test_validacion_vencida_y_seccion_desactivada_despues_de_validar_no_importan(): void
@@ -173,4 +175,27 @@ class ImportarAlumnosExcelTest extends TestCase
         $this->postJson(route('admin.alumnos.cargar'), ['archivo' => $archivo, 'validacion' => $token])->assertUnprocessable();
         $this->assertDatabaseCount('usuarios', 1);
     }
+    public function test_genera_nombre_apellido_y_sufijos_sin_modificar_cuentas_existentes(): void
+    {
+        $ocupado = $this->cuenta('JOSE_PENA', 'docente');
+        $archivo = $this->excel([$this->fila(), $this->fila('José Luis')]);
+        $respuesta = $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])
+            ->assertOk()->assertJsonPath('usuarios.0.usuario', 'Jose_Pena_2')->assertJsonPath('usuarios.1.usuario', 'Jose_Pena_3');
+        $this->post(route('admin.alumnos.cargar'), ['archivo' => $archivo, 'validacion' => $respuesta->json('validacion')])->assertRedirect(route('admin.alumnos.index'));
+        $this->assertDatabaseHas('usuarios', ['usuario' => 'Jose_Pena_2', 'nombres' => 'José María']);
+        $this->assertDatabaseHas('usuarios', ['usuario' => 'Jose_Pena_3', 'nombres' => 'José Luis']);
+        $this->assertSame('docente', $ocupado->fresh()->rol);
+        $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])->assertUnprocessable();
+        $this->assertDatabaseCount('usuarios', 4);
+    }
+
+    public function test_la_plantilla_ya_no_pide_usuario_y_los_nombres_invalidos_no_crean_cuentas(): void
+    {
+        $archivo = $this->excel([$this->fila('12345')]);
+        $filas = app(LectorAlumnosExcel::class)->leer($archivo->getRealPath());
+        $this->assertArrayNotHasKey('usuario', $filas[0]);
+        $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])->assertUnprocessable();
+        $this->assertDatabaseCount('usuarios', 1);
+    }
+
 }

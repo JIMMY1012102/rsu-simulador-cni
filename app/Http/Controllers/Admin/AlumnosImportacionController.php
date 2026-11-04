@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 
@@ -40,10 +41,12 @@ class AlumnosImportacionController extends Controller
             throw ValidationException::withMessages(['archivo' => $e instanceof \RuntimeException ? $e->getMessage() : 'Revisa la estructura y la hoja Alumnos del Excel.']);
         }
         $vistos = [];
+        $identidades = [];
         $errores = [];
         foreach ($filas as &$fila) {
+            $fila['nombres'] = Str::squish($fila['nombres']);
+            $fila['apellidos'] = Str::squish($fila['apellidos']);
             $validacion = Validator::make($fila, [
-                'usuario' => ['required', 'string', 'max:50', 'regex:/^[A-Za-z0-9._-]+$/'],
                 'contrasena' => ['required', 'string', 'min:8', 'max:72'],
                 'apellidos' => ['required', 'string', 'max:100'],
                 'nombres' => ['required', 'string', 'max:100'],
@@ -53,20 +56,38 @@ class AlumnosImportacionController extends Controller
             foreach ($validacion->errors()->all() as $mensaje) {
                 $errores[] = 'Fila '.$fila['fila'].': '.$mensaje;
             }
-            // Normaliza para bloquear duplicados también en bases con colación insensible a mayúsculas.
-            $clave = mb_strtolower($fila['usuario']);
-            if (isset($vistos[$clave])) {
-                $errores[] = 'Fila '.$fila['fila'].': usuario repetido en el archivo.';
+            $parte = static function (string $valor): string {
+                $primero = preg_split('/\s+/u', trim($valor))[0] ?? '';
+                return ucfirst(strtolower(preg_replace('/[^a-zA-Z]/', '', Str::ascii($primero))));
+            };
+            $nombre = $parte($fila['nombres']);
+            $apellido = $parte($fila['apellidos']);
+            if ($nombre === '' || $apellido === '') {
+                $errores[] = 'Fila '.$fila['fila'].': nombres y apellidos deben contener letras para generar el usuario.';
             }
-            $vistos[$clave] = true;
-            if (Usuario::whereRaw('LOWER(usuario) = ?', [$clave])->exists()) {
-                $errores[] = 'Fila '.$fila['fila'].': el usuario ya existe. No se modifican cuentas existentes.';
+            $base = substr($nombre, 0, 24).'_'.substr($apellido, 0, 24);
+            $usuario = $base;
+            $numero = 2;
+            while (isset($vistos[strtolower($usuario)]) || Usuario::whereRaw('LOWER(usuario) = ?', [strtolower($usuario)])->exists()) {
+                $sufijo = '_'.$numero++;
+                $usuario = substr($base, 0, 50 - strlen($sufijo)).$sufijo;
             }
+            $vistos[strtolower($usuario)] = true;
+            $fila['usuario'] = $usuario;
             $seccion = Seccion::where('grado', $fila['grado'])->where('nombre', $fila['seccion'])->where('activo', true)->first();
             if (!$seccion) {
                 $errores[] = 'Fila '.$fila['fila'].': grado y sección no corresponden a una sección activa. Revisa la lista disponible.';
             }
             $fila['seccion_id'] = $seccion?->id;
+            $nombres = Str::lower(Str::squish($fila['nombres']));
+            $apellidos = Str::lower(Str::squish($fila['apellidos']));
+            $identidad = json_encode([$nombres, $apellidos, $fila['seccion_id']]);
+            $existente = $seccion && Usuario::where('rol', 'estudiante')->where('seccion_id', $seccion->id)
+                ->whereRaw('LOWER(nombres) = ?', [$nombres])->whereRaw('LOWER(apellidos) = ?', [$apellidos])->exists();
+            if (isset($identidades[$identidad]) || $existente) {
+                $errores[] = 'Fila '.$fila['fila'].': ya hay un alumno con los mismos nombres y apellidos en esta sección. Revisa el registro para evitar duplicados.';
+            }
+            $identidades[$identidad] = true;
         }
         unset($fila);
         if ($errores) {
@@ -80,11 +101,13 @@ class AlumnosImportacionController extends Controller
         $filas = $this->revisar($request, $lector);
         return response()->json([
             'total' => count($filas),
+            'usuarios' => array_map(fn ($fila) => ['nombres' => $fila['nombres'], 'apellidos' => $fila['apellidos'], 'usuario' => $fila['usuario']], $filas),
             'validacion' => Crypt::encryptString(json_encode([
                 'proposito' => 'importar-alumnos',
                 'usuario' => $request->user('web')->id,
                 'hash' => hash_file('sha256', $request->file('archivo')->getRealPath()),
                 'vence' => now()->addMinutes(15)->timestamp,
+                'usuarios' => array_column($filas, 'usuario'),
             ], JSON_THROW_ON_ERROR)),
         ]);
     }
@@ -105,8 +128,11 @@ class AlumnosImportacionController extends Controller
             throw ValidationException::withMessages(['archivo' => 'Valida el archivo seleccionado antes de confirmar la importación.']);
         }
         try {
-            $total = DB::transaction(function () use ($request, $lector) {
+            $total = DB::transaction(function () use ($request, $lector, $token) {
                 $filas = $this->revisar($request, $lector);
+                if (($token['usuarios'] ?? []) !== array_column($filas, 'usuario')) {
+                    throw ValidationException::withMessages(['archivo' => 'Los usuarios disponibles cambiaron. Valida nuevamente para revisar los nombres de usuario.']);
+                }
                 // Mantiene activas las secciones durante toda la inserción.
                 $ids = array_unique(array_column($filas, 'seccion_id'));
                 if (Seccion::whereIn('id', $ids)->where('activo', true)->lockForUpdate()->get()->count() !== count($ids)) {
