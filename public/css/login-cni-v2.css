@@ -1,551 +1,494 @@
-/*
- * Simulador CNI · Login institucional v5.
- * Layout estructurado: texto y mascota NO comparten espacio.
- * Se usan las imágenes originales del repositorio.
- */
+/* LOGIN CNI — Estilo visual basado en la maqueta aprobada.
+   Reglas encapsuladas, sin capas sucesivas de overrides. */
+
 .login-screen .login-cni-v2 {
-    --login-gold: #f8cc61;
-    position: relative;
-    isolation: isolate;
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(365px, 480px);
-    align-items: center;
-    gap: clamp(24px, 3.5vw, 68px);
-    width: 100%;
-    min-height: 100vh;
-    min-height: 100svh;
-    height: auto;
-    padding: clamp(17px, 3vh, 38px) clamp(25px, 4.2vw, 82px);
-    background: #051b44;
-    overflow: hidden;
+  --cni-oro: #f8ce61;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 505px);
+  align-items: center;
+  gap: clamp(22px, 2.8vw, 44px);
+  width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: clamp(16px, 3vh, 40px) clamp(24px, 4vw, 76px);
+  overflow: hidden;
+  background: #031b44;
 }
 .login-cni-v2 .login-background {
-    position: absolute;
-    z-index: -1;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    pointer-events: none;
-    user-select: none;
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  pointer-events: none;
 }
-
-/* Columna de presentación: un encabezado en flujo + una zona de ilustración separada. */
 .login-cni-v2 .login-presentation {
-    position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    align-self: center;
-    justify-content: flex-start;
-    flex: none;
-    width: 100%;
-    max-width: none;
-    height: clamp(475px, calc(100svh - 48px), 610px);
-    min-height: 0;
-    margin: 0;
-    padding: 14px 0 0;
-    text-align: left;
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  align-self: center;
+  flex: none;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  height: clamp(500px, calc(100svh - 40px), 790px);
+  min-height: 0;
+  margin: 0;
+  padding: clamp(12px, 3.5vh, 40px) 0 0;
+  text-align: left;
 }
 .login-cni-v2 .login-presentation-copy {
-    position: relative;
-    z-index: 3;
-    flex: 0 0 auto;
-    width: 100%;
-    max-width: 680px;
-    margin: 0;
-    padding: 0;
-    transform: none;
+  position: relative;
+  z-index: 5;
+  flex: 0 0 auto;
+  max-width: 640px;
+  margin: 0;
+  padding: 0;
+  transform: none;
 }
 .login-cni-v2 .login-pretitle {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 0 0 14px;
-    color: #d5e9ff;
-    font-size: .72rem;
-    font-weight: 800;
-    letter-spacing: .16em;
-    line-height: 1.3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 clamp(12px, 1.7vh, 19px);
+  font-size: .72rem;
+  line-height: 1.3;
+  font-weight: 850;
+  letter-spacing: .17em;
+  color: #e5f0ff;
 }
 .login-cni-v2 .login-pretitle span {
-    flex: 0 0 22px;
-    height: 3px;
-    width: 22px;
-    border-radius: 4px;
-    background: var(--login-gold);
+  flex: 0 0 23px;
+  height: 3px;
+  border-radius: 4px;
+  background: var(--cni-oro);
 }
 .login-cni-v2 .login-heading {
-    max-width: 700px;
-    margin: 0;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: clamp(2.6rem, 4.18vw, 4.2rem);
-    line-height: 1.075;
-    font-weight: 700;
-    letter-spacing: -.035em;
-    color: #fff;
-    text-shadow: 0 3px 14px #00102d77;
+  max-width: none;
+  margin: 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 4.3vw, 4.55rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -.035em;
+  text-shadow: 0 3px 18px #00153794;
 }
 .login-cni-v2 .login-heading > span { display: block; }
 .login-cni-v2 .login-heading em {
-    color: #ffdc70;
-    font-weight: inherit;
-    font-style: italic;
+  color: #ffdc6d;
+  font-style: italic;
+  font-weight: inherit;
 }
 .login-cni-v2 .login-presentation-subtitle {
-    max-width: 575px;
-    margin: 13px 0 0;
-    color: #e0efff;
-    font-size: clamp(.81rem, 1.03vw, .96rem);
-    line-height: 1.5;
+  max-width: 550px;
+  margin: 12px 0 0;
+  color: #e1efff;
+  font-size: .92rem;
+  line-height: 1.55;
 }
 .login-cni-v2 .login-presentation-copy::after {
-    display: none;
+  content: "";
+  display: block;
+  width: min(300px, 47%);
+  height: 13px;
+  margin: 11px 0 0 25%;
+  border-top: 3px solid #ffd36d;
+  border-radius: 75% 55% 0 0;
+  transform: rotate(-3deg);
 }
 
-/* Única zona ilustrada: no puede subir encima del titular. */
+/* Campus y personaje están en una región propia, debajo del titular. */
 .login-cni-v2 .login-illustration {
-    position: relative;
-    z-index: 1;
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 0;
-    min-height: 0;
-    margin-top: 7px;
-    border-radius: 24px;
-    overflow: hidden;
-    pointer-events: none;
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  width: 100%;
+  margin-top: 4px;
+  overflow: visible;
+  pointer-events: none;
+}
+.login-cni-v2 .login-illustration::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 3%;
+  right: 3%;
+  bottom: 0;
+  height: 73%;
+  background: radial-gradient(ellipse at 49% 75%, #057bde7d, #074d9b26 53%, transparent 77%);
+  pointer-events: none;
 }
 .login-cni-v2 .login-campus {
-    position: absolute;
-    z-index: 0;
-    bottom: 0;
-    left: 13%;
-    width: 80%;
-    height: 88%;
-    opacity: .13;
-    filter: blur(.65px);
-    overflow: hidden;
-    pointer-events: none;
+  position: absolute;
+  z-index: 1;
+  left: 50%;
+  bottom: 1%;
+  display: block;
+  width: min(112%, 930px);
+  height: 99%;
+  transform: translateX(-50%);
+  opacity: .58;
+  object-fit: contain;
+  object-position: bottom center;
+  overflow: visible;
 }
-.login-cni-v2 .login-campus svg {
-    display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: bottom center;
+.login-cni-v2 .login-gold-stage {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: 0;
+  width: min(87%, 650px);
+  height: clamp(33px, 6.9vw, 64px);
+  transform: translateX(-50%);
+  border: 3px solid #ffe28c;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #0b7dda75, #06296199 62%, #071e4930 75%);
+  box-shadow: 0 0 20px #ffce6ba6, 0 0 42px #157fdd7d,
+              inset 0 0 17px #fff5b085;
+  pointer-events: none;
 }
-.login-cni-v2 .login-mascot-scene {
-    position: absolute;
-    z-index: 2;
-    inset: 0;
-    display: block;
-    width: 100%;
-    height: 100%;
-    margin: 0;
-    transform: none;
-    pointer-events: none;
+.login-cni-v2 .login-mascot {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  bottom: 9px;
+  display: block;
+  width: auto;
+  height: min(101%, 540px);
+  max-width: min(88%, 600px);
+  max-height: 101%;
+  object-fit: contain;
+  object-position: bottom center;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 12px 19px #00102b9c);
+  pointer-events: none;
+  user-select: none;
 }
+/* Los antiguos recursos de escenario no se muestran: el aro dorado es CSS. */
+.login-cni-v2 .login-mascot-scene,
 .login-cni-v2 .login-mascot-seat,
 .login-cni-v2 .login-mascot-glow,
-.login-cni-v2 .login-mascot {
-    position: absolute;
-    display: block;
-    user-select: none;
-    pointer-events: none;
-}
-.login-cni-v2 .login-mascot-seat {
-    z-index: 1;
-    left: 50%;
-    bottom: -12px;
-    width: min(76%, 540px);
-    opacity: .84;
-    height: auto;
-    transform: translateX(-50%);
-}
-.login-cni-v2 .login-mascot-glow {
-    z-index: 2;
-    left: 50%;
-    bottom: 0;
-    width: min(62%, 410px);
-    opacity: .48;
-    height: auto;
-    transform: translateX(-50%);
-}
-.login-cni-v2 .login-mascot-scene::after { display: none; }
-.login-cni-v2 .login-mascot {
-    z-index: 3;
-    left: 50%;
-    bottom: 0;
-    width: auto;
-    height: min(98%, 425px);
-    max-height: 100%;
-    max-width: 66%;
-    object-fit: contain;
-    object-position: bottom center;
-    transform: translateX(-50%);
-    filter: drop-shadow(0 11px 20px #00163985);
-}
 .login-cni-v2 .login-presentation-footer { display: none; }
 
-/* Tarjeta centrada: ajustes visuales, pero la autenticación sigue intacta. */
+/* Tarjeta blanca con borde fino dorado — lado derecho. */
 .login-cni-v2 .login.card {
-    position: relative;
-    z-index: 3;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    justify-content: center;
-    flex: none;
-    width: 100%;
-    max-width: 480px;
-    min-width: 0;
-    margin: 0;
-    padding: clamp(19px, 3vh, 32px) clamp(26px, 3vw, 42px);
-    border: 2px solid var(--login-gold);
-    border-radius: 28px;
-    background: linear-gradient(145deg, #fff 0%, #f9fbff 100%);
-    box-shadow: 0 26px 63px #00122a99;
+  position: relative;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: stretch;
+  flex: none;
+  width: 100%;
+  max-width: 505px;
+  min-width: 0;
+  min-height: min(720px, calc(100svh - 45px));
+  margin: 0;
+  padding: clamp(22px, 3.4vh, 42px) clamp(30px, 3.4vw, 48px);
+  border: 2px solid var(--cni-oro);
+  border-radius: 31px;
+  background: linear-gradient(145deg, #ffffff, #fbfcff 65%, #f0f4ff);
+  box-shadow: 0 25px 65px #00102f9e, 0 0 0 5px #f6ce6212;
 }
 .login-cni-v2 .login-school-identity { text-align: center; }
 .login-cni-v2 .login-school-mark {
-    display: block;
-    width: clamp(86px, 10vh, 115px);
-    height: clamp(86px, 10vh, 115px);
-    margin: 0 auto 8px;
-    object-fit: contain;
+  display: block;
+  width: clamp(95px, 13vh, 145px);
+  height: clamp(95px, 13vh, 145px);
+  margin: 0 auto clamp(9px, 1.5vh, 15px);
+  object-fit: contain;
 }
 .login-cni-v2 .login-form-kicker {
-    margin: 0;
-    color: #09529e;
-    font-size: .68rem;
-    font-weight: 850;
-    letter-spacing: .12em;
-    line-height: 1.4;
-    text-align: center;
+  margin: 0;
+  color: #063c85;
+  font-size: .78rem;
+  line-height: 1.4;
+  font-weight: 850;
+  letter-spacing: .13em;
+  text-align: center;
 }
 .login-cni-v2 .login-title-ornament {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    margin: 9px 0;
-    color: #c49222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: clamp(12px, 1.7vh, 19px) 0;
+  color: #ca982a;
 }
 .login-cni-v2 .login-title-ornament span {
-    width: 48px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #e7b74e);
+  width: 62px;
+  height: 1.5px;
+  background: linear-gradient(90deg, transparent, #e1b54d);
 }
 .login-cni-v2 .login-title-ornament span:last-child { transform: rotate(180deg); }
-.login-cni-v2 .login-title-ornament svg { width: 22px; height: 22px; }
 .login-cni-v2 .login > h1 {
-    width: 100%;
-    max-width: none;
-    margin: 0 auto 8px;
-    color: #0c3062;
-    font-size: clamp(1.24rem, 1.75vw, 1.56rem);
-    font-weight: 850;
-    line-height: 1.19;
-    letter-spacing: -.023em;
-    text-align: center;
+  max-width: none;
+  margin: 0 auto 12px;
+  color: #123768;
+  font-size: clamp(1.28rem, 1.78vw, 1.67rem);
+  line-height: 1.15;
+  font-weight: 850;
+  letter-spacing: -.027em;
+  text-align: center;
 }
-.login-cni-v2 .login > h1 span { color: #065db6; }
+.login-cni-v2 .login > h1 span { color: #0659b0; }
 .login-cni-v2 .login-instructions {
-    max-width: 420px;
-    margin: 0 auto 17px;
-    color: #60758f;
-    font-size: .83rem;
-    line-height: 1.45;
-    text-align: center;
+  max-width: 420px;
+  margin: 0 auto clamp(17px, 2.4vh, 24px);
+  color: #62748c;
+  font-size: .89rem;
+  line-height: 1.46;
+  text-align: center;
 }
 .login-cni-v2 .login form {
-    width: 100%;
-    max-width: none;
-    margin: 0;
+  width: 100%;
+  max-width: none;
+  margin: 0;
 }
-.login-cni-v2 .login-form-field + .login-form-field { margin-top: 12px; }
+.login-cni-v2 .login-form-field + .login-form-field { margin-top: clamp(14px, 2vh, 19px); }
 .login-cni-v2 .login-form-field label {
-    display: block;
-    margin: 0 0 6px;
-    color: #153865;
-    font-size: .85rem;
-    font-weight: 760;
+  display: block;
+  margin: 0 0 7px;
+  color: #113763;
+  font-size: .95rem;
+  font-weight: 780;
 }
 .login-cni-v2 .login-input-shell {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    min-height: 48px;
-    padding: 0 12px;
-    border: 1px solid #a4c1e8;
-    border-radius: 11px;
-    background: #fff;
-    box-shadow: 0 2px 7px #123c7010;
-    transition: border-color .18s, box-shadow .18s;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 13px;
+  border: 1px solid #9ebdee;
+  border-radius: 11px;
+  background: #fff;
+  box-shadow: 0 3px 9px #0c3e6c0d;
+  transition: box-shadow .17s, border-color .17s;
 }
-.login-cni-v2 .login-input-shell:hover { border-color: #639bda; }
 .login-cni-v2 .login-input-shell:focus-within {
-    border-color: #1474d1;
-    box-shadow: 0 0 0 3px #1c86df23;
+  border-color: #1770d4;
+  box-shadow: 0 0 0 3px #2e83e52b;
 }
-.login-cni-v2 .login-input-shell.is-invalid { border-color: #c65060; }
+.login-cni-v2 .login-input-shell.is-invalid { border-color: #c64b58; }
 .login-cni-v2 .login-input-shell > svg {
-    flex: 0 0 19px;
-    width: 19px;
-    height: 19px;
-    color: #58779e;
+  flex: 0 0 21px;
+  width: 21px;
+  height: 21px;
+  color: #4a6f9c;
 }
 .login-cni-v2 .login-input-shell input {
-    flex: 1 1 auto;
-    width: 100%;
-    min-width: 0;
-    min-height: 46px;
-    margin: 0;
-    padding: 10px 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: #123760;
-    font-size: .91rem;
-    box-shadow: none;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  min-height: 49px;
+  margin: 0;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: .97rem;
+  color: #153665;
+  box-shadow: none;
 }
-.login-cni-v2 .login-input-shell input:focus {
-    outline: 0;
-    border: 0;
-    box-shadow: none;
-}
-.login-cni-v2 .login-input-shell input::placeholder { color: #8a9ab0; }
+.login-cni-v2 .login-input-shell input:focus { border: 0; outline: 0; box-shadow: none; }
+.login-cni-v2 .login-input-shell input::placeholder { color: #8294ae; }
 .login-cni-v2 .login-password-toggle {
-    display: grid;
-    place-items: center;
-    flex: 0 0 36px;
-    width: 36px;
-    height: 36px;
-    padding: 7px;
-    border: 0;
-    border-radius: 8px;
-    color: #4e6e93;
-    background: transparent;
+  display: grid;
+  place-items: center;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  padding: 7px;
+  border: 0;
+  border-radius: 8px;
+  color: #4e7099;
+  background: transparent;
 }
-.login-cni-v2 .login-password-toggle:hover { color: #0757ae; background: #eaf2ff; }
+.login-cni-v2 .login-password-toggle:hover { color: #0754aa; background: #eaf1ff; }
 .login-cni-v2 .login-password-toggle svg { width: 22px; height: 22px; }
-.login-cni-v2 .login-field-error {
-    margin: 5px 0 0;
-    font-size: .78rem;
-    color: #ac3440;
-}
+.login-cni-v2 .login-field-error { margin: 5px 0 0; font-size: .8rem; color: #b23542; }
 .login-cni-v2 .login .login-submit {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    min-height: 50px;
-    margin: 19px 0 0;
-    padding: 10px 14px;
-    border: 1px solid #eabf48;
-    border-radius: 11px;
-    background: linear-gradient(180deg, #146dd5, #093575);
-    box-shadow: 0 8px 20px #073b8844;
-    color: #fff;
-    font-size: .97rem;
-    font-weight: 800;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 54px;
+  margin: clamp(24px, 3.5vh, 37px) 0 0;
+  padding: 11px;
+  border: 1.5px solid #edc64c;
+  border-radius: 11px;
+  color: #fff;
+  background: linear-gradient(180deg, #086bdb, #072c70);
+  box-shadow: 0 10px 24px #073b8e48;
+  font-size: 1.04rem;
+  font-weight: 800;
 }
-.login-cni-v2 .login .login-submit:hover { background: linear-gradient(180deg, #167ee6, #06498e); }
-.login-cni-v2 .login .login-submit svg { width: 20px; height: 20px; }
+.login-cni-v2 .login .login-submit:hover { background: linear-gradient(180deg, #0e7beb, #06438c); }
+.login-cni-v2 .login .login-submit svg { width: 23px; height: 23px; }
 .login-cni-v2 .login .login-submit:focus-visible,
 .login-cni-v2 .login-password-toggle:focus-visible {
-    outline: 3px solid #efba3c;
-    outline-offset: 2px;
+  outline: 3px solid #e3b33d;
+  outline-offset: 3px;
 }
 .login-cni-v2 .login-security-note {
-    margin: 11px 0 0;
-    color: #6a7e98;
-    font-size: .73rem;
-    text-align: center;
+  margin: 13px 0 0;
+  color: #687f9c;
+  font-size: .72rem;
+  text-align: center;
 }
-.login-cni-v2 .login-security-note span { margin-right: 4px; color: #20a27e; }
+.login-cni-v2 .login-security-note span { color: #1a9e75; margin-right: 4px; }
 
-/* Pantallas bajas de escritorio: compactar, no superponer. */
-@media (min-width: 1041px) and (max-height: 720px) {
-    .login-screen .login-cni-v2 { padding-top: 15px; padding-bottom: 15px; }
-    .login-cni-v2 .login-presentation {
-        height: calc(100svh - 40px);
-        padding-top: 6px;
-    }
-    .login-cni-v2 .login-pretitle { margin-bottom: 9px; }
-    .login-cni-v2 .login-heading { font-size: clamp(2.65rem, 4.1vw, 3.9rem); }
-    .login-cni-v2 .login-presentation-subtitle { margin-top: 9px; }
-    .login-cni-v2 .login-school-mark { width: 82px; height: 82px; margin-bottom: 5px; }
-    .login-cni-v2 .login.card { padding-top: 17px; padding-bottom: 17px; }
-    .login-cni-v2 .login-title-ornament { margin: 6px 0; }
-    .login-cni-v2 .login-instructions { margin-bottom: 12px; }
-    .login-cni-v2 .login-form-field + .login-form-field { margin-top: 9px; }
-    .login-cni-v2 .login .login-submit { margin-top: 14px; }
-    .login-cni-v2 .login-security-note { margin-top: 8px; }
+/* Laptop con poca altura: todo sigue legible; se reduce aire vertical.
+   El resultado horizontal sigue siendo de dos columnas. */
+@media (min-width: 1041px) and (max-height: 700px) {
+  .login-screen .login-cni-v2 { padding-block: 13px; }
+  .login-cni-v2 .login-presentation { height: calc(100svh - 30px); padding-top: 6px; }
+  .login-cni-v2 .login-pretitle { margin-bottom: 9px; }
+  .login-cni-v2 .login-heading { font-size: clamp(2.75rem, 4.1vw, 3.8rem); }
+  .login-cni-v2 .login-presentation-subtitle { margin-top: 8px; }
+  .login-cni-v2 .login-presentation-copy::after { margin-top: 7px; height: 8px; }
+  .login-cni-v2 .login.card { padding-block: 17px; }
+  .login-cni-v2 .login-school-mark { width: 90px; height: 90px; margin-bottom: 6px; }
+  .login-cni-v2 .login-title-ornament { margin: 8px 0; }
+  .login-cni-v2 .login > h1 { margin-bottom: 8px; }
+  .login-cni-v2 .login-instructions { margin-bottom: 12px; font-size: .81rem; }
+  .login-cni-v2 .login-form-field + .login-form-field { margin-top: 10px; }
+  .login-cni-v2 .login-form-field label { font-size: .85rem; margin-bottom: 5px; }
+  .login-cni-v2 .login-input-shell { min-height: 46px; }
+  .login-cni-v2 .login-input-shell input { min-height: 44px; }
+  .login-cni-v2 .login .login-submit { min-height: 48px; margin-top: 15px; }
+  .login-cni-v2 .login-security-note { margin-top: 8px; }
 }
-@media (min-width: 1041px) and (max-width: 1260px) {
-    .login-screen .login-cni-v2 {
-        grid-template-columns: minmax(0,1fr) minmax(350px, 450px);
-        gap: 24px;
-        padding-left: 30px;
-        padding-right: 30px;
-    }
-    .login-cni-v2 .login-heading { font-size: clamp(2.55rem, 4vw, 3.65rem); }
-    .login-cni-v2 .login.card { padding-inline: 27px; }
-    .login-cni-v2 .login > h1 { font-size: 1.3rem; }
+@media (min-width: 1041px) and (max-width: 1240px) {
+  .login-screen .login-cni-v2 {
+    grid-template-columns: minmax(0, 1fr) minmax(365px, 450px);
+    gap: 24px;
+    padding-inline: 28px;
+  }
+  .login-cni-v2 .login-heading { font-size: clamp(2.5rem, 4vw, 3.75rem); }
+  .login-cni-v2 .login.card { padding-inline: 27px; }
+  .login-cni-v2 .login > h1 { font-size: 1.35rem; }
 }
 
-/* Tablet: título y gatito en una cabecera pequeña, formulario inmediatamente debajo. */
+/* Tablet: cabecera compacta, gato a la derecha y formulario debajo. */
 @media (max-width: 1040px) {
-    .login-screen .login-cni-v2 {
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        align-items: center;
-        gap: 11px;
-        min-height: 100svh;
-        height: auto;
-        padding: 16px 18px 30px;
-        overflow: visible;
-    }
-    .login-cni-v2 .login-presentation {
-        position: relative;
-        display: block;
-        align-self: auto;
-        flex: 0 0 auto;
-        width: min(100%, 720px);
-        max-width: 720px;
-        height: 165px;
-        min-height: 0;
-        margin: 0;
-        padding: 4px 0 0;
-    }
-    .login-cni-v2 .login-presentation-copy {
-        position: relative;
-        z-index: 3;
-        width: calc(100% - 160px);
-        max-width: none;
-        padding: 0;
-        transform: none;
-    }
-    .login-cni-v2 .login-pretitle { font-size: .64rem; letter-spacing: .07em; margin-bottom: 8px; }
-    .login-cni-v2 .login-heading { font-size: clamp(1.85rem, 4.55vw, 2.6rem); line-height: 1.05; }
-    .login-cni-v2 .login-presentation-subtitle { font-size: .78rem; margin-top: 8px; }
-    .login-cni-v2 .login-illustration {
-        position: absolute;
-        z-index: 1;
-        top: 0;
-        right: 0;
-        bottom: auto;
-        width: 150px;
-        height: 165px;
-        min-height: 0;
-        margin: 0;
-        overflow: hidden;
-    }
-    .login-cni-v2 .login-campus,
-    .login-cni-v2 .login-mascot-seat,
-    .login-cni-v2 .login-mascot-glow { display: none; }
-    .login-cni-v2 .login-mascot-scene { inset: 0; width: 100%; height: 100%; }
-    .login-cni-v2 .login-mascot {
-        left: 50%;
-        bottom: 0;
-        width: auto;
-        height: 100%;
-        max-width: 100%;
-        max-height: 100%;
-        transform: translateX(-50%);
-    }
-    .login-cni-v2 .login.card {
-        align-self: center;
-        width: min(100%, 520px);
-        max-width: 520px;
-        margin: 0;
-        padding: 17px 28px;
-        border-radius: 23px;
-    }
-    .login-cni-v2 .login-school-mark { width: 72px; height: 72px; margin-bottom: 4px; }
-    .login-cni-v2 .login-title-ornament { margin: 6px 0; }
-    .login-cni-v2 .login-title-ornament svg { width: 19px; height: 19px; }
-    .login-cni-v2 .login > h1 { font-size: 1.41rem; margin-bottom: 5px; }
-    .login-cni-v2 .login-instructions { margin-bottom: 11px; font-size: .79rem; }
-    .login-cni-v2 .login-form-field + .login-form-field { margin-top: 10px; }
-    .login-cni-v2 .login-form-field label { margin-bottom: 4px; }
-    .login-cni-v2 .login-input-shell { min-height: 45px; }
-    .login-cni-v2 .login-input-shell input { min-height: 43px; }
-    .login-cni-v2 .login .login-submit { min-height: 46px; margin-top: 12px; }
-    .login-cni-v2 .login-security-note { margin-top: 8px; }
+  .login-screen .login-cni-v2 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 20px 18px 34px;
+    overflow: visible;
+  }
+  .login-cni-v2 .login-presentation {
+    display: flex;
+    flex-direction: row;
+    align-self: center;
+    align-items: center;
+    flex: none;
+    width: min(100%, 740px);
+    max-width: 740px;
+    height: 195px;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+  }
+  .login-cni-v2 .login-presentation-copy {
+    flex: 1 1 0%;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    padding-right: 13px;
+  }
+  .login-cni-v2 .login-pretitle { font-size: .62rem; letter-spacing: .07em; margin-bottom: 9px; }
+  .login-cni-v2 .login-heading { font-size: clamp(2rem, 4.2vw, 2.65rem); }
+  .login-cni-v2 .login-presentation-subtitle { font-size: .77rem; margin-top: 9px; }
+  .login-cni-v2 .login-presentation-copy::after { display: none; }
+  .login-cni-v2 .login-illustration {
+    flex: 0 0 195px;
+    width: 195px;
+    height: 195px;
+    margin: 0;
+    overflow: hidden;
+  }
+  .login-cni-v2 .login-illustration::before { display: none; }
+  .login-cni-v2 .login-campus { display: none; }
+  .login-cni-v2 .login-gold-stage { display: none; }
+  .login-cni-v2 .login-mascot {
+    height: 100%;
+    max-height: 100%;
+    max-width: 100%;
+    bottom: 0;
+  }
+  .login-cni-v2 .login.card {
+    width: min(100%, 540px);
+    max-width: 540px;
+    min-height: 0;
+    padding: 24px 31px;
+    border-radius: 26px;
+  }
+  .login-cni-v2 .login-school-mark { width: 83px; height: 83px; }
+  .login-cni-v2 .login-title-ornament { margin: 8px 0; }
+  .login-cni-v2 .login > h1 { font-size: 1.46rem; }
+  .login-cni-v2 .login-instructions { font-size: .81rem; margin-bottom: 14px; }
+  .login-cni-v2 .login-form-field + .login-form-field { margin-top: 12px; }
+  .login-cni-v2 .login .login-submit { margin-top: 17px; }
 }
 
-/* Celular: título centrado y mascota pequeña debajo, sin competir con el formulario. */
-@media (max-width: 500px) {
-    .login-screen .login-cni-v2 {
-        gap: 9px;
-        padding: 15px 12px 25px;
-    }
-    .login-cni-v2 .login-presentation {
-        width: 100%;
-        height: 231px;
-        padding: 0;
-    }
-    .login-cni-v2 .login-presentation-copy {
-        width: 100%;
-        text-align: center;
-    }
-    .login-cni-v2 .login-pretitle {
-        justify-content: center;
-        font-size: .57rem;
-        letter-spacing: .06em;
-        margin-bottom: 8px;
-    }
-    .login-cni-v2 .login-heading {
-        font-size: clamp(1.83rem, 7.5vw, 2.23rem);
-        text-align: center;
-        line-height: 1.06;
-    }
-    .login-cni-v2 .login-presentation-subtitle {
-        max-width: 340px;
-        margin: 8px auto 0;
-        font-size: .72rem;
-        line-height: 1.35;
-        text-align: center;
-    }
-    .login-cni-v2 .login-illustration {
-        position: absolute;
-        top: auto;
-        left: 50%;
-        right: auto;
-        bottom: 0;
-        width: 115px;
-        height: 82px;
-        transform: translateX(-50%);
-    }
-    .login-cni-v2 .login-mascot { height: 100%; width: auto; }
-    .login-cni-v2 .login.card { width: 100%; padding: 21px 18px; border-radius: 21px; }
-    .login-cni-v2 .login-school-mark { width: 75px; height: 75px; }
-    .login-cni-v2 .login-form-kicker { font-size: .64rem; letter-spacing: .07em; }
-    .login-cni-v2 .login > h1 { font-size: clamp(1.26rem, 5.45vw, 1.48rem); }
-    .login-cni-v2 .login > h1 span { display: block; }
-    .login-cni-v2 .login-instructions { font-size: .77rem; }
+/* Celular: ilustración pequeña tras el texto, formulario prioritario. */
+@media (max-width: 540px) {
+  .login-screen .login-cni-v2 { padding: 16px 12px 27px; gap: 12px; }
+  .login-cni-v2 .login-presentation {
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    height: 270px;
+    padding: 0;
+  }
+  .login-cni-v2 .login-presentation-copy {
+    flex: none;
+    width: 100%;
+    padding: 0;
+    text-align: center;
+  }
+  .login-cni-v2 .login-pretitle { justify-content: center; font-size: .55rem; letter-spacing: .05em; margin-bottom: 6px; }
+  .login-cni-v2 .login-heading { font-size: clamp(1.85rem, 8.4vw, 2.38rem); }
+  .login-cni-v2 .login-presentation-subtitle { font-size: .72rem; line-height: 1.35; margin: 7px auto 0; }
+  .login-cni-v2 .login-illustration { flex: none; width: 130px; height: 110px; margin-top: 6px; }
+  .login-cni-v2 .login.card { width: 100%; padding: 20px 17px; border-radius: 21px; }
+  .login-cni-v2 .login-school-mark { width: 75px; height: 75px; }
+  .login-cni-v2 .login-form-kicker { font-size: .63rem; }
+  .login-cni-v2 .login > h1 { font-size: 1.31rem; line-height: 1.18; }
+  .login-cni-v2 .login > h1 span { display: block; }
+  .login-cni-v2 .login-instructions { font-size: .78rem; }
+  .login-cni-v2 .login-input-shell { min-height: 47px; }
 }
-@media (max-width: 355px) {
-    .login-cni-v2 .login-presentation { height: 253px; }
-    .login-cni-v2 .login-heading { font-size: 1.74rem; }
-    .login-cni-v2 .login-illustration { height: 76px; }
-    .login-cni-v2 .login.card { padding: 17px 14px; }
+@media (max-width: 365px) {
+  .login-cni-v2 .login-presentation { height: 286px; }
+  .login-cni-v2 .login-heading { font-size: 1.8rem; }
+  .login-cni-v2 .login-illustration { width: 117px; height: 100px; }
 }
-/* Teléfono horizontal: permitir desplazamiento, no solapar contenido. */
-@media (max-width: 1040px) and (max-height: 490px) and (orientation: landscape) {
-    .login-cni-v2 .login-presentation { height: 142px; }
-    .login-cni-v2 .login-illustration { height: 140px; }
-    .login-cni-v2 .login-heading { font-size: clamp(1.8rem, 4.3vw, 2.2rem); }
-    .login-cni-v2 .login-presentation-subtitle { font-size: .72rem; }
+/* Teléfono horizontal: permitir desplazamiento vertical sin encimar el formulario. */
+@media (max-width: 1040px) and (max-height: 470px) and (orientation: landscape) {
+  .login-cni-v2 .login-presentation { height: 165px; }
+  .login-cni-v2 .login-illustration { height: 155px; }
+  .login-cni-v2 .login-heading { font-size: 2.1rem; }
 }
 @media (prefers-reduced-motion: reduce) {
-    .login-cni-v2 *, .login-cni-v2 *::before, .login-cni-v2 *::after {
-        transition: none !important;
-    }
+  .login-cni-v2 *, .login-cni-v2 *::before, .login-cni-v2 *::after { transition: none !important; }
 }
