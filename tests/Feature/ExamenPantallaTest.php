@@ -106,7 +106,7 @@ class ExamenPantallaTest extends TestCase
         app(IntentoService::class)->finalizar($intento, $this->alumno->id);
 
         $this->actingAs($this->alumno, 'web')->get(route('examen', $intento))
-            ->assertRedirect(route('alumno.historial'))->assertSessionHas('status')->assertSessionHasNoErrors();
+            ->assertRedirect(route('examen.resultados', $intento))->assertSessionHas('status')->assertSessionHasNoErrors();
     }
 
     public function test_responder_guarda_y_navegar_cambia_de_pregunta(): void
@@ -188,7 +188,7 @@ class ExamenPantallaTest extends TestCase
 
         Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento])
             ->call('finalizar')
-            ->assertRedirect(route('alumno.historial'));
+            ->assertRedirect(route('examen.resultados', $intento));
 
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->assertNotNull(DB::table('intentos')->where('id', $intento)->value('puntaje_total'));
@@ -205,10 +205,11 @@ class ExamenPantallaTest extends TestCase
             ->call('ir', 39)
             ->assertSee('Enviar examen')
             ->call('finalizar')
-            ->assertRedirect(route('alumno.historial'));
+            ->assertRedirect(route('examen.resultados', $intento));
 
         $this->assertSame('finalizado', DB::table('intentos')->where('id', $intento)->value('estado'));
-        $this->get(route('panel'))->assertSee('<div class="alert alert-ok" role="status">', false)
+        $this->get(route('examen.resultados', $intento))->assertOk()
+            ->assertSee('Resultados de tu examen')->assertSee('Intento #1 · Juan Carlos')
             ->assertSee('Tu examen fue enviado. Respondiste 1 de 40 preguntas')->assertDontSee('role="alert"', false);
     }
 
@@ -237,7 +238,7 @@ class ExamenPantallaTest extends TestCase
         $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
 
         $this->travel(61)->minutes();
-        $componente->call('responder', $pregunta->id, $pregunta->alternativas[0]->id)->assertRedirect(route('alumno.historial'));
+        $componente->call('responder', $pregunta->id, $pregunta->alternativas[0]->id)->assertRedirect(route('examen.resultados', $intento));
 
         $this->assertSame('enviado_auto', DB::table('intentos')->where('id', $intento)->value('estado'));
         $this->assertSame(0, DB::table('respuestas_estudiante')->where('intento_id', $intento)->whereNotNull('alternativa_id')->count());
@@ -251,5 +252,20 @@ class ExamenPantallaTest extends TestCase
             ->call('tiempoAgotado')->assertNoRedirect();
 
         $this->assertSame('en_curso', DB::table('intentos')->where('id', $intento)->value('estado'));
+    }
+
+    public function test_resultados_muestra_cifras_y_asignaturas_solo_del_intento_propio(): void
+    {
+        $intento = $this->iniciar();
+        $this->actingAs($this->alumno, 'web')->get(route('examen.resultados', $intento))
+            ->assertRedirect(route('examen', $intento));
+
+        app(IntentoService::class)->finalizar($intento, $this->alumno->id);
+        $areas = DB::table('resultados_area')->where('intento_id', $intento)->count();
+        $this->get(route('examen.resultados', $intento))->assertOk()
+            ->assertSee('Puntaje total')->assertSee('En blanco')->assertSee("{$areas} asignaturas")
+            ->assertSee('Regresar a mi panel')->assertSee(route('alumno.inicio'), false);
+
+        $this->actingAs($this->crearAlumno('otro'), 'web')->get(route('examen.resultados', $intento))->assertNotFound();
     }
 }

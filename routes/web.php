@@ -34,6 +34,8 @@ Route::middleware(['auth:web', EnsureActiveUser::class])->group(function () {
         ->whereNumber('simulacro')->name('examen.iniciar');
     Route::get('/intentos/{intento}/examen', Examen::class)
         ->whereNumber('intento')->name('examen');
+    Route::get('/intentos/{intento}/resultados', [ExamenController::class, 'resultados'])
+        ->whereNumber('intento')->name('examen.resultados');
 });
 
 // Portal del alumno (diseño "Simulador CNI · Derecho"). Solo para estudiantes.

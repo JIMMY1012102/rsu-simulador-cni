@@ -37,7 +37,7 @@ class Examen extends Component
         if ($registro->estado !== 'en_curso') {
             // Livewire reemplaza redirect() durante mount; se responde con una redirección HTTP normal.
             $this->avisar($this->mensajeCierre($registro));
-            throw new HttpResponseException(new RedirectResponse(route($this->destino())));
+            throw new HttpResponseException(new RedirectResponse(route('examen.resultados', $registro->id)));
         }
         $this->intentoId = $registro->id;
         $guardadas = $this->servicio()->respuestas($registro->id);
@@ -152,17 +152,11 @@ class Examen extends Component
     private function salir(string $mensaje): void
     {
         $this->avisar($mensaje);
-        $this->redirectRoute($this->destino());
+        $this->redirectRoute('examen.resultados', $this->intentoId);
         $this->skipRender();
     }
 
-    /** Al salir del examen: los alumnos van a su Historial; admin y docente, al panel. */
-    private function destino(): string
-    {
-        return Auth::guard('web')->user()?->rol === 'estudiante' ? 'alumno.historial' : 'panel';
-    }
-
-    /** Aviso informativo para el panel o el Historial (ambos layouts lo muestran en verde). */
+    /** Aviso informativo que muestra la pantalla de resultados. */
     private function avisar(string $mensaje): void
     {
         session()->flash('status', $mensaje);
@@ -177,9 +171,7 @@ class Examen extends Component
             : 'Tu examen fue enviado.';
 
         return "{$inicio} Respondiste {$respondidas} de {$intento->total_preguntas} preguntas; "
-            .($this->destino() === 'alumno.historial'
-                ? 'abajo verás tu puntaje.'
-                : 'revisa tu puntaje en «Mis intentos y resultados».');
+            .'revisa tu puntaje en «Mis intentos y resultados».';
     }
 
     private function servicio(): IntentoService
