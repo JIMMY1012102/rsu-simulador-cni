@@ -51,6 +51,10 @@ require __DIR__.'/alumno-humanidades.php';
 Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class])
     ->prefix('administracion')->name('admin.')->group(function () {
         Route::get('/', fn () => redirect()->route('admin.subtemas.index'))->name('inicio');
+        Route::get('/alumnos', [\App\Http\Controllers\Admin\AlumnosImportacionController::class, 'index'])->name('alumnos.index');
+        Route::get('/alumnos/plantilla', [\App\Http\Controllers\Admin\AlumnosImportacionController::class, 'plantilla'])->name('alumnos.plantilla');
+        Route::post('/alumnos/validar', [\App\Http\Controllers\Admin\AlumnosImportacionController::class, 'validar'])->middleware('throttle:6,1')->name('alumnos.validar');
+        Route::post('/alumnos/importar', [\App\Http\Controllers\Admin\AlumnosImportacionController::class, 'cargar'])->middleware('throttle:6,1')->name('alumnos.cargar');
         Route::get('/subtemas', [BancoGestionController::class, 'subtemas'])->name('subtemas.index');
         Route::get('/importar-excel', [BancoGestionController::class, 'importar'])->name('importar.index');
         Route::get('/importar-excel/plantilla', [BancoGestionController::class, 'plantilla'])->name('importar.plantilla');

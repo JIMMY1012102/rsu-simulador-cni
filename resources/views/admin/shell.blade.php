@@ -25,13 +25,19 @@
                     </a>
                 @endforeach
             </nav>
+            <div class="cni-nav-caption">ALUMNOS</div>
+            <nav class="cni-nav" aria-label="Administración de alumnos">
+                <a href="{{ route('admin.alumnos.index') }}" @class(['cni-nav__link', 'is-current' => request()->routeIs('admin.alumnos.*')]) @if(request()->routeIs('admin.alumnos.*')) aria-current="page" @endif>
+                    <span class="cni-nav__icon" aria-hidden="true">⇧</span><span>Importar alumnos</span>
+                </a>
+            </nav>
         </div>
     </aside>
 
     <button type="button" class="cni-admin-backdrop" data-admin-menu-backdrop aria-label="Cerrar menú lateral" hidden></button>
     <div class="cni-stage">
         <header class="cni-topbar">
-            <div class="cni-topbar__context"><button type="button" class="cni-admin-menu-toggle" data-admin-menu-toggle aria-controls="cni-admin-sidebar" aria-expanded="true" aria-label="Ocultar menú lateral"><span aria-hidden="true">☰</span></button><span class="cni-topbar__section">Banco de preguntas</span><span class="cni-topbar__separator">/</span><strong>@yield('admin-page', 'Resumen')</strong></div>
+            <div class="cni-topbar__context"><button type="button" class="cni-admin-menu-toggle" data-admin-menu-toggle aria-controls="cni-admin-sidebar" aria-expanded="true" aria-label="Ocultar menú lateral"><span aria-hidden="true">☰</span></button><span class="cni-topbar__section">{{ request()->routeIs('admin.alumnos.*') ? 'Alumnos' : 'Banco de preguntas' }}</span><span class="cni-topbar__separator">/</span><strong>@yield('admin-page', 'Resumen')</strong></div>
             <div class="cni-topbar__right">
                 <div class="cni-account" title="{{ auth('web')->user()->usuario }}">
                     <span class="cni-account__avatar" aria-hidden="true">A</span>
