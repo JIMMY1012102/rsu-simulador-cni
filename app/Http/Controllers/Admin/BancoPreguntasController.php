@@ -53,6 +53,7 @@ class BancoPreguntasController extends Controller
             'temas' => DB::table('temas')->orderBy('nombre')->get(['id', 'nombre']),
             'areas' => DB::table('areas')->orderBy('nombre')->get(['id', 'nombre']),
             'totalPreguntas' => DB::table('preguntas')->count(),
+            'totalIntentos' => DB::table('intentos')->count(),
             'puedeVaciarBanco' => $request->user('web')?->usuario === 'Super_Admin',
         ]);
     }
