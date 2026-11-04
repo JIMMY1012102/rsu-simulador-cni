@@ -1,10 +1,10 @@
 <div class="cni-notas" id="cni-notas">
     <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=36">
-    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=7">
+    <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=8">
     @php
         $esPreview = app()->environment('local') && (request()->is('docente-preview') || request()->is('preview-docente'));
         $seccionActual = isset($seccion) && $seccion && $seccion->activo ? '5.º '.$seccion->nombre : 'Sin sección';
-        $nombreDocente = isset($docente) && $docente ? $docente->nombres : 'Vista previa docente';
+        $nombreDocente = isset($docente) && $docente ? trim(($docente->nombres ?? '').' '.($docente->apellidos ?? '')) : 'Vista previa docente';
 
         if ($esPreview) {
             // Vista previa: NO crear alumnos ni puntajes ficticios.
@@ -33,7 +33,6 @@
             <svg class="cni-notas-ondas" viewBox="0 0 1440 200" preserveAspectRatio="none" focusable="false">
                 <path d="M0 38C198-10 360 68 550 20S895 10 1080 48S1280 5 1440 28V0H0Z" fill="#74b9ff" opacity=".12"/>
                 <path d="M0 164C225 202 295 106 490 157S745 165 941 126S1197 182 1440 125" fill="none" stroke="#92cfff" stroke-width="3" opacity=".24"/>
-                <path d="M0 186C176 142 346 201 559 166S955 159 1190 183S1364 165 1440 179" fill="none" stroke="#eec36d" stroke-width="3" opacity=".75"/>
             </svg>
             <svg class="cni-notas-iconos-academicos" viewBox="0 0 200 155" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">
                 <g transform="translate(8 6) rotate(8 32 28)">
@@ -69,7 +68,7 @@
         </div>
         <div class="cni-notas-docente">
             <span class="cni-notas-docente-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></span>
-            <span><strong>{{ $esPreview ? 'Enseñar es inspirar' : $nombreDocente }}</strong><small>{{ $esPreview ? $seccionActual : 'Docente · '.$seccionActual }}</small></span>
+            <span><strong>{{ $esPreview ? 'Enseñar es inspirar' : $nombreDocente }}</strong><small>{{ $esPreview ? 'Sin sección asignada · Vista previa' : 'Sección: '.$seccionActual }}</small></span>
             @unless($esPreview)
                 <form action="{{ route('logout') }}" method="POST">@csrf<button type="submit" class="cni-notas-exit" title="Cerrar sesión">Salir</button></form>
             @endunless

@@ -4,7 +4,7 @@
  * El resto del panel utiliza panel-docente-nuevo.css sin modificaciones.
  */
 .cni-notas .cni-notas-header--v2 {
-    --cni-dorado: #e6b54f;
+    --cni-dorado: #ffdc77;
     position: relative;
     isolation: isolate;
     display: flex;
@@ -102,13 +102,13 @@
     width: 28% !important;
     height: 100% !important;
     object-fit: cover;
-    object-position: 50% 42%;
+    object-position: 50% 36%;
     opacity: 1 !important;
     z-index: 1 !important;
     clip-path: polygon(14% 0, 100% 0, 86% 100%, 0 100%);
     -webkit-mask-image: none !important;
     mask-image: none !important;
-    filter: saturate(1.07) contrast(1.04);
+    filter: brightness(1.16) saturate(1.10) contrast(1.04);
     pointer-events: none;
 }
 
@@ -128,8 +128,8 @@
     display: block;
     position: absolute;
     inset: 0;
-    background: linear-gradient(90deg, #b17a20, #f7dc92 54%, #c68e31);
-    filter: drop-shadow(0 0 4px rgba(230, 180, 67, .24));
+    background: linear-gradient(90deg, #e8a624, #ffeb9b 54%, #e0a121);
+    filter: drop-shadow(0 0 5px rgba(255, 215, 100, .36));
 }
 .cni-notas .cni-notas-header--v2 .cni-notas-foto-marco::before {
     clip-path: polygon(14% 0, 17% 0, 3% 100%, 0 100%);
@@ -260,21 +260,23 @@ body:has(.cni-notas) { background: #eff5fd; }
     max-width: 100%;
     margin-top: 12px;
     padding: 8px 12px;
-    border: 1.5px solid #e6b54f;
+    border: 1.5px solid #ffeaa3;
     border-radius: 999px;
-    background: rgba(8, 42, 91, .42);
-    color: #f8faff;
+    background: linear-gradient(110deg, #ffe48a 0%, #ffd05c 70%, #ffdf7d 100%);
+    box-shadow: 0 3px 12px rgba(255, 197, 57, .23);
+    color: #123b70;
+    font-weight: 800;
     font-size: 12px;
 }
 .cni-notas .cni-notas-header--v2 .cni-notas-birrete {
     width: 20px;
     height: 20px;
     flex: 0 0 auto;
-    color: #eaca71;
+    color: #164776;
 }
 .cni-notas .cni-notas-header--v2 .cni-notas-docente {
     z-index: 3;
-    border-color: #e6b54f;
+    border-color: #ffda77;
     box-shadow: 0 10px 24px rgba(0, 25, 73, .23);
 }
 .cni-notas .cni-notas-header--v2 .cni-notas-docente small {
@@ -297,4 +299,12 @@ body:has(.cni-notas) { background: #eff5fd; }
 @media (max-width: 480px) {
     .cni-notas .cni-notas-header--v2 .cni-notas-subfrase { border-radius: 12px; }
     .cni-notas .cni-notas-header--v2 .cni-notas-birrete { width: 17px; height: 17px; }
+}
+
+/* Nombre y apellidos completos, y sección asignada sin truncarse. */
+.cni-notas .cni-notas-header--v2 .cni-notas-docente { min-height: 70px; }
+.cni-notas .cni-notas-header--v2 .cni-notas-docente strong,
+.cni-notas .cni-notas-header--v2 .cni-notas-docente small {
+  display: block; white-space: normal; overflow: visible;
+  overflow-wrap: anywhere; text-overflow: clip; line-height: 1.36;
 }
