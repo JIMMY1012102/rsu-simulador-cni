@@ -61,19 +61,40 @@
         <div class="cni-notas-brand">
             <img src="{{ asset('img/escudo-cni.png') }}" alt="Escudo del Colegio Nacional de Imperial">
             <div>
-                <span class="cni-notas-school">COLEGIO NACIONAL DE IMPERIAL</span>
-                <h1>Calificaciones del salón</h1>
-                <p class="cni-notas-subfrase"><svg class="cni-notas-birrete" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 9 10-5 10 5-10 5L2 9Zm5 3v5c3 3 7 3 10 0v-5M22 9v7"/></svg><span>Resultados académicos de tus estudiantes</span></p>
+               
+            <span class="cni-notas-school">COLEGIO NACIONAL DE IMPERIAL</span>
+            <h1>Calificaciones del <span class="cni-salon-dorado">salón</span>       <p class="cni-notas-subfrase"><svg class="cni-notas-birrete" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 9 10-5 10 5-10 5L2 9Zm5 3v5c3 3 7 3 10 0v-5M22 9v7"/></svg><span>Resultados académicos de tus estudiantes</span></p>
             </div>
         </div>
-        <div class="cni-notas-docente">
-            <span class="cni-notas-docente-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></span>
-            <span><strong>{{ $esPreview ? 'Enseñar es inspirar' : $nombreDocente }}</strong><small>{{ $esPreview ? 'Sin sección asignada · Vista previa' : 'Sección: '.$seccionActual }}</small></span>
-            @unless($esPreview)
-                <form action="{{ route('logout') }}" method="POST">@csrf<button type="submit" class="cni-notas-exit" title="Cerrar sesión">Salir</button></form>
-            @endunless
+         <div class="cni-notas-docente">
+    <div class="cni-notas-docente-top">
+        <span class="cni-notas-docente-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="8" r="4"/>
+                <path d="M4 21v-2a8 8 0 0 1 16 0v2"/>
+            </svg>
+        </span>
+
+        <div class="cni-notas-docente-texto">
+            <small class="cni-notas-docente-label">
+                {{ $esPreview ? 'Panel docente' : 'Docente asignado' }}
+            </small>
+
+            <strong>{{ $esPreview ? 'Enseñar es inspirar' : $nombreDocente }}</strong>
+
+            <small class="cni-notas-docente-detalle">
+                {{ $esPreview ? 'Sin sección asignada · Vista previa' : 'Sección: '.$seccionActual }}
+            </small>
         </div>
-    </header>
+    </div>
+
+    @unless($esPreview)
+        <form action="{{ route('logout') }}" method="POST" class="cni-notas-docente-actions">
+            @csrf
+            <button type="submit" class="cni-notas-exit" title="Cerrar sesión">Salir</button>
+        </form>
+    @endunless
+</div></header>
 
     <div class="cni-notas-body">
         @if($esPreview)
