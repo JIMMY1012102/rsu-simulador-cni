@@ -15,6 +15,7 @@ body:has(.cni-alumno){background:#f8f9fe}
 .cni-alumno-sidebar{position:sticky;top:0;flex:0 0 232px;width:232px;height:100vh;display:flex;flex-direction:column;justify-content:space-between;gap:24px;padding:23px 13px 18px;color:#fff;background:linear-gradient(168deg,#143967,var(--navy) 65%,#0a2149);overflow-y:auto}
 .cni-alumno-marca{display:flex;align-items:center;gap:12px;color:#fff!important;padding:0 6px;margin-bottom:20px;line-height:1.15}
 .cni-alumno-marca-icon{display:grid;place-items:center;width:43px;height:43px;flex-shrink:0;border-radius:15px;color:#1263d0;background:#d7eafe;font-size:30px}
+.cni-alumno-marca-icon img{display:block;width:36px;height:36px;object-fit:contain}
 .cni-alumno-marca strong{display:block;font-size:18px;letter-spacing:-.02em;font-weight:900}.cni-alumno-marca small{font-size:11px;color:#c4d8f4;display:block;margin-top:4px}
 .cni-alumno-area-chip{display:flex;align-items:center;gap:8px;background:#ffffff1d;color:#e9f2ff;padding:9px 12px;border-radius:11px;margin:0 0 16px;font-size:11px;font-weight:750}
 .cni-alumno-area-chip span{font-size:17px;color:#b8e8ff}
@@ -25,7 +26,7 @@ body:has(.cni-alumno){background:#f8f9fe}
 .cni-alumno-menu a.is-active{background:linear-gradient(100deg,#1c85ff,var(--accent));box-shadow:0 5px 17px #06173725;color:#fff}
 .cni-alumno-side-art{min-height:140px;display:flex;justify-content:space-around;align-items:center;opacity:.15;color:#b9dcff;font-size:65px;transform:rotate(-12deg)}
 .cni-alumno-side-art>span{font-size:32px;transform:translateY(40px)}
-.cni-alumno-sidebar-bottom{border-top:1px solid #ffffff29;padding-top:13px}
+.cni-alumno-sidebar-bottom{padding-top:13px}
 .cni-alumno-side-user{display:flex;gap:10px;align-items:center;margin:8px 0 15px;min-width:0}
 .cni-alumno-side-user>span:last-child{min-width:0}.cni-alumno-side-user strong,.cni-alumno-side-user small{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
 .cni-alumno-side-user strong{font-size:12px}.cni-alumno-side-user small{font-size:10px;color:#b3c9e9}
@@ -917,5 +918,29 @@ body:has(.cni-alumno){background:#f8f9fe}
         height:165px;
         max-width:230px;
         object-position:center top;
+    }
+}
+
+/* Encuadre completo de las mascotas originales de Ciencias Básicas y Economía. */
+.cni-alumno[data-area="B"] .cni-alumno-banner .cni-alumno-mascota,
+.cni-alumno[data-area="D"] .cni-alumno-banner .cni-alumno-mascota{
+    object-fit:contain;
+    object-position:center bottom;
+}
+@media(min-width:681px){
+    .cni-alumno[data-area="D"] .cni-alumno-banner .cni-alumno-mascota{
+        top:12px;
+        height:calc(100% - 24px);
+    }
+    .cni-alumno[data-area="B"] .cni-alumno-banner .cni-alumno-mascota{
+        top:16px;
+        width:28%;
+        height:calc(100% - 32px);
+    }
+}
+@media(max-width:680px){
+    .cni-alumno[data-area="B"] .cni-alumno-banner .cni-alumno-mascota{
+        width:36%;
+        height:150px;
     }
 }

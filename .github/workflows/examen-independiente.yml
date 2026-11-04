@@ -47,3 +47,5 @@ jobs:
       - run: php artisan route:list
       - run: php artisan view:cache
       - run: php artisan test --filter='ExamenIndependienteTest|ExamenServiceTest|ExamenPantallaTest|ImportarBancoExcelTest|BancoGestionTest|AdministracionAcademicaTest|ImportarAlumnosExcelTest|SeccionesDocenteTest'
+      - name: Verifica el panel compartido de las cinco áreas
+        run: php artisan test --filter='PanelesPorAreaTest::test_eleccion_persiste_y_llega_a_la_misma_pagina_para_cada_area|PanelesPorAreaTest::test_menu_lateral_tiene_exactamente_tres_opciones_y_un_boton_para_contraerlo'

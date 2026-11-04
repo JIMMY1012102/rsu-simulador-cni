@@ -26,7 +26,7 @@
     <aside class="cni-alumno-sidebar" id="cni-alumno-sidebar" aria-label="Menú del estudiante">
         <div class="cni-alumno-sidebar-top">
             <a class="cni-alumno-marca" href="{{ route('alumno.panel') }}">
-                <span class="cni-alumno-marca-icon" aria-hidden="true">✦</span>
+                <span class="cni-alumno-marca-icon" aria-hidden="true"><img src="{{ asset('images/escudo-cni.png') }}" width="36" height="36" alt=""></span>
                 <span><strong>Simulador</strong><small>CNI · Imperial</small></span>
             </a>
             <span class="cni-alumno-area-chip"><span aria-hidden="true">{{ $temaArea['icono'] }}</span> {{ $area->nombre }}</span>
@@ -37,7 +37,6 @@
             </nav>
         </div>
         <div class="cni-alumno-sidebar-bottom">
-            <div class="cni-alumno-side-art" aria-hidden="true">✦<span>✦</span>✦</div>
             @unless($esVistaPrevia)
                 <form method="POST" action="{{ route('logout') }}">@csrf
                     <button class="cni-alumno-salir" type="submit">↪ &nbsp; Cerrar sesión</button>
