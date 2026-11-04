@@ -46,33 +46,39 @@
     <section class="examen-pregunta" wire:key="pregunta-{{ $pregunta?->id ?? 'vacia' }}" aria-label="Pregunta del examen">
         @if($pregunta)
             <span class="examen-curso">{{ $pregunta->area }}</span>
-            @if(trim($pregunta->enunciado) !== '')
-                <h1 class="examen-enunciado" id="enunciado-{{ $pregunta->id }}">{!! nl2br(e($pregunta->enunciado)) !!}</h1>
-            @endif
-            @if($pregunta->imagen)
-                <img class="examen-imagen" src="{{ asset($pregunta->imagen) }}" alt="Pregunta {{ $actual + 1 }}"
-                     @if(trim($pregunta->enunciado) === '') id="enunciado-{{ $pregunta->id }}" @endif>
-            @endif
-            <div class="examen-opciones" role="radiogroup" aria-labelledby="enunciado-{{ $pregunta->id }}">
-                @foreach($pregunta->alternativas as $alternativa)
-                    @php $marcada = $elegida === (int) $alternativa->id; @endphp
-                    <button type="button" role="radio" aria-checked="{{ $marcada ? 'true' : 'false' }}"
-                            @class(['examen-opcion', 'is-elegida' => $marcada])
-                            wire:key="alternativa-{{ $alternativa->id }}" wire:click="responder({{ $alternativa->id }})"
-                            wire:loading.attr="disabled" wire:target="responder">
-                        <span class="examen-radio" aria-hidden="true"></span>
-                        <span>{{ $alternativa->texto }}
-                            @if($alternativa->imagen ?? null)
-                                <img class="examen-imagen-alternativa" src="{{ asset($alternativa->imagen) }}" alt="Alternativa {{ $alternativa->letra }}">
-                            @endif
-                        </span>
-                    </button>
-                @endforeach
+            <div @class(['examen-contenido-pregunta', 'examen-contenido-pregunta--con-imagen' => (bool) $pregunta->imagen])>
+                <div class="examen-material">
+                    @if(trim($pregunta->enunciado) !== '')
+                        <h1 class="examen-enunciado" id="enunciado-{{ $pregunta->id }}">{!! nl2br(e($pregunta->enunciado)) !!}</h1>
+                    @endif
+                    @if($pregunta->imagen)
+                        <img class="examen-imagen" src="{{ asset($pregunta->imagen) }}" alt="Pregunta {{ $actual + 1 }}"
+                             @if(trim($pregunta->enunciado) === '') id="enunciado-{{ $pregunta->id }}" @endif>
+                    @endif
+                </div>
+                <div class="examen-respuestas">
+                    <div class="examen-opciones" role="radiogroup" aria-labelledby="enunciado-{{ $pregunta->id }}">
+                        @foreach($pregunta->alternativas as $alternativa)
+                            @php $marcada = $elegida === (int) $alternativa->id; @endphp
+                            <button type="button" role="radio" aria-checked="{{ $marcada ? 'true' : 'false' }}"
+                                    @class(['examen-opcion', 'is-elegida' => $marcada])
+                                    wire:key="alternativa-{{ $alternativa->id }}" wire:click="responder({{ $alternativa->id }})"
+                                    wire:loading.attr="disabled" wire:target="responder">
+                                <span class="examen-radio" aria-hidden="true"></span>
+                                <span>{{ $alternativa->texto }}
+                                    @if($alternativa->imagen ?? null)
+                                        <img class="examen-imagen-alternativa" src="{{ asset($alternativa->imagen) }}" alt="Alternativa {{ $alternativa->letra }}">
+                                    @endif
+                                </span>
+                            </button>
+                        @endforeach
+                    </div>
+                    <span class="examen-guardado" aria-live="polite">
+                        <span wire:loading wire:target="responder">Guardando…</span>
+                        <span wire:loading.remove wire:target="responder">@if($elegida) Respuesta guardada @endif</span>
+                    </span>
+                </div>
             </div>
-            <span class="examen-guardado" aria-live="polite">
-                <span wire:loading wire:target="responder">Guardando…</span>
-                <span wire:loading.remove wire:target="responder">@if($elegida) Respuesta guardada @endif</span>
-            </span>
         @else
             <p class="examen-vacio" role="status">Aún no hay preguntas disponibles.</p>
         @endif
