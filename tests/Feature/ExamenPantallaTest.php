@@ -186,7 +186,7 @@ class ExamenPantallaTest extends TestCase
     public function test_el_x_data_del_examen_no_cambia_entre_renders(): void
     {
         $intento = $this->iniciar();
-        $xData = fn (string $html) => preg_match('/class="examen" x-data="([^"]+)"/', $html, $m) ? $m[1] : null;
+        $xData = fn (string $html) => preg_match('/\\bx-data="(examen\\([^"]+\\))"/', $html, $m) ? $m[1] : null;
         $componente = Livewire::actingAs($this->alumno, 'web')->test(Examen::class, ['intento' => $intento]);
         $antes = $xData($componente->html());
 
