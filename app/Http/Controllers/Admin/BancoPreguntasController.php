@@ -24,9 +24,7 @@ class BancoPreguntasController extends Controller
             'estado' => ['nullable', Rule::in(['activo', 'inactivo'])],
             'buscar' => ['nullable', 'string', 'max:200'],
         ]);
-        $consulta = DB::table('preguntas as p')->where(function ($query) {
-                $query->whereNull('p.codigo')->orWhere('p.codigo', 'not like', 'HIST_%');
-            })->join('temas as t', 't.id', '=', 'p.tema_id')
+        $consulta = DB::table('preguntas as p')->join('temas as t', 't.id', '=', 'p.tema_id')
             ->join('areas as a', 'a.id', '=', 't.area_id')
             ->select('p.id', 'p.codigo', 'p.enunciado', 'p.imagen', 'p.activo', 'p.created_at',
                 't.nombre as tema', 'a.nombre as asignatura');
@@ -54,9 +52,7 @@ class BancoPreguntasController extends Controller
             'preguntas' => $consulta->orderByDesc('p.id')->paginate(15)->withQueryString(),
             'temas' => DB::table('temas')->orderBy('nombre')->get(['id', 'nombre']),
             'areas' => DB::table('areas')->orderBy('nombre')->get(['id', 'nombre']),
-            'totalPreguntas' => DB::table('preguntas')->where(function ($query) {
-                $query->whereNull('codigo')->orWhere('codigo', 'not like', 'HIST_%');
-            })->count(),
+            'totalPreguntas' => DB::table('preguntas')->count(),
             'puedeVaciarBanco' => $request->user('web')?->usuario === 'Super_Admin',
         ]);
     }
