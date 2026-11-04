@@ -213,3 +213,88 @@ body:has(.cni-notas) { background: #eff5fd; }
 @media (prefers-reduced-motion: reduce) {
     .cni-notas .cni-notas-header--v2::before { animation: none; }
 }
+
+
+/* 03/11 – ondas discretas y símbolos académicos blancos en la cabecera. */
+.cni-notas .cni-notas-header--v2 {
+    background:
+        radial-gradient(ellipse at 17% 4%, rgba(62, 137, 212, .21), transparent 48%),
+        linear-gradient(108deg, #052151 0%, #073776 48%, #0e5698 75%, #0d478a 100%);
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-decoracion {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    color: #eaf5ff;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-ondas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-iconos-academicos {
+    position: absolute;
+    width: clamp(130px, 15vw, 215px);
+    height: auto;
+    left: 38%;
+    top: 8px;
+    opacity: .22;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-laurel {
+    position: absolute;
+    width: 115px;
+    height: 144px;
+    top: 6px;
+    right: 6px;
+    opacity: .14;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-brand { z-index: 3; }
+/* No se modifica el h1 ni se destaca «salón» con otra fuente. */
+.cni-notas .cni-notas-header--v2 .cni-notas-subfrase {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+    margin-top: 12px;
+    padding: 8px 12px;
+    border: 1.5px solid #e6b54f;
+    border-radius: 999px;
+    background: rgba(8, 42, 91, .42);
+    color: #f8faff;
+    font-size: 12px;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-birrete {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+    color: #eaca71;
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-docente {
+    z-index: 3;
+    border-color: #e6b54f;
+    box-shadow: 0 10px 24px rgba(0, 25, 73, .23);
+}
+.cni-notas .cni-notas-header--v2 .cni-notas-docente small {
+    display: block;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+    font-size: 11px;
+    line-height: 1.35;
+    color: #466994;
+}
+@media (max-width: 1200px) {
+    .cni-notas .cni-notas-header--v2 .cni-notas-iconos-academicos { opacity: .10; left: 40%; }
+}
+@media (max-width: 930px) {
+    .cni-notas .cni-notas-header--v2 .cni-notas-iconos-academicos { display: none; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-laurel { opacity: .08; }
+}
+@media (max-width: 480px) {
+    .cni-notas .cni-notas-header--v2 .cni-notas-subfrase { border-radius: 12px; }
+    .cni-notas .cni-notas-header--v2 .cni-notas-birrete { width: 17px; height: 17px; }
+}
