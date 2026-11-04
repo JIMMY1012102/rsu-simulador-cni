@@ -138,18 +138,30 @@
   width: min(112%, 930px);
   height: 99%;
   transform: translateX(-50%);
-  opacity: .58;
+  opacity: .54;
   object-fit: contain;
   object-position: bottom center;
   overflow: visible;
+}
+/* Paisaje académico más integrado: sin contornos dominantes alrededor del personaje. */
+.login-cni-v2 .login-campus-school {
+  opacity: .5;
+  filter: blur(1.35px);
+}
+.login-cni-v2 .login-campus-books,
+.login-cni-v2 .login-campus-cap {
+  opacity: .82;
+  transform: translateY(-14px) scale(.91);
+  transform-box: fill-box;
+  transform-origin: center bottom;
 }
 .login-cni-v2 .login-gold-stage {
   position: absolute;
   z-index: 2;
   left: 50%;
   bottom: 0;
-  width: min(87%, 650px);
-  height: clamp(33px, 6.9vw, 64px);
+  width: min(79%, 590px);
+  height: clamp(30px, 5.7vw, 52px);
   transform: translateX(-50%);
   border: 3px solid #ffe28c;
   border-radius: 50%;
@@ -359,7 +371,7 @@
   .login-cni-v2 .login-pretitle { margin-bottom: 9px; }
   .login-cni-v2 .login-heading { font-size: clamp(2.75rem, 4.1vw, 3.8rem); }
   .login-cni-v2 .login-presentation-subtitle { margin-top: 8px; }
-  .login-cni-v2 .login-presentation-copy::after { margin-top: 7px; height: 8px; }
+  .login-cni-v2 .login-presentation-copy::after { display: none; }
   .login-cni-v2 .login.card { padding-block: 17px; }
   .login-cni-v2 .login-school-mark { width: 90px; height: 90px; margin-bottom: 6px; }
   .login-cni-v2 .login-title-ornament { margin: 8px 0; }
