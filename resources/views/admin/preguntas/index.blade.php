@@ -9,13 +9,13 @@
         <h1 id="preguntas-titulo">Preguntas</h1>
         @if($puedeVaciarBanco)
             <details class="cni-delete-all">
-                <summary class="cni-delete-all__trigger" @if($totalPreguntas === 0) aria-disabled="true" @endif>
+                <summary class="cni-delete-all__trigger" @if($totalPreguntas === 0 && $totalIntentos === 0) aria-disabled="true" @endif>
                     <span aria-hidden="true">🗑</span> Borrar todas las preguntas
                 </summary>
                 <div class="cni-delete-all__panel">
-                    <strong>Vaciar banco de preguntas ({{ number_format($totalPreguntas) }})</strong>
+                    <strong>Reiniciar demo ({{ number_format($totalPreguntas) }} preguntas · {{ number_format($totalIntentos) }} intentos)</strong>
                     <p>Reinicio de demo: se vacía el banco, se reinician los IDs y se eliminan intentos y resultados de prueba. La operación es irreversible.</p>
-                    @if($totalPreguntas > 0)
+                    @if($totalPreguntas > 0 || $totalIntentos > 0)
                         <form action="{{ route('admin.preguntas.destroy-all') }}" method="POST">
                             @csrf
                             @method('DELETE')
@@ -24,10 +24,10 @@
                             </label>
                             <p id="banco-borrar-aviso">Esta acción no se puede deshacer. También se eliminan los intentos de examen y sus resultados.</p>
                             @error('confirmacion')<p class="cni-delete-all__error" role="alert">{{ $message }}</p>@enderror
-                            <button class="cni-delete-all__confirm" type="submit">Confirmar borrado del banco</button>
+                            <button class="cni-delete-all__confirm" type="submit">Borrar todo y reiniciar IDs</button>
                         </form>
                     @else
-                        <p>El banco ya está vacío.</p>
+                        <p>El banco y el historial de intentos ya están vacíos.</p>
                     @endif
                 </div>
             </details>
