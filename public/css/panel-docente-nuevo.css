@@ -50,9 +50,9 @@ body:has(.cni-notas){background:#eef6fd}
 .cni-notas-filtros label{display:flex;flex-direction:column;gap:7px;min-width:0}
 .cni-notas-filtros label>span{font-size:12px;color:#153b76;font-weight:750}
 .cni-notas-filtros input,.cni-notas-filtros select{height:45px;width:100%;min-width:0;border:1px solid #cadaf2;border-radius:9px;background:#fff;font-size:13px;color:#153966;padding:0 13px;outline:none}
-.cni-notas-filtros input:focus,.cni-notas-filtros select:focus,.cni-notas button:focus-visible,.cni-notas a:focus-visible{outline:3px solid #ffce69;outline-offset:2px}
+.cni-notas-filtros select:focus,.cni-notas button:focus-visible,.cni-notas a:focus-visible{outline:3px solid #ffce69;outline-offset:2px}
 .cni-input-wrap{display:flex;align-items:center;gap:6px;min-width:0;border:1px solid #cadaf2;border-radius:9px;padding:0 12px}
-.cni-input-wrap:focus-within{outline:3px solid #ffe9ac}
+.cni-input-wrap:focus-within{outline:2px solid #d3a842;outline-offset:2px}
 .cni-input-wrap>span{font-size:24px;color:#2c65a7}
 .cni-input-wrap input{border:0;padding:0 4px;box-shadow:none;outline:none}
 .cni-notas-clear{height:45px;white-space:nowrap;background:#eef6ff;color:#16477c;font-weight:750;padding:0 16px;border:1px solid #cee5fd;border-radius:9px;cursor:pointer}
@@ -142,3 +142,16 @@ body:has(.cni-notas){background:#eef6fd}
 .cni-notas .cni-notas-demo{background:#eff7ff;border:1px solid #badcf7;color:#265a83}
 @media(max-width:1100px) and (min-width:761px){.cni-notas .cni-notas-header .cni-notas-foto{left:50%!important;width:27%!important;opacity:.65}}
 @media(max-width:760px){.cni-notas .cni-notas-header{gap:10px}.cni-notas .cni-notas-header .cni-notas-foto{position:relative!important;top:auto!important;left:auto!important;width:100%!important;height:125px!important;flex:1 1 100%;order:3;opacity:1;-webkit-mask-image:none;mask-image:none;border-radius:12px;margin-top:10px}.cni-notas .cni-notas-header .cni-notas-brand{width:100%}.cni-notas .cni-notas-header .cni-notas-docente{width:100%;max-width:none}.cni-notas .cni-notas-resumen .cni-notas-kpi .kpi-icon{width:46px;height:46px;min-width:46px}.cni-notas .cni-notas-resumen .cni-notas-kpi .kpi-icon svg{width:22px;height:22px}}
+
+/* Un solo foco accesible: el contenedor del buscador, sin segundo contorno en el input. */
+.cni-notas .cni-notas-filtros .cni-input-wrap input:focus,
+.cni-notas .cni-notas-filtros .cni-input-wrap input:focus-visible {
+    outline: none;
+    outline-offset: 0;
+    box-shadow: none;
+}
+.cni-notas .cni-notas-filtros .cni-input-wrap:focus-within {
+    border-color: #d3a842;
+    outline: 2px solid #d3a842;
+    outline-offset: 2px;
+}
