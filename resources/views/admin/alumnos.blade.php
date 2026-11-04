@@ -9,7 +9,7 @@
         <span>Descargar plantilla Excel<small>.xlsx · Lista para completar</small></span>
     </a>
     </div>
-    <p>Completa Contraseña (8 a 72 caracteres), Apellidos, Nombres, Grado y Sección. El usuario se genera automáticamente con el primer nombre y primer apellido, sin tildes: <strong>José María Peña Huamán → Jose_Pena</strong>. Si ya está ocupado, se agrega un número: <strong>Jose_Pena_2</strong>.</p>
+    <p>Completa DNI (8 dígitos), Apellidos, Nombres, Grado y Sección. El DNI será la contraseña inicial del alumno. El usuario se genera automáticamente con el primer nombre y primer apellido, sin tildes: <strong>José María Peña Huamán → Jose_Pena</strong>. Si ya está ocupado, se agrega un número: <strong>Jose_Pena_2</strong>.</p>
     <p>Conserva la hoja <strong>Alumnos</strong> y sus encabezados. Máximo 1000 alumnos y 5 MB por archivo. Las columnas tienen formato de texto para conservar ceros iniciales.</p>
     <p><strong>Grados y secciones disponibles:</strong>
         @forelse($secciones as $seccion)
@@ -18,7 +18,7 @@
             No hay secciones activas. Configúralas antes de importar.
         @endforelse
     </p>
-    <p>Los alumnos quedarán vinculados a su sección y aparecerán en las listas del docente correspondiente. Guarda la plantilla en un lugar privado: contiene las contraseñas iniciales.</p>
+    <p>Los alumnos quedarán vinculados a su sección y aparecerán en las listas del docente correspondiente. Guarda la plantilla en un lugar privado: contiene los DNI usados como contraseñas iniciales.</p>
     @if($errors->any())
         <div class="cni-import-message is-error" role="alert"><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>
     @endif

@@ -47,12 +47,12 @@ class AlumnosImportacionController extends Controller
             $fila['nombres'] = Str::squish($fila['nombres']);
             $fila['apellidos'] = Str::squish($fila['apellidos']);
             $validacion = Validator::make($fila, [
-                'contrasena' => ['required', 'string', 'min:8', 'max:72'],
+                'dni' => ['required', 'string', 'regex:/^[0-9]{8}$/D'],
                 'apellidos' => ['required', 'string', 'max:100'],
                 'nombres' => ['required', 'string', 'max:100'],
                 'grado' => ['required', 'string', 'max:20'],
                 'seccion' => ['required', 'string', 'max:10'],
-            ], [], ['contrasena' => 'contraseña', 'seccion' => 'sección']);
+            ], ['dni.regex' => 'El DNI debe contener exactamente 8 dígitos. Conserva los ceros iniciales.'], ['dni' => 'DNI', 'seccion' => 'sección']);
             foreach ($validacion->errors()->all() as $mensaje) {
                 $errores[] = 'Fila '.$fila['fila'].': '.$mensaje;
             }
@@ -140,7 +140,7 @@ class AlumnosImportacionController extends Controller
                 }
                 foreach ($filas as $fila) {
                     Usuario::create([
-                        'usuario' => $fila['usuario'], 'password' => Hash::make($fila['contrasena']),
+                        'usuario' => $fila['usuario'], 'password' => Hash::make($fila['dni']),
                         'apellidos' => $fila['apellidos'], 'nombres' => $fila['nombres'],
                         'seccion_id' => $fila['seccion_id'], 'rol' => 'estudiante', 'activo' => true,
                     ]);

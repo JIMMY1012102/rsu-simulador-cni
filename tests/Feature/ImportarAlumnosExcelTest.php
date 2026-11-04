@@ -77,7 +77,7 @@ class ImportarAlumnosExcelTest extends TestCase
 
     private function fila(string $nombres = 'José María', string $seccion = 'A'): array
     {
-        return ['ClaveAlumno2026!', 'Peña Huamán', $nombres, '5to', $seccion];
+        return ['00123456', 'Peña Huamán', $nombres, '5to', $seccion];
     }
 
     private function validar(UploadedFile $archivo): string
@@ -97,13 +97,14 @@ class ImportarAlumnosExcelTest extends TestCase
         $this->assertSame($this->seccion->id, $alumno->seccion_id);
         $this->assertSame('estudiante', $alumno->rol);
         $this->assertTrue($alumno->activo);
-        $this->assertTrue(Hash::check('ClaveAlumno2026!', $alumno->password));
+        $this->assertTrue(Hash::check('00123456', $alumno->password));
+        $this->assertNotSame('00123456', $alumno->password);
         $docente = $this->cuenta('docente_a', 'docente');
         $listado = app(ResultadosSeccionService::class)->alumnos($docente);
         $this->assertTrue($listado->contains('estudiante_id', $alumno->id));
-        $this->get(route('admin.alumnos.index'))->assertOk()->assertSee('José María')->assertDontSee('ClaveAlumno2026!');
+        $this->get(route('admin.alumnos.index'))->assertOk()->assertSee('José María')->assertDontSee('00123456');
         $this->post('/logout');
-        $this->post('/login', ['usuario' => 'Jose_Pena', 'password' => 'ClaveAlumno2026!'])->assertRedirect(route('alumno.elegir-area'));
+        $this->post('/login', ['usuario' => 'Jose_Pena', 'password' => '00123456'])->assertRedirect(route('alumno.elegir-area'));
         $this->assertAuthenticatedAs($alumno, 'web');
     }
 
@@ -196,6 +197,28 @@ class ImportarAlumnosExcelTest extends TestCase
         $this->assertArrayNotHasKey('usuario', $filas[0]);
         $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])->assertUnprocessable();
         $this->assertDatabaseCount('usuarios', 1);
+    }
+
+    public function test_dni_obligatorio_de_ocho_digitos_sin_letras_y_sin_notacion_cientifica(): void
+    {
+        foreach (['', '1234567', '123456789', '1234567A', '1.23E+07'] as $dni) {
+            $fila = $this->fila();
+            $fila[0] = $dni;
+            $this->postJson(route('admin.alumnos.validar'), ['archivo' => $this->excel([$fila])])
+                ->assertUnprocessable()->assertJsonValidationErrors('archivo');
+        }
+        $this->assertDatabaseCount('usuarios', 1);
+    }
+
+    public function test_dni_se_lee_como_texto_y_no_se_expone_en_la_vista_previa(): void
+    {
+        $archivo = $this->excel([$this->fila()]);
+        $filas = app(LectorAlumnosExcel::class)->leer($archivo->getRealPath());
+        $this->assertSame('00123456', $filas[0]['dni']);
+        $this->assertArrayNotHasKey('contrasena', $filas[0]);
+        $respuesta = $this->postJson(route('admin.alumnos.validar'), ['archivo' => $archivo])->assertOk();
+        $this->assertArrayNotHasKey('dni', $respuesta->json('usuarios.0'));
+        $this->assertStringNotContainsString('00123456', $respuesta->getContent());
     }
 
 }
