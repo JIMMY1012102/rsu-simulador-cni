@@ -1,77 +1,110 @@
+{{--
+    "Resultados de tu examen": pantalla a la que llega el alumno al enviar (o vencer) el examen.
+    Datos: ResultadoService a través de OrientacionController@resultados.
+--}}
 @extends('layouts.app')
+
+@php
+    $intento = (object) $resultado['totales'];
+    $areas = collect($resultado['resultados_area'])->map(function ($area) {
+        $area = clone (object) $area;
+        $area->nombre = $area->area_nombre;
+        return $area;
+    });
+    $numeroIntento = $resultado['intento_id'];
+    $volver = route('alumno.panel');
+    $puntos = fn ($valor) => $valor === null ? '—' : number_format((float) $valor, 3);
+    // Las prácticas no se califican: sin puntaje no hay cifras que mostrar (no son ceros).
+    $calificado = $intento->puntaje_total !== null;
+    $cifra = fn ($valor) => $calificado ? (int) $valor : '—';
+    $dobleMarca = (int) $intento->doble_marca;
+    // Dos tablas lado a lado, como en el diseño.
+    $columnas = $areas->isEmpty() ? collect() : $areas->chunk((int) ceil($areas->count() / 2));
+    // Íconos de línea estilo Lucide (licencia ISC).
+    $icono = fn (string $trazos, int $tamano = 20) => '<svg xmlns="http://www.w3.org/2000/svg" width="'.$tamano.'" height="'.$tamano.'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'.$trazos.'</svg>';
+@endphp
+
 @push('styles')
-<link rel="stylesheet" href="{{ asset('css/orientacion.css') }}">
-<link rel="stylesheet" href="{{ asset('css/resultados.css') }}?v=20261104">
+    <link rel="stylesheet" href="{{ asset('css/resultados.css').'?v='.filemtime(public_path('css/resultados.css')) }}">
 @endpush
 
 @section('content')
-@php
-    // Dos columnas equilibradas sin eliminar ninguna asignatura.
-    $filas = collect($resultado['resultados_area'])->values();
-    $columnas = $filas->isEmpty() ? collect() : $filas->chunk((int) ceil($filas->count() / 2));
-@endphp
-<section class="orientacion resultados-pagina">
-    <div class="resultados-cabecera">
-        <div>
-            <p class="eyebrow">SIMULADOR CNI · RESULTADOS</p>
+<div class="resultados">
+    <section class="resultados-portada">
+        <img class="resultados-portada__escudo" src="{{ asset('img/examen/escudo-cni.png') }}" width="206" height="184"
+            alt="Escudo institucional CNI">
+        <div class="resultados-portada__titulo">
+            <p>SIMULADOR CNI</p>
             <h1>Resultados de tu examen</h1>
-            <p class="resultados-intento">Intento #{{ $resultado['intento_id'] }} · {{ $usuario->nombres }}</p>
+            <span>Intento #{{ $numeroIntento }} · {{ $usuario->nombres }}</span>
         </div>
-        <a class="resultados-regresar" href="{{ route('alumno.panel') }}">← Regresar a mi panel</a>
-    </div>
-
-    <div class="estadisticas-grid" aria-label="Resumen de resultados">
-        <article class="stat stat--puntaje">
-            <span>Puntaje total</span>
-            <strong>{{ number_format($resultado['totales']['puntaje_total'], 3) }}</strong>
-        </article>
-        <article class="stat stat--correctas">
-            <span>Correctas</span>
-            <strong>{{ $resultado['totales']['correctas'] }}</strong>
-        </article>
-        <article class="stat stat--incorrectas">
-            <span>Incorrectas</span>
-            <strong>{{ $resultado['totales']['incorrectas'] }}</strong>
-        </article>
-        <article class="stat stat--blanco">
-            <span>En blanco</span>
-            <strong>{{ $resultado['totales']['en_blanco'] }}</strong>
-        </article>
-    </div>
-
-    <section class="bloque-orientacion resultados-bloque" aria-labelledby="resultados-asignaturas">
-        <div class="resultados-seccion-cabecera">
-            <h2 id="resultados-asignaturas">Resultados por asignatura</h2>
-            <span>{{ $filas->count() }} asignaturas</span>
-        </div>
-
-        <div class="resultados-columnas">
-            @forelse($columnas as $indice => $columna)
-                <table class="resultados-tabla">
-                    <caption class="resultados-solo-lector">Resultados por asignatura, columna {{ $indice + 1 }}</caption>
-                    <thead>
-                        <tr>
-                            <th scope="col">Asignatura</th>
-                            <th scope="col">Aciertos</th>
-                            <th scope="col">%</th>
-                            <th scope="col">Puntaje</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($columna as $fila)
-                            <tr>
-                                <td>{{ $fila->area_nombre }}</td>
-                                <td>{{ $fila->aciertos }}<span class="resultado-separador">/</span>{{ $fila->total_preguntas }}</td>
-                                <td>{{ $fila->porcentaje }}%</td>
-                                <td>{{ $fila->puntaje }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            @empty
-                <p class="resultados-vacio">Aún no hay resultados por asignatura para este intento.</p>
-            @endforelse
-        </div>
+        <img class="resultados-portada__mascota" src="{{ asset('img/examen/gato-cni.webp') }}" width="331" height="380" alt="">
     </section>
-</section>
+
+    <div class="resultados-barra">
+        @if (session('status'))
+            <p class="resultados-aviso" role="status">
+                {!! $icono('<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>', 18) !!}
+                {{ session('status') }}
+            </p>
+        @endif
+        <a class="resultados-volver" href="{{ $volver }}">
+            {!! $icono('<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>', 18) !!}
+            Regresar a mi panel
+        </a>
+    </div>
+
+    <ul class="resultados-cifras">
+        <li class="is-puntaje">
+            <span class="resultados-cifras__icono">{!! $icono('<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>', 24) !!}</span>
+            <span><small>Puntaje total</small><strong>{{ $puntos($intento->puntaje_total) }}</strong></span>
+        </li>
+        <li class="is-correctas">
+            <span class="resultados-cifras__icono">{!! $icono('<path d="M20 6 9 17l-5-5"/>', 26) !!}</span>
+            <span><small>Correctas</small><strong>{{ $cifra($intento->correctas) }}</strong></span>
+        </li>
+        <li class="is-incorrectas">
+            <span class="resultados-cifras__icono">{!! $icono('<path d="M18 6 6 18"/><path d="m6 6 12 12"/>', 26) !!}</span>
+            <span><small>Incorrectas</small><strong>{{ $cifra($intento->incorrectas) }}</strong></span>
+        </li>
+        <li class="is-blanco">
+            <span class="resultados-cifras__icono">{!! $icono('<path d="M5 12h14"/>', 26) !!}</span>
+            <span><small>{{ $dobleMarca > 0 ? 'En blanco o doble marca' : 'En blanco' }}</small><strong>{{ $calificado ? (int) $intento->en_blanco + $dobleMarca : '—' }}</strong></span>
+        </li>
+    </ul>
+
+    <section class="resultados-asignaturas" aria-labelledby="titulo-asignaturas">
+        <header>
+            <h2 id="titulo-asignaturas">
+                {!! $icono('<path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M8 17v-3"/><path d="M13 17V9"/><path d="M18 17V5"/>', 22) !!}
+                Resultados por asignatura
+            </h2>
+            <span>{{ $areas->count() }} {{ $areas->count() === 1 ? 'asignatura' : 'asignaturas' }}</span>
+        </header>
+
+        @if ($areas->isEmpty())
+            <p class="resultados-vacio">{{ $calificado ? 'Este examen no tiene detalle por asignatura.' : 'Este examen todavía no tiene calificación.' }}</p>
+        @else
+            <div class="resultados-tablas">
+                @foreach ($columnas as $columna)
+                    <table>
+                        <thead>
+                            <tr><th scope="col">Asignatura</th><th scope="col">Aciertos</th><th scope="col">%</th><th scope="col">Puntaje</th></tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($columna as $area)
+                                <tr>
+                                    <th scope="row">{{ $area->nombre }}</th>
+                                    <td>{{ $area->aciertos }} / {{ $area->total_preguntas }}</td>
+                                    <td>{{ number_format((float) $area->porcentaje, 2) }}%</td>
+                                    <td>{{ $puntos($area->puntaje) }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endforeach
+            </div>
+        @endif
+    </section>
+</div>
 @endsection
