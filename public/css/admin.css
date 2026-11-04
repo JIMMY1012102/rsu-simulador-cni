@@ -435,3 +435,8 @@
 /* Selector de archivo con nombre completo en una línea independiente. */
 .cni-import-step input.cni-import-file{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);clip-path:inset(50%);white-space:nowrap;border:0}
 .cni-import-filename{display:block;margin:10px 0 0;color:#d5e1ee;font-size:14px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+/* Gatito CNI en el espacio libre del menú lateral */
+.cni-sidebar__scroll{min-height:0}
+.cni-sidebar__mascota{margin-top:auto;flex:0 0 auto;display:flex;justify-content:center;padding:10px 20px 18px;pointer-events:none;background:radial-gradient(circle at 50% 55%,#7fb6f566 0%,#7fb6f51f 45%,transparent 72%)}
+.cni-sidebar__mascota img{display:block;width:100%;max-width:178px;height:auto}
+@media(max-height:620px){.cni-sidebar__mascota{display:none}}

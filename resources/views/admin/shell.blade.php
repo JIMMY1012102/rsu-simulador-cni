@@ -32,6 +32,7 @@
                 </a>
             </nav>
         </div>
+        <div class="cni-sidebar__mascota" aria-hidden="true"><img src="{{ asset('images/gatito-menu-admin.webp') }}" alt="" width="431" height="500"></div>
     </aside>
 
     <button type="button" class="cni-admin-backdrop" data-admin-menu-backdrop aria-label="Cerrar menú lateral" hidden></button>
