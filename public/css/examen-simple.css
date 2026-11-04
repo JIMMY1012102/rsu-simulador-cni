@@ -34,6 +34,9 @@ button:focus-visible,a:focus-visible{outline:3px solid #f6b52e;outline-offset:3p
 .examen-contenido-pregunta--con-imagen .examen-material{grid-column:1;grid-row:1}
 .examen-contenido-pregunta--con-imagen .examen-respuestas{grid-column:2;grid-row:1;position:sticky;top:16px}
 }
+@media(min-width:1200px){
+.examen-contenido-pregunta--con-imagen .examen-respuestas{transform:translateX(-300px)}
+}
 .examen-opciones{display:grid;gap:4px}
 .examen-opcion{width:100%;display:flex;align-items:center;text-align:left;gap:14px;padding:8px 13px;min-height:35px;border:1px solid #dce1ea;border-radius:8px;background:white;color:#102743;font-size:12px;font-weight:600;line-height:1.4}
 .examen-opcion:hover{background:#f5f8ff;border-color:#87aff2}
