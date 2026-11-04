@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\SessionController;
 use App\Http\Controllers\Admin\BancoPreguntasController;
+use App\Http\Controllers\Admin\VaciarBancoPreguntasController;
 use App\Http\Controllers\Admin\BancoGestionController;
 use App\Http\Controllers\Admin\CatalogoController;
 use App\Http\Controllers\Admin\SimulacrosController;
@@ -64,6 +65,7 @@ Route::middleware(['auth:web', EnsureActiveUser::class, SoloAdministrador::class
         Route::post('/catalogo/temas', [CatalogoController::class, 'tema'])->name('tema.guardar');
         Route::post('/catalogo/carreras', [CatalogoController::class, 'carrera'])->name('carrera.guardar');
         Route::get('/preguntas', [BancoPreguntasController::class, 'index'])->name('preguntas.index');
+        Route::delete('/preguntas/todas', VaciarBancoPreguntasController::class)->middleware('throttle:3,10')->name('preguntas.destroy-all');
         Route::get('/preguntas/{pregunta}', [BancoPreguntasController::class, 'show'])->whereNumber('pregunta')->name('preguntas.show');
         Route::delete('/preguntas/{pregunta}', [BancoPreguntasController::class, 'destroy'])->whereNumber('pregunta')->name('preguntas.destroy');
         Route::get('/simulacros', [SimulacrosController::class, 'index'])->name('simulacros.index');
