@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=4">
+    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=5">
 @endpush
 
 @section('content')
@@ -20,6 +20,7 @@
             </div>
 
 
+            <div class="login-illustration" aria-hidden="true">
             <!-- Ilustración académica original (SVG escalable): edificio, libros y birrete.
                  Se coloca detrás del gatito CNI, sin sustituir la mascota original. -->
             <div class="login-campus" aria-hidden="true">
@@ -91,6 +92,7 @@
                 <img src="{{ asset('images/Fondo_As.png') }}" alt="" class="login-mascot-seat">
                 <img src="{{ asset('images/Fondo_Resplandor.png') }}" alt="" class="login-mascot-glow">
                 <img src="{{ asset('images/gatito-cni.png') }}" alt="" class="login-mascot">
+            </div>
             </div>
             <p class="login-presentation-footer">Tu futuro comienza con una buena preparación.</p>
         </section>
