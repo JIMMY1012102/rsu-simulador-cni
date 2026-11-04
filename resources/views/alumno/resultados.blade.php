@@ -1,6 +1,6 @@
 {{--
     "Resultados de tu examen": pantalla a la que llega el alumno al enviar (o vencer) el examen.
-    Datos: App\Http\Controllers\ExamenController@resultados.
+    Datos: ResultadoService a través de OrientacionController@resultados.
 --}}
 @extends('layouts.app')
 
@@ -27,15 +27,6 @@
 @push('styles')
     <link rel="stylesheet" href="{{ asset('css/resultados.css').'?v='.filemtime(public_path('css/resultados.css')) }}">
 @endpush
-
-@section('sin-aviso', '1')
-
-@section('cabecera-accion')
-    <a class="cabecera-regresa" href="{{ $volver }}">
-        {!! $icono('<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>', 18) !!}
-        Regresa
-    </a>
-@endsection
 
 @section('content')
 <div class="resultados">
