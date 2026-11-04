@@ -6,20 +6,19 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
-use RuntimeException;
+use Throwable;
 
 class VaciarBancoPreguntasController extends Controller
 {
     /**
-     * Retira el banco para permitir una nueva importación.
-     * Las preguntas usadas en intentos se archivan, sin alterar las respuestas
-     * ni las calificaciones históricas (FK restrictiva).
+     * Reinicio completo del banco DEMO. Se eliminan también los intentos,
+     * respuestas y resultados porque dependen de los IDs de las preguntas.
+     * Nunca modifica alumnos, usuarios, categorías ni simulacros.
      */
     public function __invoke(Request $request): RedirectResponse
     {
-        // En el sistema, Super_Admin es una cuenta con rol "admin", no un rol separado.
         abort_unless(
             $request->user('web')?->rol === 'admin'
             && $request->user('web')?->usuario === 'Super_Admin',
@@ -32,111 +31,106 @@ class VaciarBancoPreguntasController extends Controller
             'confirmacion.in' => 'Para confirmar, escribe exactamente BORRAR TODO.',
         ]);
 
-        [$eliminadas, $archivadas] = DB::transaction(function () {
-            $preguntas = DB::table('preguntas')
-                ->where(function ($query) {
-                    $query->whereNull('codigo')->orWhere('codigo', 'not like', 'HIST_%');
-                })
-                ->orderBy('id')->lockForUpdate()
-                ->get(['id', 'codigo', 'imagen']);
+        $totales = DB::transaction(function (): array {
+            $totales = [
+                'preguntas' => DB::table('preguntas')->count(),
+                'intentos' => DB::table('intentos')->count(),
+            ];
 
-            if ($preguntas->isEmpty()) {
-                return [0, 0];
-            }
+            // Respetamos las FK: primero los registros dependientes.
+            // Incluye preguntas HIST_*, inactivas y las recién importadas.
+            DB::table('respuestas_estudiante')->delete();
+            DB::table('resultados_area')->delete();
+            DB::table('intentos')->delete();
+            DB::table('alternativas')->delete();
+            DB::table('preguntas')->delete();
 
-            $ids = $preguntas->pluck('id');
-
-            // No alterar preguntas que un estudiante todavía está respondiendo.
-            $enCurso = DB::table('respuestas_estudiante as r')
-                ->join('intentos as i', 'i.id', '=', 'r.intento_id')
-                ->whereIn('r.pregunta_id', $ids)
-                ->where('i.estado', 'en_curso')
-                ->exists();
-
-            if ($enCurso) {
-                throw ValidationException::withMessages([
-                    'confirmacion' => 'No se puede vaciar el banco mientras haya exámenes en curso. Finaliza esos intentos primero.',
-                ]);
-            }
-
-            $usadas = DB::table('respuestas_estudiante')
-                ->whereIn('pregunta_id', $ids)
-                ->distinct()
-                ->pluck('pregunta_id')
-                ->mapWithKeys(fn ($id) => [(int) $id => true]);
-
-            $sinUso = [];
-            $archivadas = 0;
-
-            foreach ($preguntas as $pregunta) {
-                if (! isset($usadas[(int) $pregunta->id])) {
-                    $sinUso[] = (int) $pregunta->id;
-                    continue;
-                }
-
-                // El importador reutiliza nombres banco/CODIGO.png. Se conserva una
-                // copia independiente para que otra importación no altere el examen anterior.
-                $imagen = $this->conservarImagen($pregunta->imagen, (int) $pregunta->id);
-                $alternativas = DB::table('alternativas')
-                    ->where('pregunta_id', $pregunta->id)->get(['id', 'imagen']);
-                foreach ($alternativas as $alternativa) {
-                    $imagenAlternativa = $this->conservarImagen($alternativa->imagen, (int) $pregunta->id);
-                    if ($imagenAlternativa !== $alternativa->imagen) {
-                        DB::table('alternativas')->where('id', $alternativa->id)
-                            ->update(['imagen' => $imagenAlternativa, 'updated_at' => now()]);
-                    }
-                }
-
-                // Código histórico exclusivo: libera el código original (p. ej. AM_1)
-                // para volver a importar una pregunta nueva sin tocar el intento anterior.
-                DB::table('preguntas')->where('id', $pregunta->id)->update([
-                    'codigo' => 'HIST_'.$pregunta->id,
-                    'imagen' => $imagen,
-                    'activo' => false,
-                    'updated_at' => now(),
-                ]);
-                $archivadas++;
-            }
-
-            foreach (array_chunk($sinUso, 500) as $grupo) {
-                // Las alternativas sin historial se eliminan por ON DELETE CASCADE.
-                DB::table('preguntas')->whereIn('id', $grupo)->delete();
-            }
-
-            return [count($sinUso), $archivadas];
+            return $totales;
         });
 
-        logger()->notice('Banco de preguntas CNI vaciado por Super_Admin', [
+        // ALTER TABLE produce commit implícito en MariaDB, por eso va
+        // después de terminar la transacción de borrado.
+        $idsReiniciados = $this->reiniciarIds();
+        $imagenesEliminadas = $this->borrarImagenesDelBanco();
+
+        Log::notice('Reinicio completo del banco CNI DEMO', [
             'usuario_id' => $request->user('web')->id,
-            'eliminadas' => $eliminadas,
-            'archivadas' => $archivadas,
+            'preguntas' => $totales['preguntas'],
+            'intentos' => $totales['intentos'],
+            'ids_reiniciados' => $idsReiniciados,
+            'imagenes_eliminadas' => $imagenesEliminadas,
         ]);
 
-        return redirect()->route('admin.preguntas.index')->with(
-            'status',
-            "Banco vaciado: {$eliminadas} preguntas eliminadas y {$archivadas} archivadas para conservar exámenes anteriores. Ya puedes importar nuevas preguntas."
-        );
+        $mensaje = "Banco DEMO reiniciado: {$totales['preguntas']} preguntas y {$totales['intentos']} intentos eliminados, junto con respuestas y resultados de prueba.";
+        if ($idsReiniciados) {
+            $mensaje .= ' IDs reiniciados desde 1.';
+        } else {
+            $mensaje .= ' No se pudieron reiniciar todos los contadores de ID; revisa los permisos de la base de datos.';
+        }
+        if (! $imagenesEliminadas) {
+            $mensaje .= ' Algunos archivos de imágenes no pudieron eliminarse; revisa storage/app/public.';
+        }
+
+        return redirect()->route('admin.preguntas.index')->with('status', $mensaje);
     }
 
-    private function conservarImagen(?string $imagen, int $preguntaId): ?string
+    private function reiniciarIds(): bool
     {
-        // Las imágenes manuales de storage/preguntas/ son únicas; solo hay
-        // riesgo de sobrescritura en los archivos de la importación Excel.
-        if (! $imagen || ! str_starts_with($imagen, 'storage/banco/')) {
-            return $imagen;
+        $tablas = [
+            'respuestas_estudiante',
+            'resultados_area',
+            'intentos',
+            'alternativas',
+            'preguntas',
+        ];
+
+        try {
+            $driver = DB::getDriverName();
+
+            if ($driver === 'sqlite') {
+                DB::table('sqlite_sequence')->whereIn('name', $tablas)->delete();
+                return true;
+            }
+
+            if (in_array($driver, ['mysql', 'mariadb'], true)) {
+                foreach ($tablas as $tabla) {
+                    // Nombres fijos, nunca derivados del request.
+                    DB::statement("ALTER TABLE {$tabla} AUTO_INCREMENT = 1");
+                }
+                return true;
+            }
+
+            Log::warning('Motor de BD no compatible con reinicio de IDs', ['driver' => $driver]);
+        } catch (Throwable $e) {
+            Log::warning('El banco fue borrado, pero falló el reinicio de IDs', [
+                'error' => $e->getMessage(),
+            ]);
         }
 
-        $origen = substr($imagen, strlen('storage/'));
+        return false;
+    }
+
+    private function borrarImagenesDelBanco(): bool
+    {
         $disco = Storage::disk('public');
-        if (! $disco->exists($origen)) {
-            return $imagen;
+        $correcto = true;
+
+        // Estas carpetas son exclusivas de imágenes de preguntas importadas
+        // y creadas manualmente. También borra las copias HIST_*.
+        foreach (['banco', 'preguntas'] as $carpeta) {
+            try {
+                if ($disco->directoryExists($carpeta) && ! $disco->deleteDirectory($carpeta)) {
+                    $correcto = false;
+                }
+            } catch (Throwable $e) {
+                $correcto = false;
+                Log::warning('No se pudo limpiar la carpeta del banco CNI', [
+                    'carpeta' => $carpeta,
+                    'error' => $e->getMessage(),
+                ]);
+            }
         }
 
-        $destino = 'banco/historico/'.$preguntaId.'/'.basename($origen);
-        if (! $disco->copy($origen, $destino)) {
-            throw new RuntimeException('No se pudo preservar la imagen histórica. El banco no fue modificado.');
-        }
-
-        return 'storage/'.$destino;
+        return $correcto;
     }
 }
