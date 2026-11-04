@@ -92,17 +92,21 @@ class VaciarBancoPreguntasTest extends TestCase
         $this->assertDatabaseHas('preguntas', ['id' => $id, 'codigo' => 'AM_1']);
     }
 
-    public function test_vacia_el_banco_y_conserva_historial_e_imagenes_de_preguntas_usadas(): void
+    public function test_reinicia_completamente_banco_historial_imagenes_e_ids(): void
     {
-        Storage::disk('public')->put('banco/AM_1.png', 'imagen-original');
-        Storage::disk('public')->put('banco/AM_1_A.png', 'alternativa-original');
+        Storage::disk('public')->put('banco/AM_1.png', 'imagen-anterior');
+        Storage::disk('public')->put('banco/historico/7/archivo.png', 'historial');
+        Storage::disk('public')->put('preguntas/manual.png', 'manual');
 
         $historicaId = $this->pregunta('AM_1', 'storage/banco/AM_1.png');
         $nuevaId = $this->pregunta('LE_1');
-        DB::table('alternativas')->where('pregunta_id', $historicaId)
-            ->update(['imagen' => 'storage/banco/AM_1_A.png']);
+        $temaId = DB::table('preguntas')->where('id', $nuevaId)->value('tema_id');
+        $areaId = DB::table('temas')->where('id', $temaId)->value('area_id');
+        DB::table('preguntas')->where('id', $historicaId)->update([
+            'codigo' => 'HIST_'.$historicaId, 'activo' => false,
+        ]);
 
-        $alumno = $this->usuario('alumno_1', 'estudiante');
+        $alumno = $this->usuario('demo', 'estudiante');
         $intento = DB::table('intentos')->insertGetId([
             'usuario_id' => $alumno->id,
             'tipo' => 'practica',
@@ -115,50 +119,47 @@ class VaciarBancoPreguntasTest extends TestCase
             'pregunta_id' => $historicaId,
             'orden' => 1,
         ]);
+        DB::table('resultados_area')->insert([
+            'intento_id' => $intento,
+            'area_id' => $areaId,
+            'total_preguntas' => 1,
+            'aciertos' => 0,
+            'incorrectas' => 0,
+            'en_blanco' => 1,
+            'puntaje' => 0,
+            'porcentaje' => 0,
+        ]);
 
         $this->actingAs($this->usuario('Super_Admin'), 'web')
             ->delete(route('admin.preguntas.destroy-all'), ['confirmacion' => 'BORRAR TODO'])
             ->assertRedirect(route('admin.preguntas.index'))
             ->assertSessionHas('status');
 
-        $this->assertDatabaseMissing('preguntas', ['id' => $nuevaId]);
-        $this->assertDatabaseMissing('alternativas', ['pregunta_id' => $nuevaId]);
-        $this->assertDatabaseHas('preguntas', [
-            'id' => $historicaId, 'codigo' => 'HIST_'.$historicaId, 'activo' => false,
-            'imagen' => 'storage/banco/historico/'.$historicaId.'/AM_1.png',
-        ]);
-        $this->assertDatabaseHas('alternativas', [
-            'pregunta_id' => $historicaId,
-            'imagen' => 'storage/banco/historico/'.$historicaId.'/AM_1_A.png',
-        ]);
-        $this->assertDatabaseHas('respuestas_estudiante', [
-            'intento_id' => $intento, 'pregunta_id' => $historicaId,
-        ]);
+        foreach (['respuestas_estudiante', 'resultados_area', 'intentos', 'alternativas', 'preguntas'] as $tabla) {
+            $this->assertDatabaseCount($tabla, 0);
+        }
+        $this->assertDatabaseHas('usuarios', ['id' => $alumno->id]);
+        $this->assertDatabaseHas('temas', ['id' => $temaId]);
+        $this->assertDatabaseHas('areas', ['id' => $areaId]);
+        Storage::disk('public')->assertMissing('banco/AM_1.png');
+        Storage::disk('public')->assertMissing('banco/historico/7/archivo.png');
+        Storage::disk('public')->assertMissing('preguntas/manual.png');
+        $this->get(route('admin.preguntas.index'))->assertOk()->assertSee('No hay preguntas para mostrar.');
 
-        Storage::disk('public')->assertExists('banco/historico/'.$historicaId.'/AM_1.png');
-        Storage::disk('public')->assertExists('banco/historico/'.$historicaId.'/AM_1_A.png');
-        $this->assertSame('imagen-original', Storage::disk('public')
-            ->get('banco/historico/'.$historicaId.'/AM_1.png'));
-
-        $this->get(route('admin.preguntas.index'))->assertOk()
-            ->assertSee('No hay preguntas para mostrar.')
-            ->assertDontSee('HIST_'.$historicaId);
-
-        // El código queda libre para importar una versión completamente nueva.
-        DB::table('preguntas')->insert([
+        $primerId = DB::table('preguntas')->insertGetId([
             'codigo' => 'AM_1',
-            'tema_id' => DB::table('preguntas')->where('id', $historicaId)->value('tema_id'),
-            'enunciado' => 'Nueva pregunta',
+            'tema_id' => $temaId,
+            'enunciado' => 'Pregunta nueva',
             'nivel' => 'basico',
             'solucion' => '',
             'activo' => true,
         ]);
-        $this->assertDatabaseHas('preguntas', ['codigo' => 'AM_1', 'activo' => true]);
+        $this->assertSame(1, $primerId);
     }
 
-    public function test_no_vacia_el_banco_si_hay_un_examen_en_curso(): void
+    public function test_se_puede_reiniciar_demo_con_intentos_en_curso(): void
     {
-        $id = $this->pregunta('AM_1');
+        $id = $this->pregunta('RM_1');
         $alumno = $this->usuario('alumno_examen', 'estudiante');
         $intento = DB::table('intentos')->insertGetId([
             'usuario_id' => $alumno->id,
@@ -170,11 +171,14 @@ class VaciarBancoPreguntasTest extends TestCase
         DB::table('respuestas_estudiante')->insert([
             'intento_id' => $intento, 'pregunta_id' => $id, 'orden' => 1,
         ]);
-        $this->actingAs($this->usuario('Super_Admin'), 'web')
-            ->from(route('admin.preguntas.index'))
-            ->delete(route('admin.preguntas.destroy-all'), ['confirmacion' => 'BORRAR TODO'])
-            ->assertSessionHasErrors('confirmacion');
 
-        $this->assertDatabaseHas('preguntas', ['id' => $id, 'codigo' => 'AM_1', 'activo' => true]);
+        $this->actingAs($this->usuario('Super_Admin'), 'web')
+            ->delete(route('admin.preguntas.destroy-all'), ['confirmacion' => 'BORRAR TODO'])
+            ->assertRedirect(route('admin.preguntas.index'));
+
+        $this->assertDatabaseCount('preguntas', 0);
+        $this->assertDatabaseCount('intentos', 0);
+        $this->assertDatabaseCount('respuestas_estudiante', 0);
+        $this->assertDatabaseHas('usuarios', ['id' => $alumno->id]);
     }
 }
