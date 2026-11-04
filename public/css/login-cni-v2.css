@@ -113,6 +113,7 @@
     min-width: 0;
     min-height: 0;
     margin-top: 7px;
+    border-radius: 24px;
     overflow: hidden;
     pointer-events: none;
 }
@@ -120,10 +121,11 @@
     position: absolute;
     z-index: 0;
     bottom: 0;
-    left: 6%;
-    width: 92%;
-    height: 96%;
-    opacity: .18;
+    left: 13%;
+    width: 80%;
+    height: 88%;
+    opacity: .13;
+    filter: blur(.65px);
     overflow: hidden;
     pointer-events: none;
 }
@@ -156,16 +158,18 @@
 .login-cni-v2 .login-mascot-seat {
     z-index: 1;
     left: 50%;
-    bottom: -22px;
-    width: min(90%, 650px);
+    bottom: -12px;
+    width: min(76%, 540px);
+    opacity: .84;
     height: auto;
     transform: translateX(-50%);
 }
 .login-cni-v2 .login-mascot-glow {
     z-index: 2;
     left: 50%;
-    bottom: -5px;
-    width: min(73%, 510px);
+    bottom: 0;
+    width: min(62%, 410px);
+    opacity: .48;
     height: auto;
     transform: translateX(-50%);
 }
@@ -175,9 +179,9 @@
     left: 50%;
     bottom: 0;
     width: auto;
-    height: min(97%, 410px);
+    height: min(98%, 425px);
     max-height: 100%;
-    max-width: 70%;
+    max-width: 66%;
     object-fit: contain;
     object-position: bottom center;
     transform: translateX(-50%);

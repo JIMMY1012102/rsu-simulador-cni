@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=5">
+    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=6">
 @endpush
 
 @section('content')
@@ -21,8 +21,7 @@
 
 
             <div class="login-illustration" aria-hidden="true">
-            <!-- Ilustración académica original (SVG escalable): edificio, libros y birrete.
-                 Se coloca detrás del gatito CNI, sin sustituir la mascota original. -->
+            <!-- Colegio estilizado en segundo plano. La mascota del CNI conserva protagonismo. -->
             <div class="login-campus" aria-hidden="true">
                 <svg viewBox="0 0 1000 565" xmlns="http://www.w3.org/2000/svg" fill="none" role="presentation" focusable="false">
                     <defs>
@@ -33,9 +32,6 @@
                         <linearGradient id="campusRoof" x1="0" y1="0" x2="1" y2="1">
                             <stop stop-color="#85c5ff" stop-opacity=".42"/>
                             <stop offset="1" stop-color="#2767b3" stop-opacity=".4"/>
-                        </linearGradient>
-                        <linearGradient id="campusBook" x1="0" y1="0" x2="1" y2="1">
-                            <stop stop-color="#164d9a"/><stop offset="1" stop-color="#072455"/>
                         </linearGradient>
                         <linearGradient id="campusGround" x1="0" y1="0" x2="0" y2="1">
                             <stop stop-color="#45b3ff" stop-opacity=".24"/>
@@ -66,24 +62,6 @@
                         <rect x="259" y="169" width="81" height="25" rx="7" fill="#163e7a" stroke-opacity=".5"/>
                         <text x="300" y="187" font-family="Georgia,serif" text-anchor="middle" font-size="18" font-weight="bold" fill="#b7d9ff" stroke="none" opacity=".85">CNI</text>
                         <path d="M29 464h547M49 480h502" stroke-opacity=".35"/>
-                    </g>
-                    <!-- Libros sobre la izquierda -->
-                    <g transform="translate(18 468)" stroke-linejoin="round">
-                        <path d="M3 39h158l-12 31H2L3 39Z" fill="url(#campusBook)" stroke="#4ea5ed" stroke-width="3"/>
-                        <path d="M13 42h132l-7 22H11l2-22Z" fill="#e5eefc" stroke="#9fc3ed" stroke-width="2"/>
-                        <path d="M5 74h159l-11 27H0L5 74Z" fill="#154b93" stroke="#447fca" stroke-width="3"/>
-                        <path d="M13 77h137l-6 19H10l3-19Z" fill="#f4f7ff"/>
-                        <path d="M13 38 28 4l123 20-8 29" fill="#0f4389" stroke="#4c9be4" stroke-width="3"/>
-                        <path d="m30 10 115 18-4 15-114-17" fill="#dce9fc"/>
-                        <path d="M141 24h8v28" stroke="#efbe50" stroke-width="4"/>
-                    </g>
-                    <!-- Birrete académico a la derecha -->
-                    <g transform="translate(763 446)" stroke-linejoin="round">
-                        <ellipse cx="101" cy="91" rx="112" ry="21" fill="#071e4b" opacity=".5"/>
-                        <path d="M20 47 104 14l83 33-83 33L20 47Z" fill="#072c68" stroke="#619ee6" stroke-width="3"/>
-                        <path d="M60 66v22c30 18 59 16 88 0V66" fill="#144e9a" stroke="#619ee6" stroke-width="3"/>
-                        <path d="M103 50c22 1 47 2 76-3l1 47" stroke="#efbe50" stroke-width="4"/>
-                        <path d="M173 93h14l4 23h-22l4-23Z" fill="#ffc956"/>
                     </g>
                 </svg>
             </div>
