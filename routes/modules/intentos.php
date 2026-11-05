@@ -1,9 +1,10 @@
 <?php
 
 use App\Http\Controllers\Api\IntentoController;
+use App\Http\Middleware\EnsureActiveUser;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth')->prefix('intentos')->group(function () {
+Route::middleware(['auth:web', EnsureActiveUser::class])->prefix('intentos')->group(function () {
     Route::post('/', [IntentoController::class, 'iniciar']);
     Route::get('/{id}', [IntentoController::class, 'mostrar'])
         ->whereNumber('id');

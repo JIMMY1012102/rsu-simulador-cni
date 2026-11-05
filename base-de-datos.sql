@@ -77,7 +77,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
     usuario         VARCHAR(50)     NOT NULL COMMENT 'Nombre de usuario para iniciar sesión',
     password        VARCHAR(255)    NOT NULL COMMENT 'Contraseña cifrada (bcrypt)',
     rol             ENUM('admin','docente','estudiante') NOT NULL,
-    seccion_id      BIGINT UNSIGNED NULL COMMENT 'Obligatoria solo para estudiantes',
+    seccion_id      BIGINT UNSIGNED NULL COMMENT 'Asignada a estudiantes y docentes de sección',
     carrera_id      BIGINT UNSIGNED NULL COMMENT 'Carrera elegida por el estudiante (RF-16)',
     activo          TINYINT(1)      NOT NULL DEFAULT 1,
     remember_token  VARCHAR(100)    NULL DEFAULT NULL,

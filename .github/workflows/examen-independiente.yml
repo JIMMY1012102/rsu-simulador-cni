@@ -1,0 +1,51 @@
+name: Examen independiente
+on:
+  pull_request:
+    branches: ['OFICIAL#1']
+  push:
+    branches: ['OFICIAL#1']
+    paths: ['app/**', 'routes/**', 'resources/views/**', 'tests/**', '.github/workflows/examen-independiente.yml']
+permissions:
+  contents: read
+jobs:
+  examen:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        database: [sqlite, mysql]
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root_ci_only
+          MARIADB_DATABASE: cni_test
+          MARIADB_USER: cni_test
+          MARIADB_PASSWORD: test_ci_only
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s --health-timeout=5s --health-retries=10
+    env:
+      APP_ENV: testing
+      DB_CONNECTION: ${{ matrix.database }}
+      DB_DATABASE: ${{ matrix.database == 'sqlite' && ':memory:' || 'cni_test' }}
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_USERNAME: cni_test
+      DB_PASSWORD: test_ci_only
+      DB_URL: ''
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, pdo_sqlite, pdo_mysql, gd, zip
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist
+      - run: cp .env.example .env
+      - run: php artisan key:generate
+      - run: php artisan route:list
+      - run: php artisan view:cache
+      - run: php artisan test --filter='ExamenIndependienteTest|ExamenServiceTest|ExamenPantallaTest|ImportarBancoExcelTest|BancoGestionTest|AdministracionAcademicaTest|ImportarAlumnosExcelTest|SeccionesDocenteTest'
+      - name: Verifica el panel compartido de las cinco áreas
+        run: php artisan test --filter='PanelesPorAreaTest::test_eleccion_persiste_y_llega_a_la_misma_pagina_para_cada_area|PanelesPorAreaTest::test_menu_lateral_tiene_exactamente_tres_opciones_y_un_boton_para_contraerlo'

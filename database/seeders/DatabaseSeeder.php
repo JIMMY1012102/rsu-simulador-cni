@@ -8,7 +8,18 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Los seeders oficiales serán agregados por Nia y revisados por el equipo.
-        // No insertar usuarios ni catálogos sin validar el SQL existente.
+        $this->call([
+            CatalogoBancoCniSeeder::class,
+            SeccionSeeder::class,
+            AreaPostulacionSeeder::class,
+            CarreraSeeder::class,
+            UsuarioSeeder::class,
+        ]);
+
+        // Los cuatro docentes ficticios existen solo para desarrollo y pruebas.
+        if (app()->environment(['local', 'testing'])) {
+            $this->call(DocentesSeccionDemoSeeder::class);
+        }
     }
 }
+
