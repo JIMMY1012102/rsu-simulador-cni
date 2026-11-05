@@ -1,7 +1,8 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=9">
+    <link rel="stylesheet" href="{{ asset('css/login-cni-v2.css') }}?v=8">
+    <link rel="stylesheet" href="{{ asset('css/login-cni-final.css') }}?v=1">
 @endpush
 
 @section('content')
@@ -35,92 +36,19 @@
         </svg>
 
         <section class="login-presentation" aria-labelledby="login-presentation-title">
-            <div class="login-presentation-copy">
-                <h2 class="login-heading" id="login-presentation-title">
-                    Tu próximo paso
-                    <span>empieza <em>aquí.</em></span>
-                </h2>
-            </div>
-
-            <div class="login-academic-icons" aria-hidden="true">
-                <svg class="login-academic-book" viewBox="0 0 136 94" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M68 25C48 10 27 11 6 22v50c24-12 46-10 62 4V25Zm0 0c17-15 40-17 62-4v51c-23-11-45-9-62 4V25Z"
-                          stroke="#9bcbff" stroke-width="3" stroke-linejoin="round"/>
-                    <path d="M15 31c18-7 34-4 44 2M77 32c17-11 30-12 44-5M15 44c18-7 33-5 44 2M77 45c18-10 31-9 44-4"
-                          stroke="#9bcbff" stroke-width="2" stroke-opacity=".48"/>
-                </svg>
-                <svg class="login-academic-laurel" viewBox="0 0 150 136" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g stroke="#9fc9ff" stroke-opacity=".58" stroke-width="2.5">
-                        <path d="M57 18 75 8 96 18 75 29 57 18Zm6 7v15c8 8 19 8 25 0V25M96 18v24"/>
-                        <path d="M75 8v-4"/>
-                        <path d="M30 20c-33 35-13 82 32 99M120 20c33 35 13 82-32 99"/>
-                        <path d="m31 24-15-4 9 19M19 51 6 48l9 18M19 80l-13 3 16 14M34 105l-7 13 19-5"/>
-                        <path d="m119 24 15-4-9 19M131 51l13-3-9 18M131 80l13 3-16 14M116 105l7 13-19-5"/>
-                    </g>
-                </svg>
-            </div>
-            <div class="login-illustration" aria-hidden="true">
-                <svg class="login-campus" viewBox="0 0 1000 540" fill="none"
-                     xmlns="http://www.w3.org/2000/svg" focusable="false">
-                    <defs>
-                        <linearGradient id="cniFacade" x1="0" y1="0" x2="0" y2="1">
-                            <stop stop-color="#75c1ff" stop-opacity=".84"/>
-                            <stop offset=".43" stop-color="#1879cf" stop-opacity=".65"/>
-                            <stop offset="1" stop-color="#093c86" stop-opacity=".9"/>
-                        </linearGradient>
-                        <linearGradient id="cniGlass" x1="0" y1="0" x2="0" y2="1">
-                            <stop stop-color="#79c3ff" stop-opacity=".8"/>
-                            <stop offset="1" stop-color="#0a3e8b" stop-opacity=".78"/>
-                        </linearGradient>
-                        <linearGradient id="cniBookBlue" x1="0" y1="0" x2="1" y2="1">
-                            <stop stop-color="#1b84e7"/>
-                            <stop offset="1" stop-color="#022b70"/>
-                        </linearGradient>
-                        <radialGradient id="cniLight">
-                            <stop stop-color="#4db9ff" stop-opacity=".65"/>
-                            <stop offset="1" stop-color="#0054bc" stop-opacity="0"/>
-                        </radialGradient>
-                    </defs>
-                    <ellipse cx="520" cy="480" rx="485" ry="63" fill="url(#cniLight)"/>
-                    <g class="login-campus-school" stroke="#76c2ff" stroke-width="2.2" stroke-linejoin="round">
-                        <path d="M244 231 540 110 855 231v17H244Z" fill="#2179ce" fill-opacity=".82"/>
-                        <path d="m525 128 15-32 16 32" fill="#4791d5"/>
-                        <path d="M541 98V43" stroke="#b7e4ff" stroke-width="3"/>
-                        <path d="M540 43c29-6 44 14 62 7v42c-19 5-37-8-62-6Z" fill="#4699e4" fill-opacity=".8" stroke="none"/>
-                        <rect x="270" y="248" width="540" height="214" fill="url(#cniFacade)"/>
-                        <rect x="276" y="260" width="528" height="23" fill="#143d7d" fill-opacity=".72" stroke="none"/>
-                        <rect x="291" y="295" width="100" height="145" rx="47" fill="url(#cniGlass)"/>
-                        <rect x="410" y="295" width="100" height="145" rx="47" fill="url(#cniGlass)"/>
-                        <rect x="570" y="295" width="100" height="145" rx="47" fill="url(#cniGlass)"/>
-                        <rect x="690" y="295" width="100" height="145" rx="47" fill="url(#cniGlass)"/>
-                        <path d="M341 295v144M460 295v144M620 295v144M740 295v144" stroke-opacity=".48"/>
-                        <path d="M287 367h515M271 460h539" stroke-opacity=".48"/>
-                        <rect x="480" y="194" width="122" height="42" rx="4" fill="#14447f" stroke-opacity=".45"/>
-                        <text x="541" y="223" font-family="Georgia,serif" text-anchor="middle" font-size="30" font-weight="bold" fill="#d2eeff" stroke="none">CNI</text>
-                    </g>
-                    <g class="login-campus-books" stroke-linejoin="round">
-                        <ellipse cx="108" cy="515" rx="120" ry="12" fill="#001332" opacity=".55"/>
-                        <path d="M12 425h200l-12 43H0l12-43Z" fill="url(#cniBookBlue)" stroke="#5eaff9" stroke-width="3"/>
-                        <path d="M25 429h167l-6 32H18l7-32Z" fill="#eff5ff"/>
-                        <path d="M5 474h204l-11 38H-7l12-38Z" fill="#063775" stroke="#6cb9ff" stroke-width="3"/>
-                        <path d="M16 478h183l-7 27H9l7-27Z" fill="#e6f1ff"/>
-                        <path d="M35 429 58 385l143 32-10 17" fill="#1050a4" stroke="#72beff" stroke-width="3"/>
-                        <path d="m59 392 130 30-3 6-129-29" fill="#ebf6ff"/>
-                        <path d="M26 425v36" stroke="#ffc65b" stroke-width="5"/>
-                    </g>
-                    <g class="login-campus-cap" stroke-linejoin="round">
-                        <ellipse cx="876" cy="515" rx="117" ry="15" fill="#001431" opacity=".54"/>
-                        <path d="m751 424 124-51 122 51-122 48-124-48Z" fill="#0b3d89" stroke="#92caff" stroke-width="3"/>
-                        <path d="M817 450v35c35 24 80 25 116 0v-35" fill="#1351a5" stroke="#85bfff" stroke-width="3"/>
-                        <path d="M876 421h91v66" stroke="#ffd56f" stroke-width="4"/>
-                        <path d="m959 485 14 1 6 26-27-1Z" fill="#ffd66a"/>
-                    </g>
-                </svg>
-                <div class="login-gold-stage"></div>
-                <img src="{{ asset('images/gatito-cni.png') }}"
-                     alt="" class="login-mascot">
-            </div>
-        </section>
+    <div class="login-presentation-copy">
+        <h2 class="login-heading" id="login-presentation-title">
+            Tu próximo paso
+            <span>empieza <em>aquí.</em></span>
+        </h2>
+    </div>
+    <div class="login-cni-scene" role="img" aria-label="Mascota del CNI en una plataforma luminosa">
+        <div class="login-cni-stage" aria-hidden="true"></div>
+        <img class="login-cni-cat"
+             src="{{ asset('images/gatito-cni.png') }}"
+             alt="Gatito del Simulador CNI con uniforme y laptop">
+    </div>
+</section>
 
         <section class="login card" aria-labelledby="login-title">
             <div class="login-school-identity">
