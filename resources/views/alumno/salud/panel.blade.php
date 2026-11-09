@@ -61,7 +61,7 @@
                 </div>
                 <div class="cni-alumno-banner-pattern" aria-hidden="true"></div>
                 @if($esSalud)
-                    <img class="cni-alumno-mascota" src="{{ asset('images/alumno/pinguino-medicina.webp') }}" alt="Pingüino médico azul del área Ciencias de la Salud, con estrellas, estetoscopio y tableta">
+                    <img class="cni-alumno-mascota" src="{{ asset('images/mascotas/pinguino-salud.png') }}" alt="Pingüino médico azul del área Ciencias de la Salud, con estetoscopio y tableta">
                 @else
                     <div class="cni-alumno-grupo" aria-hidden="true">{{ $area->codigo }}</div>
                 @endif

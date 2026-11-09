@@ -11,7 +11,7 @@ return [
             'icono' => '✚',
             'descripcion' => 'Cada respuesta te acerca a tu vocación de cuidar vidas.',
             'lema' => 'Aprende hoy para transformar vidas mañana.',
-            'mascota_webp' => 'images/mascotas/cni-mascota-salud.webp',
+            'mascota_webp' => 'images/mascotas/pinguino-salud.png',
             'mascota_svg' => 'images/mascotas/mascota-salud.svg',
         ],
         'B' => [
