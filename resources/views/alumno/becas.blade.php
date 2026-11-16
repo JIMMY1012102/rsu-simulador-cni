@@ -334,7 +334,6 @@ h1,h2,h3,p{margin:0}
         </div>
         <div class="btns">
           <a class="btn btn-blue" href="https://www.pronabec.gob.pe/beca-18/" target="_blank" rel="noopener noreferrer">Ver cómo postular</a>
-          <a class="btn btn-ghost" href="https://www.pronabec.gob.pe/libro-preparate/" target="_blank" rel="noopener noreferrer">Libro "Prepárate"</a>
         </div>
       </div>
       <div>
