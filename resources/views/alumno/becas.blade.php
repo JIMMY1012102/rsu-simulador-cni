@@ -428,10 +428,14 @@ h1,h2,h3,p{margin:0}
         <form method="POST" action="{{ route('examen.independiente') }}" target="_top">@csrf<button class="btn btn-ghost" type="submit">Dar examen</button></form>
       </div>
       <div class="quote">
-        <div class="ph" aria-hidden="true">[FOTO]</div>
+        <div class="ph" aria-hidden="true">LA</div>
         <div>
-          <q>[FRASE CORTA de un exalumno del CNI sobre cómo ingresó con beca]</q>
-          <span>[Nombre] · [Carrera] · [Universidad] · Cañete</span>
+          <h3>Conoce la historia de Lizeth Atoccsa</h3>
+          <p>Beneficiaria de Beca 18 que comparte su experiencia universitaria, aprendizajes y consejos para estudiantes.</p>
+          <div class="btns">
+            <a class="btn btn-gold" href="https://www.youtube.com/@LizethVlogger" target="_blank" rel="noopener noreferrer">Ver su YouTube ↗</a>
+            <a class="btn btn-ghost" href="https://www.tiktok.com/@lizeth.atoccsa" target="_blank" rel="noopener noreferrer">Ver su TikTok ↗</a>
+          </div>
         </div>
       </div>
       <footer class="foot">
