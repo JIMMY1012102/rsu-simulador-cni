@@ -110,7 +110,7 @@ h1,h2,h3,p{margin:0}
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:20px;padding-bottom:clamp(64px,10vh,120px)}
 .step{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:clamp(20px,4vw,48px);align-items:center;background:var(--ink-3);border:1px solid var(--line);border-radius:28px;padding:clamp(20px,3vw,32px)}
 .step-art{aspect-ratio:1;width:100%;max-width:380px;border-radius:32px;background:radial-gradient(circle at 30% 20%,rgba(143,176,255,.4),transparent 62%),var(--ink-2);border:1px solid var(--line);display:grid;place-items:center;padding:12%}
-.step-art svg{width:100%;height:auto;display:block}
+.step-art--photo{padding:0;overflow:hidden;aspect-ratio:4/3;background:#fff}.step-art--photo img{display:block;width:100%;height:100%;object-fit:contain}.step-art svg{width:100%;height:auto;display:block}
 .step-tag{font-weight:700;color:var(--gold);font-size:.95rem}
 .step-word{font-family:var(--display);font-weight:900;font-size:clamp(2.1rem,7vw,5rem);line-height:1.05;letter-spacing:-.02em;overflow:hidden;padding-block:.06em}
 .step-word .wi{display:inline-block}
@@ -284,7 +284,7 @@ h1,h2,h3,p{margin:0}
       <p class="stage-label">Premio <b id="stepnum">1</b> de 4</p>
       <div class="steps">
         <article class="step">
-          <div class="step-art"><svg viewBox="0 0 200 200" aria-hidden="true"><rect x="38" y="46" width="124" height="86" rx="10" fill="#16246b" stroke="#8fb0ff" stroke-width="5"/><rect x="50" y="58" width="100" height="62" rx="4" fill="#2f63f0"/><path d="M60 108l20-22 16 14 24-30 20 20" fill="none" stroke="#ffc83d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/><path d="M20 146h160l-14 16H34z" fill="#8fb0ff"/></svg></div>
+          <div class="step-art step-art--photo"><img src="{{ asset('images/becas/laptop.webp') }}" alt="Laptop ASUS con una imagen de Spider-Man" width="1200" height="900" decoding="async"></div>
           <div>
             <p class="step-tag">Beca 18</p>
             <h3 class="step-word"><span class="wi">LAPTOP</span></h3>
@@ -292,7 +292,7 @@ h1,h2,h3,p{margin:0}
           </div>
         </article>
         <article class="step">
-          <div class="step-art"><svg viewBox="0 0 200 200" aria-hidden="true"><path d="M30 98L100 38l70 60" fill="none" stroke="#8fb0ff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/><rect x="48" y="92" width="104" height="72" rx="6" fill="#16246b" stroke="#8fb0ff" stroke-width="5"/><rect x="88" y="120" width="24" height="44" rx="4" fill="#ffc83d"/><rect x="58" y="104" width="20" height="18" rx="3" fill="#2f63f0"/><rect x="122" y="104" width="20" height="18" rx="3" fill="#2f63f0"/></svg></div>
+          <div class="step-art step-art--photo"><img src="{{ asset('images/becas/cuarto.webp') }}" alt="Habitación con cama individual y escritorio" width="738" height="415" decoding="async"></div>
           <div>
             <p class="step-tag">Beca 18</p>
             <h3 class="step-word"><span class="wi">CUARTO*</span></h3>
@@ -300,7 +300,7 @@ h1,h2,h3,p{margin:0}
           </div>
         </article>
         <article class="step">
-          <div class="step-art"><svg viewBox="0 0 200 200" aria-hidden="true"><rect x="34" y="50" width="132" height="92" rx="16" fill="#16246b" stroke="#8fb0ff" stroke-width="5"/><rect x="46" y="62" width="50" height="34" rx="6" fill="#2f63f0"/><rect x="104" y="62" width="50" height="34" rx="6" fill="#2f63f0"/><path d="M34 112h132" stroke="#8fb0ff" stroke-width="5"/><circle cx="70" cy="146" r="12" fill="#ffc83d" stroke="#0c1332" stroke-width="4"/><circle cx="130" cy="146" r="12" fill="#ffc83d" stroke="#0c1332" stroke-width="4"/></svg></div>
+          <div class="step-art step-art--photo"><img src="{{ asset('images/becas/pasajes.webp') }}" alt="Buses universitarios de transporte" width="602" height="332" decoding="async"></div>
           <div>
             <p class="step-tag">Beca 18</p>
             <h3 class="step-word"><span class="wi">PASAJES</span></h3>
@@ -308,7 +308,7 @@ h1,h2,h3,p{margin:0}
           </div>
         </article>
         <article class="step">
-          <div class="step-art"><svg viewBox="0 0 200 200" aria-hidden="true"><path d="M100 30L186 72L100 114L14 72Z" fill="#ffc83d"/><path d="M44 92V128C44 144 70 156 100 156C130 156 156 144 156 128V92L100 120Z" fill="#e0a516"/><path d="M178 78V126" stroke="#ffc83d" stroke-width="7"/><circle cx="178" cy="134" r="9" fill="#ffc83d"/></svg></div>
+          <div class="step-art step-art--photo"><img src="{{ asset('images/becas/carrera.webp') }}" alt="Universidades peruanas donde continuar tus estudios" width="721" height="425" decoding="async"></div>
           <div>
             <p class="step-tag">Beca 18</p>
             <h3 class="step-word"><span class="wi">CARRERA</span></h3>
@@ -580,7 +580,7 @@ h1,h2,h3,p{margin:0}
         tl.to(steps[i - 1], { opacity: 0, y: -50, scale: 0.97, duration: 0.45 }, t);
         tl.fromTo(s, { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 0.6 }, t + 0.2);
         tl.fromTo(s.querySelector(".wi"), { yPercent: 110 }, { yPercent: 0, duration: 0.6 }, t + 0.25);
-        tl.fromTo(s.querySelector(".step-art svg"), { scale: 0.65, rotation: -10 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.6)" }, t + 0.2);
+        tl.fromTo(s.querySelector(".step-art img, .step-art svg"), { scale: 0.65, rotation: -10 }, { scale: 1, rotation: 0, duration: 0.7, ease: "back.out(1.6)" }, t + 0.2);
         tl.to(bar, { scaleX: (i + 1) / n, duration: 0.5, ease: "none" }, t + 0.2);
       }
       (function (num) {
