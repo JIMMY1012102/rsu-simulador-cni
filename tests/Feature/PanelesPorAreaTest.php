@@ -57,6 +57,8 @@ class PanelesPorAreaTest extends TestCase
                 ->assertSee('href="#perfil"', false)
                 ->assertSee('href="#progreso"', false)
                 ->assertSee('href="#historial"', false)
+                ->assertSee('Misión Beca CNI')
+                ->assertSee(route('alumno.becas'))
                 ->assertSee('aria-controls="cni-alumno-sidebar"', false)
                 ->assertSee('data-sidebar-toggle', false);
         }
@@ -105,7 +107,7 @@ class PanelesPorAreaTest extends TestCase
         $this->get(route('alumno.tema', ['tema' => 9999]))->assertNotFound();
     }
 
-    public function test_menu_lateral_tiene_exactamente_tres_opciones_y_un_boton_para_contraerlo(): void
+    public function test_menu_lateral_tiene_cuatro_opciones_y_un_boton_para_contraerlo(): void
     {
         $this->actingAs($this->estudiante('C'), 'web');
         $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
@@ -115,7 +117,7 @@ class PanelesPorAreaTest extends TestCase
             $html,
             $navegacion
         ));
-        $this->assertSame(3, preg_match_all('/<a\\b/', $navegacion[1]));
+        $this->assertSame(4, preg_match_all('/<a\\b/', $navegacion[1]));
         $this->assertStringContainsString('Mi perfil', $navegacion[1]);
         $this->assertStringContainsString('Mi progreso', $navegacion[1]);
         $this->assertStringContainsString('Historial', $navegacion[1]);
@@ -173,6 +175,26 @@ class PanelesPorAreaTest extends TestCase
         }
     }
 
+    public function test_mision_beca_es_comun_a_las_cinco_areas(): void
+    {
+        foreach (['A', 'B', 'C', 'D', 'E'] as $codigo) {
+            $usuario = $this->estudiante($codigo);
+            $this->actingAs($usuario, 'web')->get(route('alumno.becas'))
+                ->assertOk()->assertViewIs('alumno.becas')
+                ->assertSee('BECA 18')->assertSee('BECAS BCP')
+                ->assertSee('Volver al panel')
+                ->assertSee(route('examen.independiente'));
+        }
+    }
+
+    public function test_mision_beca_requiere_sesion_y_rol_estudiante(): void
+    {
+        $this->get(route('alumno.becas'))->assertRedirect(route('login'));
+        $usuario = $this->estudiante('A');
+        $usuario->update(['rol' => 'docente']);
+        $this->actingAs($usuario, 'web')->get(route('alumno.becas'))->assertForbidden();
+    }
+
     public function test_docente_no_puede_abrir_el_panel_de_alumno(): void
     {
         $docente = Usuario::create([
@@ -186,3 +208,4 @@ class PanelesPorAreaTest extends TestCase
             ->get(route('alumno.panel'))->assertForbidden();
     }
 }
+

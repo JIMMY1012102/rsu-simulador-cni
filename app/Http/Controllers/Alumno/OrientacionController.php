@@ -26,6 +26,13 @@ class OrientacionController extends Controller
         return $usuario;
     }
 
+    public function becas(Request $request): View
+    {
+        $usuario = $this->estudiante($request);
+
+        return view('alumno.becas', compact('usuario'));
+    }
+
     public function elegirArea(Request $request): View|RedirectResponse
     {
         $usuario = $this->estudiante($request);
@@ -239,3 +246,4 @@ class OrientacionController extends Controller
         ]);
     }
 }
+

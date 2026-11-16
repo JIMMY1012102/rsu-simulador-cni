@@ -37,6 +37,7 @@ Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::clas
         Route::get('/elegir-area', [OrientacionController::class, 'elegirArea'])->name('elegir-area');
         Route::post('/elegir-area', [OrientacionController::class, 'guardarArea'])->name('area.guardar');
         Route::get('/panel', [OrientacionController::class, 'panel'])->name('panel');
+        Route::get('/becas', [OrientacionController::class, 'becas'])->name('becas');
         Route::post('/carrera', [OrientacionController::class, 'guardarCarrera'])->name('carrera.guardar');
         Route::get('/tema/{tema}', [OrientacionController::class, 'tema'])
             ->whereNumber('tema')->name('tema');
@@ -126,3 +127,4 @@ if (app()->environment('local')) {
         ]);
     });
 }
+
