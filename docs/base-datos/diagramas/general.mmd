@@ -1,0 +1,106 @@
+erDiagram
+  secciones {
+    bigint id PK
+    varchar nombre
+  }
+  areas_postulacion {
+    bigint id PK
+    char codigo
+    varchar nombre
+  }
+  carreras {
+    bigint id PK
+    bigint area_postulacion_id FK
+    varchar nombre
+  }
+  usuarios {
+    bigint id PK
+    varchar usuario
+    bigint seccion_id FK
+    bigint carrera_id FK
+    bigint area_postulacion_id FK
+  }
+  areas {
+    bigint id PK
+    varchar nombre
+  }
+  temas {
+    bigint id PK
+    bigint area_id FK
+    varchar nombre
+  }
+  preguntas {
+    bigint id PK
+    bigint tema_id FK
+    enum nivel
+    bigint creado_por FK
+  }
+  alternativas {
+    bigint id PK
+    bigint pregunta_id FK
+  }
+  simulacros {
+    bigint id PK
+    varchar nombre
+    bigint creado_por FK
+    bigint carrera_id FK
+  }
+  area_postulacion_simulacro {
+    bigint id PK
+    bigint area_postulacion_id FK
+    bigint simulacro_id FK
+  }
+  simulacro_area {
+    bigint id PK
+    bigint simulacro_id FK
+    bigint area_id FK
+    enum nivel
+  }
+  intentos {
+    bigint id PK
+    bigint usuario_id FK
+    bigint carrera_id FK
+    bigint simulacro_id FK
+    bigint area_id FK
+    bigint tema_id FK
+    enum estado
+    decimal puntaje_total
+  }
+  respuestas_estudiante {
+    bigint id PK
+    bigint intento_id FK
+    bigint pregunta_id FK
+    bigint alternativa_id FK
+  }
+  resultados_area {
+    bigint id PK
+    bigint intento_id FK
+    bigint area_id FK
+  }
+  personal_access_tokens {
+    bigint id PK
+  }
+  areas_postulacion ||--o{ carreras : "area_postulacion_id"
+  secciones |o--o{ usuarios : "seccion_id"
+  carreras |o--o{ usuarios : "carrera_id"
+  areas_postulacion |o--o{ usuarios : "area_postulacion_id"
+  areas ||--o{ temas : "area_id"
+  temas ||--o{ preguntas : "tema_id"
+  usuarios |o--o{ preguntas : "creado_por"
+  preguntas ||--o{ alternativas : "pregunta_id"
+  usuarios |o--o{ simulacros : "creado_por"
+  carreras |o--o{ simulacros : "carrera_id"
+  areas_postulacion ||--o{ area_postulacion_simulacro : "area_postulacion_id"
+  simulacros ||--o{ area_postulacion_simulacro : "simulacro_id"
+  simulacros ||--o{ simulacro_area : "simulacro_id"
+  areas ||--o{ simulacro_area : "area_id"
+  usuarios ||--o{ intentos : "usuario_id"
+  carreras |o--o{ intentos : "carrera_id"
+  simulacros |o--o{ intentos : "simulacro_id"
+  areas |o--o{ intentos : "area_id"
+  temas |o--o{ intentos : "tema_id"
+  intentos ||--o{ respuestas_estudiante : "intento_id"
+  preguntas ||--o{ respuestas_estudiante : "pregunta_id"
+  alternativas |o--o{ respuestas_estudiante : "alternativa_id"
+  intentos ||--o{ resultados_area : "intento_id"
+  areas ||--o{ resultados_area : "area_id"

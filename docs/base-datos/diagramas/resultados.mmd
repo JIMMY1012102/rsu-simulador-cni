@@ -1,0 +1,142 @@
+erDiagram
+  usuarios {
+    bigint id PK
+    varchar nombres
+    varchar apellidos
+    varchar usuario
+    varchar password
+    enum rol
+    bigint seccion_id FK
+    bigint carrera_id FK
+    boolean activo
+    varchar remember_token
+    bigint area_postulacion_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  carreras {
+    bigint id PK
+    bigint area_postulacion_id FK
+    varchar nombre
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  simulacros {
+    bigint id PK
+    varchar nombre
+    smallint tiempo_limite
+    smallint total_preguntas
+    smallint cantidad_alternativas
+    decimal puntaje_correcta
+    decimal puntaje_incorrecta
+    decimal puntaje_blanco
+    decimal puntaje_maximo
+    datetime fecha_inicio
+    datetime fecha_fin
+    boolean activo
+    bigint creado_por FK
+    bigint carrera_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas {
+    bigint id PK
+    varchar nombre
+    enum bloque
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  temas {
+    bigint id PK
+    bigint area_id FK
+    varchar nombre
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  preguntas {
+    bigint id PK
+    bigint tema_id FK
+    text enunciado
+    varchar imagen
+    enum nivel
+    text solucion
+    boolean activo
+    bigint creado_por FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  alternativas {
+    bigint id PK
+    bigint pregunta_id FK
+    char letra
+    varchar texto
+    boolean es_correcta
+    timestamp created_at
+    timestamp updated_at
+  }
+  intentos {
+    bigint id PK
+    bigint usuario_id FK
+    bigint carrera_id FK
+    bigint simulacro_id FK
+    enum tipo
+    bigint area_id FK
+    bigint tema_id FK
+    datetime fecha_inicio
+    datetime fecha_limite
+    datetime fecha_fin
+    enum estado
+    smallint total_preguntas
+    decimal puntaje_total
+    smallint correctas
+    smallint incorrectas
+    smallint en_blanco
+    smallint doble_marca
+    timestamp created_at
+    timestamp updated_at
+  }
+  respuestas_estudiante {
+    bigint id PK
+    bigint intento_id FK
+    bigint pregunta_id FK
+    smallint orden
+    bigint alternativa_id FK
+    enum estado_respuesta
+    decimal puntaje_obtenido
+    datetime respondida_en
+    timestamp created_at
+    timestamp updated_at
+  }
+  resultados_area {
+    bigint id PK
+    bigint intento_id FK
+    bigint area_id FK
+    smallint total_preguntas
+    smallint aciertos
+    smallint incorrectas
+    smallint en_blanco
+    decimal puntaje
+    decimal porcentaje
+    timestamp created_at
+    timestamp updated_at
+  }
+  carreras |o--o{ usuarios : "carrera_id"
+  areas ||--o{ temas : "area_id"
+  temas ||--o{ preguntas : "tema_id"
+  usuarios |o--o{ preguntas : "creado_por"
+  preguntas ||--o{ alternativas : "pregunta_id"
+  usuarios |o--o{ simulacros : "creado_por"
+  carreras |o--o{ simulacros : "carrera_id"
+  usuarios ||--o{ intentos : "usuario_id"
+  carreras |o--o{ intentos : "carrera_id"
+  simulacros |o--o{ intentos : "simulacro_id"
+  areas |o--o{ intentos : "area_id"
+  temas |o--o{ intentos : "tema_id"
+  intentos ||--o{ respuestas_estudiante : "intento_id"
+  preguntas ||--o{ respuestas_estudiante : "pregunta_id"
+  alternativas |o--o{ respuestas_estudiante : "alternativa_id"
+  intentos ||--o{ resultados_area : "intento_id"
+  areas ||--o{ resultados_area : "area_id"

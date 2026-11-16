@@ -1,0 +1,44 @@
+erDiagram
+  secciones {
+    bigint id PK
+    varchar nombre
+    varchar grado
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas_postulacion {
+    bigint id PK
+    char codigo
+    varchar nombre
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  carreras {
+    bigint id PK
+    bigint area_postulacion_id FK
+    varchar nombre
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  usuarios {
+    bigint id PK
+    varchar nombres
+    varchar apellidos
+    varchar usuario
+    varchar password
+    enum rol
+    bigint seccion_id FK
+    bigint carrera_id FK
+    boolean activo
+    varchar remember_token
+    bigint area_postulacion_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas_postulacion ||--o{ carreras : "area_postulacion_id"
+  secciones |o--o{ usuarios : "seccion_id"
+  carreras |o--o{ usuarios : "carrera_id"
+  areas_postulacion |o--o{ usuarios : "area_postulacion_id"

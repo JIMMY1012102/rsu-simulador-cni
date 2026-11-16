@@ -1,0 +1,204 @@
+/* Panel Ciencias Básicas: marco Figma 301:1600 «Ciencias Básicas · Inicio del simulador» (1440 × 1100). Prefijo exclusivo: ini-.
+   Inter se carga desde /fonts/alumno (PR #13); si aún no está, se usa Arial. */
+@font-face{font-family:Inter;src:url('/fonts/alumno/Inter-400.ttf') format('truetype');font-weight:400;font-display:swap}
+@font-face{font-family:Inter;src:url('/fonts/alumno/Inter-500.ttf') format('truetype');font-weight:500;font-display:swap}
+@font-face{font-family:Inter;src:url('/fonts/alumno/Inter-600.ttf') format('truetype');font-weight:600;font-display:swap}
+@font-face{font-family:Inter;src:url('/fonts/alumno/Inter-700.ttf') format('truetype');font-weight:700;font-display:swap}
+@font-face{font-family:Inter;src:url('/fonts/alumno/Inter-800.ttf') format('truetype');font-weight:800;font-display:swap}
+
+.ini-body{margin:0;background:#f7faf5;color:#062d2d;font:16px/1.21 Inter,Arial,sans-serif}
+.ini,.ini *{box-sizing:border-box}
+.ini h1,.ini h2,.ini h3,.ini p,.ini ul,.ini ol,.ini dl,.ini dd,.ini blockquote{margin:0;padding:0}
+.ini ul,.ini ol{list-style:none}
+.ini img{display:block;flex-shrink:0}
+.ini a{color:inherit;text-decoration:none}
+.ini [title]{cursor:default}
+.ini-skip{position:absolute;left:-999px}
+.ini-skip:focus{left:8px;top:8px;z-index:10;background:#fff;padding:8px 12px;border-radius:8px}
+.ini :focus-visible{outline:3px solid #70ce05;outline-offset:2px}
+
+.ini{display:grid;grid-template-columns:155px minmax(0,1fr);min-height:100vh}
+
+/* Navegación lateral 301:1601 */
+.ini-lateral{background:#064936;color:#fff;display:flex;flex-direction:column;min-height:100%}
+.ini-identidad{display:flex;flex-direction:column;padding:24px 0 0 16px;height:116px}
+.ini-identidad-portal{font-size:22px;font-weight:700;line-height:27px}
+.ini-identidad-cni{font-size:28px;font-weight:800;line-height:34px}
+.ini-menu{display:flex;flex-direction:column;gap:9px;padding:0 8px}
+.ini-menu>*{display:flex;align-items:center;height:59px;padding:0 8px 0 16px;border-radius:10px;font-size:18px;font-weight:500;line-height:22px;color:#fff;background:#064936}
+.ini-menu a:hover{background:#0b5a43}
+.ini-menu [aria-current]{background:#70ce05;font-weight:700}
+.ini-menu [aria-current]:hover{background:#70ce05}
+.ini-paisaje{width:155px;height:530px;margin-top:21px;object-fit:cover}
+.ini-lateral-pie{margin-top:auto;border-top:2px solid rgba(255,255,255,.14);padding:24px 16px 47px;display:flex;flex-direction:column;gap:52px;font-size:17px;line-height:21px;color:#e2f0e6}
+.ini-lateral-pie button{all:unset;cursor:pointer;color:#e2f0e6;font:inherit}
+.ini-lateral-pie button:hover{text-decoration:underline}
+
+/* Encabezado 301:1621 */
+.ini-principal{min-width:0;display:flex;flex-direction:column}
+.ini-barra{display:flex;align-items:center;justify-content:space-between;gap:16px;height:86px;padding:0 16px 0 38px;background:#edf6e8;border-bottom:1px solid #e1e8f2}
+.ini-area{display:flex;align-items:center;gap:26px;min-width:0}
+.ini-area h1{font-size:27px;font-weight:700;line-height:33px;white-space:nowrap}
+.ini-emblema{display:flex;align-items:center;justify-content:center;width:58px;height:58px;border-radius:50%;background:#278f18;flex-shrink:0}
+.ini-emblema-grande{width:67px;height:67px}
+.ini-cuenta{display:flex;align-items:center;gap:21px}
+.ini-avisos{position:relative;width:43px;height:48px;flex-shrink:0}
+.ini-avisos img{position:absolute;left:2px;top:8px}
+.ini-avisos-punto{position:absolute;left:21px;top:3px;width:15px;height:15px;border-radius:50%;background:#ff4574}
+.ini-avatar{display:flex;align-items:center;justify-content:center;width:52px;height:52px;border-radius:50%;background:#e8eaf0;flex-shrink:0}
+.ini-alumno{display:flex;flex-direction:column;gap:4px;min-width:0}
+.ini-alumno strong{font-size:18px;font-weight:700;line-height:22px;white-space:nowrap}
+.ini-alumno span{font-size:14px;line-height:17px;color:#658181}
+
+/* Bienvenida 301:1635 */
+.ini-bienvenida{position:relative;min-height:454px;background:#eaf0e5;box-shadow:inset 0 -1px #e1e8f2;padding:45px 0 0 54px;overflow:hidden}
+.ini-escena{position:absolute;top:0;right:0;width:652px;height:100%}
+.ini-escena img{width:100%;height:100%;object-fit:cover;object-position:left top}
+/* La ilustración de referencia trae impreso el borde de la tarjeta de progreso en sus primeros 85 px;
+   la tarjeta real debe cubrirlo, así que su borde derecho queda anclado a 85 px dentro de la escena. */
+/* «Transición del laboratorio»: degradado de 170px que nace 93px antes de la escena. */
+.ini-escena::before{content:"";position:absolute;top:0;bottom:0;left:-93px;width:170px;background:linear-gradient(90deg,#eaf0e5,rgba(234,240,229,0));z-index:1}
+.ini-mensaje{position:relative;z-index:2;display:flex;flex-direction:column;gap:8px;max-width:735px}
+.ini-mensaje h2{font-size:45px;font-weight:800;line-height:54px;letter-spacing:-1.8px}
+.ini-mensaje h2 span{color:#168512}
+.ini-mensaje-sub{font-size:22px;line-height:27px}
+.ini-mensaje-desc{max-width:540px;font-size:19px;line-height:141%;color:#557575}
+.ini .ini-cita{display:flex;gap:10px;padding-top:8px}
+.ini-cita span{font-size:50px;font-weight:800;line-height:61px;height:61px;color:#278f18;width:22px}
+.ini-cita p{font-size:18px;font-style:italic;line-height:150%;color:#607d74}
+.ini-progreso{position:relative;z-index:2;width:calc(100% - 565px);margin:13px 0 2px -2px;display:flex;flex-direction:column;gap:18px;padding:21px 21px 12px;background:#f0f8df;border:1px solid #e1e8f2;border-radius:22px}
+.ini-progreso-avance{display:flex;align-items:center;gap:18px}
+.ini-progreso-barra{flex:1;min-width:0;display:flex;flex-direction:column;gap:13px}
+.ini-progreso-barra p{font-size:16px;line-height:19px}
+.ini-progreso-fila{display:flex;align-items:center;gap:18px}
+.ini-pista{flex:1;height:20px;border-radius:20px;background:#e9f8db;overflow:hidden}
+.ini-pista span{display:block;height:100%;border-radius:20px;background:#278f18}
+.ini-progreso-fila strong{font-size:18px;font-weight:800;line-height:22px;min-width:40px;text-align:right}
+.ini-resultados{display:flex;justify-content:space-between;gap:12px}
+.ini-resultados>div{display:flex;align-items:center;gap:15px}
+.ini-resultados>div>div{display:flex;flex-direction:column-reverse;gap:1px}
+.ini-resultados dd{font-size:25px;font-weight:800;line-height:30px}
+.ini-resultados dt{font-size:12px;line-height:15px;color:#6f8092}
+
+/* Práctica y racha 301:1673 */
+.ini-practica{display:flex;gap:24px;padding:11px 45px 13px}
+.ini-simulador{position:relative;flex:1;min-width:0;min-height:184px;display:flex;align-items:center;gap:20px;padding:0 24px;background:#cfe9ca;border:1px solid #e1e8f2;border-radius:22px;overflow:hidden}
+.ini-simulador::before{content:"";position:absolute;left:-26px;top:-20px;width:222px;height:222px;border-radius:50%;background:#e5f3d8}
+.ini-simulador>*{position:relative}
+.ini-simulador-texto{width:302px;display:flex;flex-direction:column;gap:8px}
+.ini-simulador h2{font-size:30px;font-weight:800;line-height:108%}
+.ini-simulador p{font-size:16px;line-height:135%;color:#587778}
+.ini-boton{display:inline-flex;align-items:center;justify-content:center;gap:19px;width:258px;height:65px;flex-shrink:0;border:1px solid #e3a922;border-radius:40px;background:#278f18;color:#fff;font-size:22px;line-height:27px}
+a.ini-boton:hover{background:#1f7a13}
+/* Sin simulacros abiertos el botón no navega, pero conserva el color del diseño. */
+.ini-boton[aria-disabled]{cursor:not-allowed}
+.ini-racha{width:321px;flex-shrink:0;display:flex;flex-direction:column;gap:22px;padding:23px 12px 12px;background:#fff0ce;border:1px solid #e1e8f2;border-radius:22px}
+.ini-racha-resumen{display:flex;align-items:center;gap:15px}
+.ini-racha-resumen>div{display:flex;flex-direction:column;gap:3px}
+.ini-racha h2{font-size:16px;font-weight:400;line-height:19px}
+.ini-racha-dias{font-size:25px;line-height:30px}
+.ini-racha-motivo{font-size:13px;line-height:16px;color:#658181}
+.ini-semana{display:flex;gap:13px}
+.ini-semana li{width:31px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;line-height:15px;color:#7c8ca3}
+.ini-semana span{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:#fff;border:2px solid #dae2e8;color:#fff;font-size:19px;font-weight:700;line-height:23px}
+.ini-semana .ini-dia-hecho span{background:#00bb86;border-color:#00bb86}
+
+/* Temas de estudio 301:1717 */
+.ini-temas{display:flex;flex-direction:column;gap:17px;padding:10px 45px 32px}
+.ini-temas-encabezado{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.ini-temas-encabezado h2{display:flex;align-items:center;gap:10px;font-size:27px;font-weight:800;line-height:33px}
+.ini-ver-todos{font-size:14px;font-weight:600;line-height:17px;color:#278f18}
+.ini-materias{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 18px}
+.ini-materia{--tono:#1670ff;--fondo:#e9efff;display:flex;align-items:center;gap:8px;min-height:116px;padding:0 14px 0 16px;background:var(--fondo);border:1px solid #e1e8f2;border-radius:22px}
+.ini-materia-icono{position:relative;display:flex;align-items:center;justify-content:center;width:69px;height:69px;border-radius:25px;flex-shrink:0;overflow:hidden}
+.ini-materia-icono::before{content:"";position:absolute;inset:0;background:var(--tono);opacity:.1}
+.ini-materia-icono img{position:relative}
+.ini-materia-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:13px}
+.ini-materia h3{font-size:15px;font-weight:400;line-height:125%;color:#203550;max-width:133px}
+.ini-materia h3::after{content:"";display:block;width:95px;height:2px;margin-top:13px;background:var(--tono);opacity:.14}
+.ini-materia p{font-size:12px;line-height:15px;color:#728099}
+.ini-materia-abrir{display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:24px;background:#fff;flex-shrink:0}
+.ini-tono-azul{--tono:#1670ff;--fondo:#e9efff}
+.ini-tono-ambar{--tono:#ffac00;--fondo:#fff5de}
+.ini-tono-rosa{--tono:#ff4a79;--fondo:#ffebf0}
+.ini-tono-verde{--tono:#00be88;--fondo:#e2faf0}
+.ini-tono-violeta{--tono:#a02eff;--fondo:#f1e7ff}
+.ini-tono-celeste{--tono:#00c5e8;--fondo:#e3f8fe}
+.ini-tono-naranja{--tono:#ff7c16;--fondo:#fff0e4}
+.ini-tono-fucsia{--tono:#ff3f75;--fondo:#ffe8ef}
+
+/* Más ancho que el diseño: ambas tarjetas crecen en la proporción 850:321 de Figma
+   y el botón se centra en el espacio libre para no dejar un hueco a la derecha. */
+@media (min-width:1441px){
+  .ini-simulador{flex:850 1 0}
+  .ini-racha{flex:321 1 0;width:auto}
+  .ini-simulador .ini-boton{margin-inline:auto}
+}
+/* Adaptación: el diseño se fija en 1440 px; por debajo se reacomodan bloques sin cambiar estilos. */
+@media (max-width:1279px){
+  .ini-bienvenida{padding:0;display:flex;flex-direction:column}
+  /* Escena completa arriba, recortando por CSS la franja izquierda con la tarjeta impresa. */
+  .ini-escena{position:relative;width:100%;height:auto;aspect-ratio:567/454;max-height:440px;order:-1;overflow:hidden}
+  .ini-escena img{position:absolute;top:0;right:0;width:calc(100% * 652 / 567);height:auto;object-fit:initial}
+  .ini-escena::before{display:none}
+  .ini-mensaje{padding:28px 32px 0}
+  .ini-progreso{width:auto;margin:20px 32px 24px}
+  .ini-materias{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:1180px){
+  .ini-practica{flex-direction:column}
+  .ini-racha{width:auto}
+  .ini-simulador{padding:20px 24px}
+}
+@media (max-width:980px){
+  .ini-simulador{flex-wrap:wrap}
+  .ini-simulador-texto{width:auto;flex:1;min-width:220px}
+}
+@media (max-width:720px){
+  .ini{grid-template-columns:minmax(0,1fr)}
+  .ini-lateral{min-height:0;min-width:0}
+  .ini-identidad{height:auto;flex-direction:row;align-items:baseline;gap:8px;padding:16px}
+  .ini-menu{flex-direction:row;overflow-x:auto;padding:0 8px 12px}
+  .ini-menu>*{height:44px;white-space:nowrap;font-size:16px}
+  .ini .ini-paisaje{display:none}
+  .ini-lateral-pie{flex-direction:row;justify-content:space-between;gap:16px;padding:12px 16px;font-size:15px}
+  .ini-barra{height:auto;padding:12px 16px}
+  .ini-area{gap:12px}
+  .ini-area h1{font-size:20px}
+  .ini-emblema{width:44px;height:44px}
+  .ini-emblema img{width:32px;height:32px}
+  .ini-emblema-grande{width:56px;height:56px}
+  .ini-emblema-grande img{width:40px;height:40px}
+  .ini-cuenta{gap:10px}
+  .ini-alumno{display:none}
+  .ini-mensaje{padding:20px 16px 0}
+  .ini-mensaje h2{font-size:32px;line-height:39px;letter-spacing:-1.2px}
+  .ini-mensaje-sub{font-size:19px;line-height:24px}
+  .ini-mensaje-desc{font-size:16px}
+  .ini-progreso{margin:16px 16px 20px;padding:16px}
+  .ini-resultados{flex-wrap:wrap}
+  .ini-practica,.ini-temas{padding-left:16px;padding-right:16px}
+  .ini-simulador{gap:12px;padding:20px 16px}
+  .ini-simulador-icono{width:72px;height:72px}
+  .ini-boton{width:100%}
+  .ini-semana{justify-content:space-between;gap:4px}
+  .ini-temas-encabezado h2{font-size:22px}
+  .ini-materias{grid-template-columns:1fr}
+}
+
+/* Integración funcional: avisos y «Ver todos» con la misma paleta del marco 301:1600. */
+[x-cloak]{display:none!important}
+.ini-contenido{display:contents}
+.ini-lateral-pie a:hover{text-decoration:underline}
+.ini button.ini-ver-todos{all:unset;cursor:pointer;font-size:14px;font-weight:600;line-height:17px;color:#278f18}
+.ini button.ini-ver-todos:hover{text-decoration:underline}
+.ini .ini-materia-abrir[title]{cursor:not-allowed}
+button.ini-boton{cursor:pointer;font-family:inherit}
+button.ini-boton:hover{background:#1f7a13}
+button.ini-boton:disabled{cursor:not-allowed;opacity:.6}
+.ini-simulador>form{display:contents}
+.ini-simulador>form>.ini-boton{position:relative}
+.ini .ini-simulador-aviso{margin-top:4px;padding:8px 12px;border-radius:12px;background:#fff8e6;border:1px solid #f1d48a;color:#6b4c00!important;font-size:14px!important;line-height:1.35!important}
+.ini-simulador-aviso a,.ini-vacio a{color:#168512;font-weight:700;text-decoration:underline}
+.ini .ini-vacio{padding:18px 20px;border-radius:22px;background:#fff;border:1px dashed #cfdccb;color:#587778;font-size:15px;line-height:1.5}
+.ini-temas .ini-vacio{margin-bottom:4px}

@@ -201,7 +201,7 @@ Datos iniciales (seeder): A – Ciencias de la Salud; B – Ciencias Básicas; C
 | `usuario` | VARCHAR(50) | NN | UQ | Nombre de usuario para iniciar sesión. |
 | `password` | VARCHAR(255) | NN | — | Contraseña cifrada (bcrypt). |
 | `rol` | ENUM('admin','docente','estudiante') | NN | — | Rol que determina las opciones visibles (RF-01). |
-| `seccion_id` | BIGINT UNSIGNED | NULL | FK → `secciones.id` | Sección del estudiante. Obligatoria solo si `rol = estudiante`. |
+| `seccion_id` | BIGINT UNSIGNED | NULL | FK → `secciones.id` | Sección del estudiante y del docente a cargo del salón; nula para administradores. |
 | `carrera_id` | BIGINT UNSIGNED | NULL | FK → `carreras.id` | Carrera elegida por el estudiante (RF-16). El área de postulación se obtiene a través de la carrera. |
 | `activo` | BOOLEAN | NN | Por defecto `1` | Cuenta activa o desactivada (RF-02). |
 | `remember_token` | VARCHAR(100) | NULL | — | Token de sesión de Laravel. |

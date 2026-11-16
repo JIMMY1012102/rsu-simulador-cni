@@ -1,0 +1,13 @@
+erDiagram
+  personal_access_tokens {
+    bigint id PK
+    varchar tokenable_type
+    bigint tokenable_id
+    text name
+    varchar token
+    text abilities
+    timestamp last_used_at
+    timestamp expires_at
+    timestamp created_at
+    timestamp updated_at
+  }

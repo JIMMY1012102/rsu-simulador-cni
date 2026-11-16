@@ -2,16 +2,19 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
 /**
- * Modelo inicial compatible con la tabla "usuarios" del SQL de Sebastián.
- * Nia puede ampliar validaciones, relaciones y funcionalidades de autenticación.
+ * Usuario del sistema (tabla "usuarios"): administradores, docentes y estudiantes.
+ * Se autentica mediante el guard web y sesiones de Laravel.
  */
 class Usuario extends Authenticatable
 {
     use Notifiable;
+
+    public const ROLES = ['admin', 'docente', 'estudiante'];
 
     protected $table = 'usuarios';
 
@@ -23,6 +26,7 @@ class Usuario extends Authenticatable
         'rol',
         'seccion_id',
         'carrera_id',
+        'area_postulacion_id',
         'activo',
     ];
 
@@ -37,5 +41,20 @@ class Usuario extends Authenticatable
             'activo' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function seccion(): BelongsTo
+    {
+        return $this->belongsTo(Seccion::class, 'seccion_id');
+    }
+
+    public function areaPostulacion(): BelongsTo
+    {
+        return $this->belongsTo(AreaPostulacion::class, 'area_postulacion_id');
+    }
+
+    public function carrera(): BelongsTo
+    {
+        return $this->belongsTo(Carrera::class, 'carrera_id');
     }
 }

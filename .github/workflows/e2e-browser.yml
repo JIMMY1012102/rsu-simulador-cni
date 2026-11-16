@@ -1,0 +1,134 @@
+name: CNI E2E - navegador, Laravel y MariaDB
+
+on:
+  pull_request:
+    branches: [develop]
+    paths:
+      - '.github/workflows/e2e-browser.yml'
+      - 'tests/e2e/**'
+      - 'app/**'
+      - 'database/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'public/**'
+      - 'config/**'
+      - 'composer.json'
+      - 'composer.lock'
+  push:
+    branches: [develop]
+    paths:
+      - '.github/workflows/e2e-browser.yml'
+      - 'tests/e2e/**'
+      - 'app/**'
+      - 'database/**'
+      - 'resources/**'
+      - 'routes/**'
+      - 'public/**'
+      - 'config/**'
+      - 'composer.json'
+      - 'composer.lock'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cni-browser:
+    name: Chromium + Laravel + MariaDB 11.4 (DEMO)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: root_ci_temporary
+          MARIADB_DATABASE: cni_browser_ci
+          MARIADB_USER: cni_e2e
+          MARIADB_PASSWORD: e2e_ci_temporary
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      APP_URL: http://127.0.0.1:8000
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_DATABASE: cni_browser_ci
+      DB_USERNAME: cni_e2e
+      DB_PASSWORD: e2e_ci_temporary
+      DB_URL: ''
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      CNI_ALUMNO_AREAS_ENABLED: 'true'
+      CNI_ADMIN_ACADEMICO_ENABLED: 'true'
+      CNI_E2E_CI_ONLY: '1'
+      PLAYWRIGHT_BROWSERS_PATH: /home/runner/.cache/ms-playwright
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, dom, pdo_mysql, gd
+          coverage: none
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependencias Laravel
+        run: composer install --no-interaction --prefer-dist
+      - name: Crear la app DEMO efímera
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+          php artisan migrate:fresh --force
+          php artisan db:seed --class=DatabaseSeeder --force
+          php artisan db:seed --class=SimulacrosCincoAreasDemoSeeder --force
+          php artisan cni:auditar-areas
+          php artisan route:list
+          php artisan view:cache
+      - name: Crear credencial aleatoria solamente en el runner efímero
+        run: |
+          password="$(openssl rand -hex 24)"
+          echo "::add-mask::$password"
+          echo "CNI_E2E_PASSWORD=$password" >> "$GITHUB_ENV"
+      - name: Preparar cuentas DEMO para Chromium
+        run: php tests/e2e/fixture.php prepare
+      - name: Instalar navegador de pruebas
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Iniciar servidor Laravel en localhost
+        run: |
+          php artisan serve --host=127.0.0.1 --port=8000 > /tmp/cni-e2e-laravel.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl --fail --silent --output /dev/null http://127.0.0.1:8000/login; then
+              echo "Laravel responde en localhost:8000"
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/cni-e2e-laravel.log
+          exit 1
+      - name: Ejecutar navegador real (frontend, backend y MariaDB)
+        run: node tests/e2e/browser.mjs
+      - name: Verificar persistencia e integridad SQL tras las acciones UI
+        run: php tests/e2e/fixture.php verify
+      - name: Publicar capturas y diagnóstico DEMO
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cni-e2e-capturas-y-logs
+          path: |
+            tests/e2e/capturas/**
+            /tmp/cni-e2e-laravel.log
+          retention-days: 7
+          if-no-files-found: warn

@@ -1,0 +1,57 @@
+erDiagram
+  usuarios {
+    bigint id PK
+    varchar nombres
+    varchar apellidos
+    varchar usuario
+    varchar password
+    enum rol
+    bigint seccion_id FK
+    bigint carrera_id FK
+    boolean activo
+    varchar remember_token
+    bigint area_postulacion_id FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas {
+    bigint id PK
+    varchar nombre
+    enum bloque
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  temas {
+    bigint id PK
+    bigint area_id FK
+    varchar nombre
+    boolean activo
+    timestamp created_at
+    timestamp updated_at
+  }
+  preguntas {
+    bigint id PK
+    bigint tema_id FK
+    text enunciado
+    varchar imagen
+    enum nivel
+    text solucion
+    boolean activo
+    bigint creado_por FK
+    timestamp created_at
+    timestamp updated_at
+  }
+  alternativas {
+    bigint id PK
+    bigint pregunta_id FK
+    char letra
+    varchar texto
+    boolean es_correcta
+    timestamp created_at
+    timestamp updated_at
+  }
+  areas ||--o{ temas : "area_id"
+  temas ||--o{ preguntas : "tema_id"
+  usuarios |o--o{ preguntas : "creado_por"
+  preguntas ||--o{ alternativas : "pregunta_id"
