@@ -445,7 +445,7 @@ h1,h2,h3,p{margin:0}
         </div>
       </div>
       <footer class="foot">
-        <p class="note">Confirma fechas, requisitos y beneficios en las páginas oficiales antes de postular. Cambian en cada convocatoria.</p>
+        
         <p class="note">Fuentes:</p>
         <ul class="note">
           <li><a href="https://www.pronabec.gob.pe/beca-18/" target="_blank" rel="noopener noreferrer">Pronabec · Beca 18</a> y <a href="https://elperuano.pe/noticia/306541-beca-18-pronabec-ofrece-6000-vacantes-para-estudiar-carreras-acordes-con-necesidades-del-pais" target="_blank" rel="noopener noreferrer">El Peruano, convocatoria 2027</a></li>
