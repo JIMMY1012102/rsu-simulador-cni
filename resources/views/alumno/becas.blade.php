@@ -167,7 +167,7 @@ h1,h2,h3,p{margin:0}
 .finale-in{display:grid;gap:36px;padding-top:56px}
 .finale .title-xl{max-width:12ch}
 .quote{display:flex;flex-wrap:wrap;gap:22px;align-items:center;border:1.5px dashed var(--line);border-radius:26px;padding:24px}
-.quote .ph{width:84px;height:84px;border-radius:50%;border:2px dashed var(--blue-soft);display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--blue-soft);text-align:center}
+.quote .quote-video{flex:1 1 360px;min-width:0;display:block}.quote-video iframe{display:block;width:100%;aspect-ratio:16/9;border:0;border-radius:16px;background:#000}.quote-video>a{display:inline-block;margin-top:8px;color:var(--blue-soft);font-size:.9rem;text-decoration:underline}.quote .ph{width:84px;height:84px;border-radius:50%;border:2px dashed var(--blue-soft);display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--blue-soft);text-align:center}
 .quote q{display:block;font-family:var(--display);font-weight:700;font-size:clamp(1.05rem,2vw,1.4rem);line-height:1.35;quotes:none}
 .quote div{flex:1 1 280px;display:grid;gap:6px}
 .quote span{color:var(--muted);font-size:.9rem}
@@ -428,7 +428,13 @@ h1,h2,h3,p{margin:0}
         <form method="POST" action="{{ route('examen.independiente') }}" target="_top">@csrf<button class="btn btn-ghost" type="submit">Dar examen</button></form>
       </div>
       <div class="quote">
-        <div class="ph" aria-hidden="true">LA</div>
+        <div class="quote-video">
+          <iframe src="https://www.youtube-nocookie.com/embed/HpvIx7UlrO0"
+                  title="Video de Lizeth Atoccsa en YouTube"
+                  loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+          <a href="https://www.youtube.com/watch?v=HpvIx7UlrO0" target="_blank" rel="noopener noreferrer">Abrir video en YouTube ↗</a>
+        </div>
         <div>
           <h3>Conoce la historia de Lizeth Atoccsa</h3>
           <p>Beneficiaria de Beca 18 que comparte su experiencia universitaria, aprendizajes y consejos para estudiantes.</p>
