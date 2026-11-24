@@ -1011,3 +1011,36 @@ body:has(.cni-alumno){background:#f8f9fe}
     .cni-alumno-academias-grid{grid-template-columns:1fr;gap:12px}
     .cni-alumno-academia-card{min-height:132px;padding:17px}
 }
+
+/* Academias virtuales: tarjetas compactas con vista previa diferida de YouTube. */
+.cni-alumno-academias-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-items:stretch;gap:18px}
+.cni-alumno-academia{display:flex;min-width:0;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 6px 18px #243e5c0a}
+.cni-alumno-academia-card{display:flex;min-width:0;align-items:flex-start;gap:13px;padding:17px 18px 13px;border:0;border-radius:0;background:transparent;box-shadow:none;transition:background .16s ease}
+.cni-alumno-academia-card:hover{transform:none;border-color:transparent;background:var(--pale);box-shadow:none}
+.cni-alumno-academia-avatar{display:grid;width:46px;height:46px;flex:0 0 46px;place-items:center;border-radius:50%;background:#174f91;color:#fff;font-size:14px;font-weight:900;letter-spacing:.02em}
+.cni-alumno-academia:nth-child(6n+2) .cni-alumno-academia-avatar{background:#176b58}
+.cni-alumno-academia:nth-child(6n+3) .cni-alumno-academia-avatar{background:#80512b}
+.cni-alumno-academia:nth-child(6n+4) .cni-alumno-academia-avatar{background:#68458e}
+.cni-alumno-academia:nth-child(6n+5) .cni-alumno-academia-avatar{background:#9a3f55}
+.cni-alumno-academia:nth-child(6n+6) .cni-alumno-academia-avatar{background:#315d78}
+.cni-alumno-academia-info{display:flex;min-width:0;flex:1;flex-direction:column;align-items:flex-start;gap:6px}
+.cni-alumno-academia-info strong{color:var(--ink);font-size:15px;font-weight:850;overflow-wrap:anywhere}
+.cni-alumno-academia-descripcion{font-size:12px;color:var(--muted)}
+.cni-alumno-academia-enlace{margin-top:2px;color:var(--accent-dark);font-size:12px;font-weight:800}
+.cni-alumno-academia-preview{display:flex;width:100%;flex-direction:column;gap:9px;padding:0 14px 14px;border:0;background:transparent;color:var(--accent-dark);text-align:left;cursor:pointer}
+.cni-alumno-academia-preview-frame{position:relative;display:grid;width:100%;aspect-ratio:16 / 9;place-items:center;overflow:hidden;border-radius:11px;background:linear-gradient(135deg,#174f91,#2b83bc)}
+.cni-alumno-academia:nth-child(6n+2) .cni-alumno-academia-preview-frame{background:linear-gradient(135deg,#176b58,#45a58a)}
+.cni-alumno-academia:nth-child(6n+3) .cni-alumno-academia-preview-frame{background:linear-gradient(135deg,#80512b,#c18a4c)}
+.cni-alumno-academia:nth-child(6n+4) .cni-alumno-academia-preview-frame{background:linear-gradient(135deg,#68458e,#a17bc4)}
+.cni-alumno-academia:nth-child(6n+5) .cni-alumno-academia-preview-frame{background:linear-gradient(135deg,#9a3f55,#d47b8c)}
+.cni-alumno-academia:nth-child(6n+6) .cni-alumno-academia-preview-frame{background:linear-gradient(135deg,#315d78,#649bb5)}
+.cni-alumno-academia-play{position:relative;display:block;width:58px;height:58px;border:2px solid #ffffffd9;border-radius:50%;background:#071d38a8;box-shadow:0 4px 16px #071d3840}
+.cni-alumno-academia-play::after{position:absolute;top:50%;left:53%;width:0;height:0;border-top:11px solid transparent;border-bottom:11px solid transparent;border-left:17px solid #fff;content:"";transform:translate(-40%,-50%)}
+.cni-alumno-academia-preview-label{font-size:12px;font-weight:850}
+.cni-alumno-academia-preview:hover .cni-alumno-academia-preview-frame{filter:brightness(1.08)}
+.cni-alumno-academia-preview:focus-visible,.cni-alumno-academia-card:focus-visible{outline:3px solid #ffbe3f;outline-offset:-3px;border-radius:10px}
+.cni-alumno-academia-preview-frame iframe{position:absolute;inset:0;display:block;width:100%;height:100%;border:0;border-radius:11px}
+@media(max-width:960px){.cni-alumno-academias-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.cni-alumno-academias-grid{grid-template-columns:minmax(0,1fr);gap:12px}.cni-alumno-academia-card{padding:16px 16px 12px}.cni-alumno-academia-preview{padding:0 12px 12px}}
+@media(max-width:380px){.cni-alumno-academia-card{gap:10px;padding-right:12px;padding-left:12px}.cni-alumno-academia-avatar{width:42px;height:42px;flex-basis:42px}}
+@media(prefers-reduced-motion:reduce){.cni-alumno-academia-card,.cni-alumno-academia-preview-frame{transition:none}.cni-alumno-academia-card:hover{transform:none}}
