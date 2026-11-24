@@ -947,3 +947,67 @@ body:has(.cni-alumno){background:#f8f9fe}
         height:150px;
     }
 }
+/* Academias virtuales: tarjetas con el acabado común del panel. */
+.cni-alumno-vista-academias>h2{
+    margin:0 0 7px;
+    color:var(--ink);
+    font-size:clamp(22px,2.4vw,30px);
+    font-weight:900;
+    letter-spacing:-.035em;
+}
+.cni-alumno-academias-intro{
+    margin:0 0 20px!important;
+    color:var(--muted);
+    font-size:13px;
+}
+.cni-alumno-academias-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:16px;
+}
+.cni-alumno-academia-card{
+    display:flex;
+    min-width:0;
+    min-height:156px;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    padding:20px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:#fff;
+    box-shadow:0 6px 18px #243e5c0a;
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.cni-alumno-academia-card:hover{
+    transform:translateY(-2px);
+    border-color:var(--accent);
+    box-shadow:0 9px 22px #243e5c14;
+}
+.cni-alumno-academia-card:focus-visible{
+    outline:3px solid #ffbe3f;
+    outline-offset:3px;
+}
+.cni-alumno-academia-card strong{
+    color:var(--ink);
+    font-size:16px;
+    font-weight:850;
+    overflow-wrap:anywhere;
+}
+.cni-alumno-academia-descripcion{
+    color:var(--muted);
+    font-size:12px;
+}
+.cni-alumno-academia-enlace{
+    margin-top:auto;
+    color:var(--accent-dark);
+    font-size:12px;
+    font-weight:800;
+}
+@media(max-width:960px){
+    .cni-alumno-academias-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:680px){
+    .cni-alumno-academias-grid{grid-template-columns:1fr;gap:12px}
+    .cni-alumno-academia-card{min-height:132px;padding:17px}
+}

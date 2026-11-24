@@ -34,6 +34,7 @@
                 <a href="#perfil" class="is-active" aria-current="location"><span aria-hidden="true">♙</span> Mi perfil</a>
                 <a href="#progreso"><span aria-hidden="true">▤</span> Mi progreso</a>
                 <a href="#historial"><span aria-hidden="true">◷</span> Historial</a>
+                <a href="#academias"><span aria-hidden="true">▶</span> Academias virtuales</a>
                 <a href="{{ route('alumno.becas') }}"><span aria-hidden="true">★</span> Misión Beca CNI</a>
             </nav>
         </div>
@@ -102,6 +103,22 @@
                 @include('alumno.partials.historial')
             </section>
 
+            <section class="cni-alumno-vista cni-alumno-vista-academias" id="academias" data-panel-view="academias" aria-labelledby="academias-titulo" hidden>
+                <h2 id="academias-titulo">Academias virtuales</h2>
+                <p class="cni-alumno-academias-intro">Canales de YouTube para reforzar tu preparación. Se abren en una pestaña nueva.</p>
+                <div class="cni-alumno-academias-grid">
+                    @foreach (config('panel_alumno.academias') as $academia)
+                        <a class="cni-alumno-academia-card" href="{{ $academia['url'] }}" target="_blank" rel="noopener noreferrer">
+                            <strong>{{ $academia['nombre'] }}</strong>
+                            @if (!empty($academia['descripcion']))
+                                <span class="cni-alumno-academia-descripcion">{{ $academia['descripcion'] }}</span>
+                            @endif
+                            <span class="cni-alumno-academia-enlace">Ver canal en YouTube ↗</span>
+                        </a>
+                    @endforeach
+                </div>
+            </section>
+
 
         </main>
     </div>
@@ -145,13 +162,14 @@
     });
     // Sólo una sección visible a la vez. Por defecto: bienvenida y acceso al examen.
     const vistas = [...panel.querySelectorAll('[data-panel-view]')];
-    const destinos = ['#perfil', '#progreso', '#historial'];
+    const destinos = ['#perfil', '#progreso', '#historial', '#academias'];
     const mostrarSeccion = (destino, navegar = false) => {
         const seleccion = destinos.includes(destino) ? destino : '#perfil';
         const encabezados = {
             '#perfil': ['Mi perfil', '♙'],
             '#progreso': ['Mi progreso', '▤'],
             '#historial': ['Historial', '◷'],
+            '#academias': ['Academias virtuales', '▶'],
         };
         const [titulo, icono] = encabezados[seleccion];
         panel.querySelector('[data-panel-header-title]').textContent = titulo;
