@@ -243,5 +243,48 @@ class PanelesPorAreaTest extends TestCase
         $this->actingAs($docente, 'web')
             ->get(route('alumno.panel'))->assertForbidden();
     }
-}
 
+    public function test_cada_academia_muestra_vista_previa_y_no_renderiza_iframes_al_cargar(): void
+    {
+        $ids = [
+            'Grupo Ciencias San Marcos' => 'UC2t2Wzp4cnLGW31aBWSb9MA',
+            'Academia Vonex' => 'UCcRvqu5Z-8xcYT8rZ05KEXg',
+            'Alberto Cruz' => 'UCfXlr6-4saqmE8U9mtw3WPQ',
+            'David ERRE' => 'UCLvutyuve6_JeMk2fL2QmIw',
+            'Física PRE' => 'UCc4RghPUscsFM5X6exrTZ5w',
+            'Jonathan Cachimbo' => 'UCjEwR5G0LtxCSh__51k0Iog',
+            'Juan Meneses' => 'UC9OAoS3avLDNj9vB4T-9xuw',
+        ];
+
+        $this->actingAs($this->estudiante('A'), 'web');
+        $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
+        preg_match('/<section class="cni-alumno-vista cni-alumno-vista-academias" id="academias"[^>]*>(.*?)<\\/section>/s', $html, $seccion);
+        $this->assertNotEmpty($seccion[1] ?? null);
+        $this->assertStringNotContainsString('<iframe', $seccion[1]);
+
+        foreach ($ids as $id) {
+            $this->assertStringContainsString(
+                'youtube-nocookie.com/embed/videoseries?list=UU'.substr($id, 2),
+                $seccion[1]
+            );
+        }
+        $this->assertSame(7, preg_match_all('/<button type="button" class="cni-alumno-academia-preview"/', $seccion[1]));
+        $this->assertStringContainsString('MutationObserver', $html);
+    }
+
+    public function test_academias_sin_id_o_con_id_invalido_no_muestran_vista_previa(): void
+    {
+        config(['panel_alumno.academias' => [
+            ['nombre' => 'Academia sin ID', 'url' => 'https://www.youtube.com/@sinid'],
+            ['nombre' => 'Academia ID inválido', 'url' => 'https://www.youtube.com/@invalido', 'canal_id' => 'abc'],
+        ]]);
+
+        $this->actingAs($this->estudiante('A'), 'web');
+        $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
+        $this->assertStringContainsString('Academia sin ID', $html);
+        $this->assertStringContainsString('Academia ID inválido', $html);
+        $this->assertStringNotContainsString('data-academia-preview', $html);
+        $this->assertStringNotContainsString('youtube-nocookie.com/embed/videoseries', $html);
+    }
+
+}
