@@ -38,13 +38,14 @@ return [
             'mascota_png' => 'images/mascotas/cni-mascota-humanidades.png',
         ],
     ],
+    // El ID del canal empieza con UC (24 caracteres); se obtiene en «Más información sobre este canal → Compartir canal → Copiar ID del canal».
     'academias' => [
-        ['nombre' => 'Grupo Ciencias San Marcos', 'url' => 'https://www.youtube.com/@GrupoCienciasSanMarcos'],
-        ['nombre' => 'Academia Vonex', 'url' => 'https://www.youtube.com/@AcademiaVonex/videos'],
-        ['nombre' => 'Alberto Cruz', 'url' => 'https://www.youtube.com/@AlbertoCruz11111', 'descripcion' => 'Videos pregrabados de academias'],
-        ['nombre' => 'David ERRE', 'url' => 'https://www.youtube.com/@DAVIDERRE'],
-        ['nombre' => 'Física PRE', 'url' => 'https://www.youtube.com/@F%C3%ADsicaPRE'],
-        ['nombre' => 'Jonathan Cachimbo', 'url' => 'https://www.youtube.com/@jonathancachimbo'],
-        ['nombre' => 'Juan Meneses', 'url' => 'https://www.youtube.com/@juanmenesesrm'],
+        ['nombre' => 'Grupo Ciencias San Marcos', 'canal_id' => 'UC2t2Wzp4cnLGW31aBWSb9MA', 'url' => 'https://www.youtube.com/@GrupoCienciasSanMarcos'],
+        ['nombre' => 'Academia Vonex', 'canal_id' => 'UCcRvqu5Z-8xcYT8rZ05KEXg', 'url' => 'https://www.youtube.com/@AcademiaVonex/videos'],
+        ['nombre' => 'Alberto Cruz', 'canal_id' => 'UCfXlr6-4saqmE8U9mtw3WPQ', 'url' => 'https://www.youtube.com/@AlbertoCruz11111', 'descripcion' => 'Videos pregrabados de academias'],
+        ['nombre' => 'David ERRE', 'canal_id' => 'UCLvutyuve6_JeMk2fL2QmIw', 'url' => 'https://www.youtube.com/@DAVIDERRE'],
+        ['nombre' => 'Física PRE', 'canal_id' => 'UCc4RghPUscsFM5X6exrTZ5w', 'url' => 'https://www.youtube.com/@F%C3%ADsicaPRE'],
+        ['nombre' => 'Jonathan Cachimbo', 'canal_id' => 'UCjEwR5G0LtxCSh__51k0Iog', 'url' => 'https://www.youtube.com/@jonathancachimbo'],
+        ['nombre' => 'Juan Meneses', 'canal_id' => 'UC9OAoS3avLDNj9vB4T-9xuw', 'url' => 'https://www.youtube.com/@juanmenesesrm'],
     ],
 ];
