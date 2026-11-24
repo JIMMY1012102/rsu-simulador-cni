@@ -107,7 +107,7 @@ class PanelesPorAreaTest extends TestCase
         $this->get(route('alumno.tema', ['tema' => 9999]))->assertNotFound();
     }
 
-    public function test_menu_lateral_tiene_cuatro_opciones_y_un_boton_para_contraerlo(): void
+    public function test_menu_lateral_tiene_cinco_opciones_y_un_boton_para_contraerlo(): void
     {
         $this->actingAs($this->estudiante('C'), 'web');
         $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
@@ -117,15 +117,51 @@ class PanelesPorAreaTest extends TestCase
             $html,
             $navegacion
         ));
-        $this->assertSame(4, preg_match_all('/<a\\b/', $navegacion[1]));
+        $this->assertSame(5, preg_match_all('/<a\\b/', $navegacion[1]));
         $this->assertStringContainsString('Mi perfil', $navegacion[1]);
         $this->assertStringContainsString('Mi progreso', $navegacion[1]);
         $this->assertStringContainsString('Historial', $navegacion[1]);
+        $this->assertStringContainsString('Academias virtuales', $navegacion[1]);
         $this->assertStringContainsString('aria-expanded="true"', $html);
         $this->assertStringContainsString('data-sidebar-backdrop', $html);
         $this->assertStringContainsString('id="progreso"', $html);
         $this->assertStringContainsString('id="historial"', $html);
         $this->assertStringContainsString('id="perfil"', $html);
+    }
+
+
+    public function test_academias_virtuales_son_comunes_a_las_cinco_areas(): void
+    {
+        $academias = [
+            'Grupo Ciencias San Marcos' => 'https://www.youtube.com/@GrupoCienciasSanMarcos',
+            'Academia Vonex' => 'https://www.youtube.com/@AcademiaVonex/videos',
+            'Alberto Cruz' => 'https://www.youtube.com/@AlbertoCruz11111',
+            'David ERRE' => 'https://www.youtube.com/@DAVIDERRE',
+            'Física PRE' => 'https://www.youtube.com/@F%C3%ADsicaPRE',
+            'Jonathan Cachimbo' => 'https://www.youtube.com/@jonathancachimbo',
+            'Juan Meneses' => 'https://www.youtube.com/@juanmenesesrm',
+        ];
+
+        foreach (['A', 'B', 'C', 'D', 'E'] as $codigo) {
+            $this->actingAs($this->estudiante($codigo), 'web');
+            $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
+
+            $this->assertStringContainsString('href="#academias"', $html);
+            $this->assertStringContainsString('id="academias" data-panel-view="academias"', $html);
+            $this->assertMatchesRegularExpression('/id="academias"[^>]*hidden>/', $html);
+
+            foreach ($academias as $nombre => $url) {
+                $this->assertStringContainsString($nombre, $html);
+                $this->assertStringContainsString($url, $html);
+            }
+
+            $this->assertSame(7, preg_match_all(
+                '/<a class="cni-alumno-academia-card"[^>]*target="_blank" rel="noopener noreferrer"/',
+                $html
+            ));
+            $this->assertStringContainsString("const destinos = ['#perfil', '#progreso', '#historial', '#academias'];", $html);
+            $this->assertStringContainsString("'#academias': ['Academias virtuales', '▶']", $html);
+        }
     }
 
     public function test_mi_perfil_abre_de_entrada_con_solo_portada_y_dos_tarjetas(): void
