@@ -947,3 +947,136 @@ body:has(.cni-alumno){background:#f8f9fe}
         height:150px;
     }
 }
+
+
+/* Academias virtuales: tarjetas con el acabado común del panel. */
+.cni-alumno-vista-academias>h2{
+    margin:0 0 7px;
+    color:var(--ink);
+    font-size:clamp(22px,2.4vw,30px);
+    font-weight:900;
+    letter-spacing:-.035em;
+}
+.cni-alumno-academias-intro{
+    margin:0 0 20px!important;
+    color:var(--muted);
+    font-size:13px;
+}
+.cni-alumno-academias-grid{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:16px;
+}
+.cni-alumno-academia-card{
+    display:flex;
+    min-width:0;
+    min-height:156px;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+    padding:20px;
+    border:1px solid var(--line);
+    border-radius:16px;
+    background:#fff;
+    box-shadow:0 6px 18px #243e5c0a;
+    transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease;
+}
+.cni-alumno-academia-card:hover{
+    transform:translateY(-2px);
+    border-color:var(--accent);
+    box-shadow:0 9px 22px #243e5c14;
+}
+.cni-alumno-academia-card:focus-visible{
+    outline:3px solid #ffbe3f;
+    outline-offset:3px;
+}
+.cni-alumno-academia-card strong{
+    color:var(--ink);
+    font-size:16px;
+    font-weight:850;
+    overflow-wrap:anywhere;
+}
+.cni-alumno-academia-descripcion{
+    color:var(--muted);
+    font-size:12px;
+}
+.cni-alumno-academia-enlace{
+    margin-top:auto;
+    color:var(--accent-dark);
+    font-size:12px;
+    font-weight:800;
+}
+@media(min-width:681px) and (max-width:960px){
+    .cni-alumno-academias-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .cni-alumno .cni-alumno-sidebar{
+        flex-basis:64px;
+        width:64px;
+        padding:15px 7px;
+    }
+    .cni-alumno .cni-alumno-marca>span:last-child,
+    .cni-alumno .cni-alumno-area-chip{display:none}
+    .cni-alumno .cni-alumno-marca{justify-content:center;margin:0 0 25px}
+    .cni-alumno .cni-alumno-menu a{
+        justify-content:center;
+        gap:0;
+        padding:13px 0;
+        font-size:0;
+    }
+    .cni-alumno .cni-alumno-menu a>span{font-size:21px}
+}
+@media(max-width:680px){
+    .cni-alumno-academias-grid{grid-template-columns:1fr;gap:12px}
+    .cni-alumno-academia-card{min-height:132px;padding:17px}
+    .cni-alumno .cni-alumno-sidebar{
+        position:fixed;
+        z-index:32;
+        top:auto;
+        right:0;
+        bottom:0;
+        left:0;
+        width:100%;
+        height:62px;
+        min-height:62px;
+        padding:5px 7px;
+        overflow:visible;
+        transform:none;
+        visibility:visible;
+        pointer-events:auto;
+        box-shadow:0 -5px 18px #09162e18;
+    }
+    .cni-alumno .cni-alumno-sidebar-top{
+        width:100%;
+        padding:0;
+    }
+    .cni-alumno .cni-alumno-menu{
+        display:flex;
+        width:100%;
+        height:52px;
+        align-items:center;
+        justify-content:space-around;
+        gap:2px;
+    }
+    .cni-alumno .cni-alumno-menu a{
+        display:flex;
+        flex:1 1 20%;
+        width:20%;
+        max-width:none;
+        min-width:0;
+        height:48px;
+        align-items:center;
+        justify-content:center;
+        padding:8px 0;
+        font-size:0;
+        gap:0;
+    }
+    .cni-alumno .cni-alumno-menu a>span{
+        width:auto;
+        font-size:20px;
+    }
+    .cni-alumno .cni-alumno-sidebar-bottom,
+    .cni-alumno .cni-alumno-marca,
+    .cni-alumno .cni-alumno-area-chip,
+    .cni-alumno .cni-alumno-sidebar-toggle,
+    .cni-alumno .cni-alumno-sidebar-backdrop{display:none!important}
+    .cni-alumno-content{padding-bottom:82px}
+}
