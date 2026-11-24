@@ -38,4 +38,13 @@ return [
             'mascota_png' => 'images/mascotas/cni-mascota-humanidades.png',
         ],
     ],
+    'academias' => [
+        ['nombre' => 'Grupo Ciencias San Marcos', 'url' => 'https://www.youtube.com/@GrupoCienciasSanMarcos'],
+        ['nombre' => 'Academia Vonex', 'url' => 'https://www.youtube.com/@AcademiaVonex/videos'],
+        ['nombre' => 'Alberto Cruz', 'url' => 'https://www.youtube.com/@AlbertoCruz11111', 'descripcion' => 'Videos pregrabados de academias'],
+        ['nombre' => 'David ERRE', 'url' => 'https://www.youtube.com/@DAVIDERRE'],
+        ['nombre' => 'Física PRE', 'url' => 'https://www.youtube.com/@F%C3%ADsicaPRE'],
+        ['nombre' => 'Jonathan Cachimbo', 'url' => 'https://www.youtube.com/@jonathancachimbo'],
+        ['nombre' => 'Juan Meneses', 'url' => 'https://www.youtube.com/@juanmenesesrm'],
+    ],
 ];
