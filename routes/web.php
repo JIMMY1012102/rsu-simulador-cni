@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SimulacrosController;
 use App\Http\Middleware\SoloAdministrador;
 use App\Http\Controllers\ExamenController;
 use App\Http\Controllers\Alumno\OrientacionController;
+use App\Http\Controllers\Alumno\AcademiasController;
 use App\Http\Middleware\EnsureActiveUser;
 use App\Http\Middleware\RedirigirPanelEstudiante;
 use App\Http\Middleware\FeatureAlumnoAreas;
@@ -37,6 +38,9 @@ Route::middleware(['auth:web', EnsureActiveUser::class, FeatureAlumnoAreas::clas
         Route::get('/elegir-area', [OrientacionController::class, 'elegirArea'])->name('elegir-area');
         Route::post('/elegir-area', [OrientacionController::class, 'guardarArea'])->name('area.guardar');
         Route::get('/panel', [OrientacionController::class, 'panel'])->name('panel');
+        Route::get('/academias/{canal}/ultimo-video', AcademiasController::class)
+            ->where('canal', 'UC[A-Za-z0-9_-]{22}')
+            ->middleware('throttle:30,1')->name('academias.ultimo-video');
         Route::get('/becas', [OrientacionController::class, 'becas'])->name('becas');
         Route::post('/carrera', [OrientacionController::class, 'guardarCarrera'])->name('carrera.guardar');
         Route::get('/tema/{tema}', [OrientacionController::class, 'tema'])

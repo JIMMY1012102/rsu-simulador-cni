@@ -7,6 +7,7 @@ use Database\Seeders\AreaPostulacionSeeder;
 use Database\Seeders\CarreraSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 /**
@@ -291,6 +292,60 @@ class PanelesPorAreaTest extends TestCase
         $this->assertStringNotContainsString('data-academia-preview', $seccion[1]);
         $this->assertSame(0, substr_count($seccion[1], 'data-academia-close'));
         $this->assertStringNotContainsString('youtube-nocookie.com/embed/videoseries', $seccion[1]);
+    }
+
+
+    public function test_ultimo_video_de_academia_devuelve_json_y_usa_cache(): void
+    {
+        $canal = config('panel_alumno.academias.0.canal_id');
+        $feed = '<?xml version="1.0" encoding="UTF-8"?>'
+            .'<feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">'
+            .'<entry><yt:videoId>AbCdEfGhI12</yt:videoId><title>Primer video</title></entry>'
+            .'<entry><yt:videoId>ZyXwVuTsR98</yt:videoId><title>Segundo video</title></entry>'
+            .'</feed>';
+        Http::fake(['www.youtube.com/feeds/videos.xml' => Http::response($feed, 200)]);
+
+        $this->actingAs($this->estudiante('A'), 'web');
+        $url = route('alumno.academias.ultimo-video', ['canal' => $canal]);
+        $this->getJson($url)->assertOk()->assertExactJson([
+            'video_id' => 'AbCdEfGhI12',
+            'titulo' => 'Primer video',
+        ]);
+        $this->getJson($url)->assertOk()->assertExactJson([
+            'video_id' => 'AbCdEfGhI12',
+            'titulo' => 'Primer video',
+        ]);
+        Http::assertSentCount(1);
+    }
+
+    public function test_ultimo_video_rechaza_canales_que_no_estan_en_la_configuracion(): void
+    {
+        Http::fake();
+        $this->actingAs($this->estudiante('A'), 'web');
+        $this->getJson(route('alumno.academias.ultimo-video', ['canal' => 'UC0000000000000000000000']))
+            ->assertNotFound()->assertExactJson([]);
+        Http::assertNothingSent();
+    }
+
+    public function test_ultimo_video_responde_404_si_youtube_falla(): void
+    {
+        Http::fake(['www.youtube.com/feeds/videos.xml' => Http::response('', 500)]);
+        $this->actingAs($this->estudiante('A'), 'web');
+        $canal = config('panel_alumno.academias.0.canal_id');
+        $this->getJson(route('alumno.academias.ultimo-video', ['canal' => $canal]))
+            ->assertNotFound()->assertExactJson([]);
+        $this->get(route('alumno.panel'))->assertOk();
+    }
+
+    public function test_ultimo_video_requiere_sesion_y_rol_estudiante(): void
+    {
+        $canal = config('panel_alumno.academias.0.canal_id');
+        $url = route('alumno.academias.ultimo-video', ['canal' => $canal]);
+        $this->get($url)->assertRedirect(route('login'));
+
+        $docente = $this->estudiante('A');
+        $docente->update(['rol' => 'docente']);
+        $this->actingAs($docente, 'web')->get($url)->assertForbidden();
     }
 
 }

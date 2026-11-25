@@ -1060,3 +1060,12 @@ body:has(.cni-alumno){background:#f8f9fe}
 .cni-alumno-academia-cerrar:hover{background:#edf2f7;color:#263b52}
 .cni-alumno-academia-cerrar:focus-visible{outline:2px solid #ffbe3f;outline-offset:2px}
 @media(max-width:680px){.cni-alumno-academia-preview-box{padding:0 12px 12px}.cni-alumno-academia-cerrar{margin-left:12px}}
+
+
+/* Miniaturas reales de los últimos videos de Academias virtuales. */
+.cni-alumno-academia-preview-frame{position:relative;overflow:hidden}
+.cni-alumno-academia-miniatura{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cni-alumno-academia-preview{position:relative;z-index:1}
+.cni-alumno-academia-preview-frame--miniatura .cni-alumno-academia-preview{background:linear-gradient(180deg,rgba(8,20,38,.18),rgba(8,20,38,.68))}
+.cni-alumno-academia-ultimo{margin:8px 12px 0;color:var(--muted);font-size:12px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
+@media(max-width:680px){.cni-alumno-academia-ultimo{margin:7px 12px 0;font-size:12px}}
