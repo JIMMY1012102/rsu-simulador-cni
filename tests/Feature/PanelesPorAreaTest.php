@@ -357,4 +357,67 @@ class PanelesPorAreaTest extends TestCase
         $this->actingAs($docente, 'web')->get($url)->assertForbidden();
     }
 
+
+    public function test_ultimo_video_fallo_en_cache_expira_a_los_10_minutos_sin_renovarse(): void
+    {
+        Cache::flush();
+        Http::preventStrayRequests();
+
+        $canal = config('panel_alumno.academias.0.canal_id');
+        $feed = '<?xml version="1.0" encoding="UTF-8"?>'
+            .'<feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">'
+            .'<entry><yt:videoId>AbCdEfGhI12</yt:videoId><title>Video recuperado</title></entry>'
+            .'</feed>';
+        Http::fake([
+            'https://www.youtube.com/feeds/videos.xml*' => Http::sequence()
+                ->push('', 500)
+                ->push($feed, 200),
+        ]);
+
+        $this->actingAs($this->estudiante('A'), 'web');
+        $url = route('alumno.academias.ultimo-video', ['canal' => $canal]);
+
+        $this->getJson($url)->assertNotFound()->assertExactJson([]);
+        Http::assertSentCount(1);
+
+        $this->travel(6)->minutes();
+        $this->getJson($url)->assertNotFound()->assertExactJson([]);
+        Http::assertSentCount(1);
+
+        $this->travel(5)->minutes();
+        $this->getJson($url)->assertOk()->assertExactJson([
+            'video_id' => 'AbCdEfGhI12',
+            'titulo' => 'Video recuperado',
+        ]);
+        Http::assertSentCount(2);
+    }
+
+    public function test_ultimo_video_rechaza_xml_invalido_y_video_id_invalido(): void
+    {
+        Cache::flush();
+        Http::preventStrayRequests();
+
+        $canalXmlRoto = config('panel_alumno.academias.0.canal_id');
+        $canalVideoInvalido = config('panel_alumno.academias.1.canal_id');
+        $feedVideoInvalido = '<?xml version="1.0" encoding="UTF-8"?>'
+            .'<feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">'
+            .'<entry><yt:videoId>no-es-un-id</yt:videoId><title>Video inválido</title></entry>'
+            .'</feed>';
+
+        Http::fake([
+            'https://www.youtube.com/feeds/videos.xml*' => Http::sequence()
+                ->push('<feed><entry>', 200)
+                ->push($feedVideoInvalido, 200),
+        ]);
+
+        $this->actingAs($this->estudiante('A'), 'web');
+
+        $this->getJson(route('alumno.academias.ultimo-video', ['canal' => $canalXmlRoto]))
+            ->assertNotFound()->assertExactJson([]);
+        $this->getJson(route('alumno.academias.ultimo-video', ['canal' => $canalVideoInvalido]))
+            ->assertNotFound()->assertExactJson([]);
+
+        Http::assertSentCount(2);
+    }
+
 }

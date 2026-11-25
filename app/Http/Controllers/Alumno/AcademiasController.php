@@ -1,9 +1,9 @@
 <?php
 
-namespace App\\Http\\Controllers\\Alumno;
+namespace App\Http\Controllers\Alumno;
 
-use Illuminate\\Support\\Facades\\Cache;
-use Illuminate\\Support\\Facades\\Http;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class AcademiasController
 {
@@ -46,10 +46,10 @@ class AcademiasController
             Cache::put($clave, $resultado, now()->addHours(6));
 
             return response()->json($resultado, 200);
-        } catch (\\Throwable $error) {
+        } catch (\Throwable $error) {
             try {
                 Cache::put($clave, false, now()->addMinutes(10));
-            } catch (\\Throwable $ignored) {
+            } catch (\Throwable $ignored) {
                 // No exponer fallos de cache al usuario.
             }
 
@@ -77,7 +77,7 @@ class AcademiasController
 
             $usoInternoPrevio = libxml_use_internal_errors(true);
             try {
-                $xml = simplexml_load_string($cuerpo, \\SimpleXMLElement::class, LIBXML_NONET);
+                $xml = simplexml_load_string($cuerpo, \SimpleXMLElement::class, LIBXML_NONET);
             } finally {
                 libxml_clear_errors();
                 libxml_use_internal_errors($usoInternoPrevio);
@@ -103,7 +103,7 @@ class AcademiasController
             $titulo = mb_substr($titulo, 0, 120);
 
             return ['video_id' => $videoId, 'titulo' => $titulo];
-        } catch (\\Throwable $error) {
+        } catch (\Throwable $error) {
             return false;
         }
     }
