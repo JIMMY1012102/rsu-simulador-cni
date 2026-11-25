@@ -404,7 +404,7 @@ class PanelesPorAreaTest extends TestCase
         $canalVideoInvalido = config('panel_alumno.academias.1.canal_id');
         $feedVideoInvalido = '<?xml version="1.0" encoding="UTF-8"?>'
             .'<feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">'
-            .'<entry><yt:videoId>no-es-un-id</yt:videoId><title>Video inválido</title></entry>'
+            .'<entry><yt:videoId>bad-id</yt:videoId><title>Video inválido</title></entry>'
             .'</feed>';
 
         Http::fake([
