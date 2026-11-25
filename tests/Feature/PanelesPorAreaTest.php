@@ -281,10 +281,12 @@ class PanelesPorAreaTest extends TestCase
 
         $this->actingAs($this->estudiante('A'), 'web');
         $html = $this->get(route('alumno.panel'))->assertOk()->getContent();
-        $this->assertStringContainsString('Academia sin ID', $html);
-        $this->assertStringContainsString('Academia ID inválido', $html);
-        $this->assertStringNotContainsString('data-academia-preview', $html);
-        $this->assertStringNotContainsString('youtube-nocookie.com/embed/videoseries', $html);
+        preg_match('/<section class="cni-alumno-vista cni-alumno-vista-academias" id="academias"[^>]*>(.*?)<\\/section>/s', $html, $seccion);
+        $this->assertNotEmpty($seccion[1] ?? null);
+        $this->assertStringContainsString('Academia sin ID', $seccion[1]);
+        $this->assertStringContainsString('Academia ID inválido', $seccion[1]);
+        $this->assertStringNotContainsString('data-academia-preview', $seccion[1]);
+        $this->assertStringNotContainsString('youtube-nocookie.com/embed/videoseries', $seccion[1]);
     }
 
 }
