@@ -378,13 +378,16 @@ class PanelesPorAreaTest extends TestCase
         $url = route('alumno.academias.ultimo-video', ['canal' => $canal]);
 
         $this->getJson($url)->assertNotFound()->assertExactJson([]);
+        $this->assertFalse(Cache::get('yt_ultimo_video_'.$canal));
         Http::assertSentCount(1);
 
         $this->travel(6)->minutes();
         $this->getJson($url)->assertNotFound()->assertExactJson([]);
+        $this->assertFalse(Cache::get('yt_ultimo_video_'.$canal));
         Http::assertSentCount(1);
 
         $this->travel(5)->minutes();
+        $this->assertNull(Cache::get('yt_ultimo_video_'.$canal));
         $this->getJson($url)->assertOk()->assertExactJson([
             'video_id' => 'AbCdEfGhI12',
             'titulo' => 'Video recuperado',
