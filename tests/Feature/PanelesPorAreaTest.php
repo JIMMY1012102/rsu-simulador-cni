@@ -6,6 +6,7 @@ use App\Models\Usuario;
 use Database\Seeders\AreaPostulacionSeeder;
 use Database\Seeders\CarreraSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
@@ -297,13 +298,15 @@ class PanelesPorAreaTest extends TestCase
 
     public function test_ultimo_video_de_academia_devuelve_json_y_usa_cache(): void
     {
+        Cache::flush();
+        Http::preventStrayRequests();
         $canal = config('panel_alumno.academias.0.canal_id');
         $feed = '<?xml version="1.0" encoding="UTF-8"?>'
             .'<feed xmlns="http://www.w3.org/2005/Atom" xmlns:yt="http://www.youtube.com/xml/schemas/2015">'
             .'<entry><yt:videoId>AbCdEfGhI12</yt:videoId><title>Primer video</title></entry>'
             .'<entry><yt:videoId>ZyXwVuTsR98</yt:videoId><title>Segundo video</title></entry>'
             .'</feed>';
-        Http::fake(['www.youtube.com/feeds/videos.xml' => Http::response($feed, 200)]);
+        Http::fake(['https://www.youtube.com/feeds/videos.xml*' => Http::response($feed, 200)]);
 
         $this->actingAs($this->estudiante('A'), 'web');
         $url = route('alumno.academias.ultimo-video', ['canal' => $canal]);
@@ -320,6 +323,8 @@ class PanelesPorAreaTest extends TestCase
 
     public function test_ultimo_video_rechaza_canales_que_no_estan_en_la_configuracion(): void
     {
+        Cache::flush();
+        Http::preventStrayRequests();
         Http::fake();
         $this->actingAs($this->estudiante('A'), 'web');
         $this->getJson(route('alumno.academias.ultimo-video', ['canal' => 'UC0000000000000000000000']))
@@ -329,7 +334,9 @@ class PanelesPorAreaTest extends TestCase
 
     public function test_ultimo_video_responde_404_si_youtube_falla(): void
     {
-        Http::fake(['www.youtube.com/feeds/videos.xml' => Http::response('', 500)]);
+        Cache::flush();
+        Http::preventStrayRequests();
+        Http::fake(['https://www.youtube.com/feeds/videos.xml*' => Http::response('', 500)]);
         $this->actingAs($this->estudiante('A'), 'web');
         $canal = config('panel_alumno.academias.0.canal_id');
         $this->getJson(route('alumno.academias.ultimo-video', ['canal' => $canal]))
@@ -339,6 +346,8 @@ class PanelesPorAreaTest extends TestCase
 
     public function test_ultimo_video_requiere_sesion_y_rol_estudiante(): void
     {
+        Cache::flush();
+        Http::preventStrayRequests();
         $canal = config('panel_alumno.academias.0.canal_id');
         $url = route('alumno.academias.ultimo-video', ['canal' => $canal]);
         $this->get($url)->assertRedirect(route('login'));
