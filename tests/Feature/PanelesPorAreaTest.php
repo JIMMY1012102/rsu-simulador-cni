@@ -269,6 +269,9 @@ class PanelesPorAreaTest extends TestCase
             );
         }
         $this->assertSame(7, preg_match_all('/<button type="button" class="cni-alumno-academia-preview"/', $seccion[1]));
+        $this->assertSame(7, substr_count($seccion[1], 'data-academia-preview'));
+        $this->assertSame(7, substr_count($seccion[1], 'data-academia-close'));
+        $this->assertSame(7, preg_match_all('/youtube-nocookie\\.com\\/embed\\/videoseries\\?list=UU/', $seccion[1]));
         $this->assertStringContainsString('MutationObserver', $html);
     }
 
@@ -286,6 +289,7 @@ class PanelesPorAreaTest extends TestCase
         $this->assertStringContainsString('Academia sin ID', $seccion[1]);
         $this->assertStringContainsString('Academia ID inválido', $seccion[1]);
         $this->assertStringNotContainsString('data-academia-preview', $seccion[1]);
+        $this->assertSame(0, substr_count($seccion[1], 'data-academia-close'));
         $this->assertStringNotContainsString('youtube-nocookie.com/embed/videoseries', $seccion[1]);
     }
 
