@@ -108,13 +108,40 @@
                 <p class="cni-alumno-academias-intro">Canales de YouTube para reforzar tu preparación. Se abren en una pestaña nueva.</p>
                 <div class="cni-alumno-academias-grid">
                     @foreach (config('panel_alumno.academias') as $academia)
-                        <a class="cni-alumno-academia-card" href="{{ $academia['url'] }}" target="_blank" rel="noopener noreferrer">
-                            <strong>{{ $academia['nombre'] }}</strong>
-                            @if (!empty($academia['descripcion']))
-                                <span class="cni-alumno-academia-descripcion">{{ $academia['descripcion'] }}</span>
+                        @php
+                            $palabrasAcademia = preg_split('/\\s+/u', trim($academia['nombre']));
+                            $inicialesAcademia = mb_strtoupper(
+                                mb_substr($palabrasAcademia[0] ?? '', 0, 1).
+                                mb_substr($palabrasAcademia[1] ?? '', 0, 1)
+                            );
+                            $canalValido = preg_match('/^UC[A-Za-z0-9_-]{22}$/', $academia['canal_id'] ?? '') === 1;
+                        @endphp
+                        <article class="cni-alumno-academia">
+                            <a class="cni-alumno-academia-card" href="{{ $academia['url'] }}" target="_blank" rel="noopener noreferrer">
+                                <span class="cni-alumno-academia-avatar" aria-hidden="true">{{ $inicialesAcademia }}</span>
+                                <span class="cni-alumno-academia-info">
+                                    <strong>{{ $academia['nombre'] }}</strong>
+                                    @if (!empty($academia['descripcion']))
+                                        <span class="cni-alumno-academia-descripcion">{{ $academia['descripcion'] }}</span>
+                                    @endif
+                                    <span class="cni-alumno-academia-enlace">Ver canal en YouTube ↗</span>
+                                </span>
+                            </a>
+                            @if ($canalValido)
+                                <div class="cni-alumno-academia-preview-box">
+                                    <div class="cni-alumno-academia-preview-frame" data-academia-frame>
+                                        <button type="button" class="cni-alumno-academia-preview" data-academia-preview
+                                                data-embed-url="https://www.youtube-nocookie.com/embed/videoseries?list=UU{{ substr($academia['canal_id'], 2) }}"
+                                                data-academia-name="{{ $academia['nombre'] }}"
+                                                aria-label="Ver videos recientes de {{ $academia['nombre'] }}">
+                                            <span class="cni-alumno-academia-play" aria-hidden="true"></span>
+                                            <span class="cni-alumno-academia-preview-label">Ver videos recientes</span>
+                                        </button>
+                                    </div>
+                                    <button type="button" class="cni-alumno-academia-cerrar" data-academia-close hidden>Cerrar vista previa</button>
+                                </div>
                             @endif
-                            <span class="cni-alumno-academia-enlace">Ver canal en YouTube ↗</span>
-                        </a>
+                        </article>
                     @endforeach
                 </div>
             </section>
@@ -208,5 +235,61 @@
     actualizar();
 })();
 </script>
+<script>
+(() => {
+    const seccion = document.querySelector('#academias');
+    if (!seccion) return;
+
+    const cerrarTarjeta = (marco) => {
+        const iframe = marco.querySelector('iframe');
+        if (iframe) iframe.remove();
+        const play = marco.querySelector('[data-academia-preview]');
+        const cerrar = marco.closest('.cni-alumno-academia-preview-box')?.querySelector('[data-academia-close]');
+        if (play) play.hidden = false;
+        if (cerrar) cerrar.hidden = true;
+    };
+
+    const cerrarTodas = () => {
+        seccion.querySelectorAll('[data-academia-frame]').forEach((marco) => {
+            if (marco.querySelector('iframe')) cerrarTarjeta(marco);
+        });
+    };
+
+    document.addEventListener('click', (evento) => {
+        const cerrar = evento.target.closest('[data-academia-close]');
+        if (cerrar && seccion.contains(cerrar)) {
+            const tarjeta = cerrar.closest('.cni-alumno-academia-preview-box');
+            const marco = tarjeta?.querySelector('[data-academia-frame]');
+            if (marco) cerrarTarjeta(marco);
+            return;
+        }
+
+        const boton = evento.target.closest('[data-academia-preview]');
+        if (!boton || !seccion.contains(boton)) return;
+
+        cerrarTodas();
+        const marco = boton.closest('.cni-alumno-academia-preview-box')?.querySelector('[data-academia-frame]');
+        const cerrarTarjetaBoton = boton.closest('.cni-alumno-academia-preview-box')?.querySelector('[data-academia-close]');
+        if (!marco || !cerrarTarjetaBoton) return;
+
+        const iframe = document.createElement('iframe');
+        iframe.src = boton.dataset.embedUrl;
+        iframe.title = 'Videos recientes de ' + boton.dataset.academiaName;
+        iframe.loading = 'lazy';
+        iframe.allowFullscreen = true;
+        iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+        iframe.allow = 'accelerometer; encrypted-media; picture-in-picture; fullscreen';
+        marco.appendChild(iframe);
+        boton.hidden = true;
+        cerrarTarjetaBoton.hidden = false;
+    });
+
+    const observador = new MutationObserver(() => {
+        if (seccion.hidden) cerrarTodas();
+    });
+    observador.observe(seccion, { attributes: true, attributeFilter: ['hidden'] });
+})();
+</script>
+
 @endsection
 
