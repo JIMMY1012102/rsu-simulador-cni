@@ -1069,3 +1069,75 @@ body:has(.cni-alumno){background:#f8f9fe}
 .cni-alumno-academia-preview-frame--miniatura .cni-alumno-academia-preview{background:linear-gradient(180deg,rgba(8,20,38,.18),rgba(8,20,38,.68))}
 .cni-alumno-academia-ultimo{margin:8px 12px 0;color:var(--muted);font-size:12px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2;overflow:hidden}
 @media(max-width:680px){.cni-alumno-academia-ultimo{margin:7px 12px 0;font-size:12px}}
+
+
+/* Topbar móvil: menú, título y avatar en una fila; examen debajo. */
+@media(max-width:680px){
+    .cni-alumno{
+        position:relative;
+    }
+    .cni-alumno-sidebar-toggle{
+        position:absolute;
+        top:11px;
+        left:16px;
+        z-index:42;
+        min-height:43px;
+        height:43px;
+    }
+    .cni-alumno .cni-alumno-topbar{
+        display:grid;
+        grid-template-columns:minmax(0,1fr) auto;
+        align-items:center;
+        gap:10px;
+        height:auto;
+        min-height:0;
+        padding:12px 16px 12px 104px;
+    }
+    .cni-alumno-top-title{
+        grid-column:1;
+        grid-row:1;
+        min-width:0;
+        gap:9px;
+    }
+    .cni-alumno-top-title>span:last-child{
+        flex:1;
+        min-width:0;
+    }
+    .cni-alumno-top-title strong{
+        overflow:hidden;
+        white-space:nowrap;
+        text-overflow:ellipsis;
+    }
+    .cni-alumno-top-actions{
+        display:contents;
+    }
+    .cni-alumno-top-actions .cni-alumno-top-profile{
+        grid-column:2;
+        grid-row:1;
+        min-width:0;
+        flex:0 0 auto;
+    }
+    .cni-alumno-top-actions .cni-alumno-top-profile>span:last-child{
+        max-width:150px;
+        min-width:0;
+    }
+    .cni-alumno-header-examen-form{
+        grid-column:1 / -1;
+        grid-row:2;
+        width:100%;
+        min-width:0;
+    }
+    .cni-alumno .cni-alumno-header-examen{
+        min-height:44px;
+        width:100%;
+        padding:10px 14px;
+    }
+}
+@media(max-width:480px){
+    .cni-alumno-top-actions .cni-alumno-top-profile>span:last-child{
+        display:none;
+    }
+    .cni-alumno-top-actions .cni-alumno-top-profile>.cni-alumno-avatar{
+        display:grid;
+    }
+}
