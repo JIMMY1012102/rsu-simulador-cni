@@ -16,7 +16,9 @@ class AcademiasController
             ->filter(fn ($id) => is_string($id))
             ->all();
 
-        abort_unless(in_array($canal, $canalesPermitidos, true), 404);
+        if (!in_array($canal, $canalesPermitidos, true)) {
+            return response()->json([], 404);
+        }
 
         $clave = 'yt_ultimo_video_'.$canal;
 
