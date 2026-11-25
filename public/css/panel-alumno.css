@@ -1141,3 +1141,11 @@ body:has(.cni-alumno){background:#f8f9fe}
         display:grid;
     }
 }
+
+/* La segunda fila recupera el margen común aunque la primera reserve sitio al menú. */
+@media(max-width:680px){
+    .cni-alumno-header-examen-form{
+        width:calc(100% + 88px);
+        margin-left:-88px;
+    }
+}
