@@ -128,7 +128,7 @@
                                 </span>
                             </a>
                             @if ($canalValido)
-                                <div class="cni-alumno-academia-preview-box">
+                                <div class="cni-alumno-academia-preview-box" data-ultimo-url="{{ route('alumno.academias.ultimo-video', ['canal' => $academia['canal_id']]) }}">
                                     <div class="cni-alumno-academia-preview-frame" data-academia-frame>
                                         <button type="button" class="cni-alumno-academia-preview" data-academia-preview
                                                 data-embed-url="https://www.youtube-nocookie.com/embed/videoseries?list=UU{{ substr($academia['canal_id'], 2) }}"
@@ -138,6 +138,7 @@
                                             <span class="cni-alumno-academia-preview-label">Ver videos recientes</span>
                                         </button>
                                     </div>
+                                    <p class="cni-alumno-academia-ultimo" hidden></p>
                                     <button type="button" class="cni-alumno-academia-cerrar" data-academia-close hidden>Cerrar vista previa</button>
                                 </div>
                             @endif
@@ -284,10 +285,45 @@
         cerrarTarjetaBoton.hidden = false;
     });
 
+    let miniaturasSolicitadas = false;
+    const cargarMiniaturas = async () => {
+        if (miniaturasSolicitadas || seccion.hidden) return;
+        miniaturasSolicitadas = true;
+        const tarjetas = [...seccion.querySelectorAll('.cni-alumno-academia-preview-box[data-ultimo-url]')];
+        for (const tarjeta of tarjetas) {
+            try {
+                const respuesta = await fetch(tarjeta.dataset.ultimoUrl, {
+                    credentials: 'same-origin',
+                    headers: { Accept: 'application/json' }
+                });
+                if (!respuesta.ok) continue;
+                const datos = await respuesta.json();
+                if (typeof datos.video_id !== 'string' || !/^[A-Za-z0-9_-]{11}$/.test(datos.video_id)) continue;
+                const marco = tarjeta.querySelector('[data-academia-frame]');
+                const texto = tarjeta.querySelector('.cni-alumno-academia-ultimo');
+                if (!marco || !texto) continue;
+                const imagen = document.createElement('img');
+                imagen.className = 'cni-alumno-academia-miniatura';
+                imagen.src = 'https://i.ytimg.com/vi/' + datos.video_id + '/hqdefault.jpg';
+                imagen.alt = '';
+                imagen.loading = 'lazy';
+                imagen.decoding = 'async';
+                marco.insertBefore(imagen, marco.firstChild);
+                marco.classList.add('cni-alumno-academia-preview-frame--miniatura');
+                texto.textContent = 'Último video: ' + String(datos.titulo || '').slice(0, 120);
+                texto.hidden = false;
+            } catch (_) {
+                // La tarjeta conserva su presentación habitual si la miniatura no está disponible.
+            }
+        }
+    };
+
     const observador = new MutationObserver(() => {
         if (seccion.hidden) cerrarTodas();
+        else cargarMiniaturas();
     });
     observador.observe(seccion, { attributes: true, attributeFilter: ['hidden'] });
+    if (!seccion.hidden) cargarMiniaturas();
 })();
 </script>
 
