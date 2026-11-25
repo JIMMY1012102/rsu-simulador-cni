@@ -48,4 +48,4 @@ jobs:
       - run: php artisan view:cache
       - run: php artisan test --filter='ExamenIndependienteTest|ExamenServiceTest|ExamenPantallaTest|ImportarBancoExcelTest|BancoGestionTest|AdministracionAcademicaTest|ImportarAlumnosExcelTest|SeccionesDocenteTest'
       - name: Verifica el panel compartido de las cinco áreas
-        run: php artisan test --filter='PanelesPorAreaTest::test_eleccion_persiste_y_llega_a_la_misma_pagina_para_cada_area|PanelesPorAreaTest::test_menu_lateral_tiene_exactamente_tres_opciones_y_un_boton_para_contraerlo'
+        run: php artisan test --filter='PanelesPorAreaTest::test_eleccion_persiste_y_llega_a_la_misma_pagina_para_cada_area|PanelesPorAreaTest::test_menu_lateral_tiene_cinco_opciones_y_un_boton_para_contraerlo|PanelesPorAreaTest::test_academias_virtuales_son_comunes_a_las_cinco_areas|PanelesPorAreaTest::test_cada_academia_muestra_vista_previa_y_no_renderiza_iframes_al_cargar|PanelesPorAreaTest::test_academias_sin_id_o_con_id_invalido_no_muestran_vista_previa'
