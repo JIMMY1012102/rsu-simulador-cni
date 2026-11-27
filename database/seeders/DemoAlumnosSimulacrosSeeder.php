@@ -1,15 +1,15 @@
 <?php
 
-namespace Database\\Seeders;
+namespace Database\Seeders;
 
-use App\\Models\\Usuario;
-use App\\Services\\Alumno\\ExamenIndependienteService;
-use App\\Services\\IntentoService;
-use Illuminate\\Database\\Seeder;
-use Illuminate\\Support\\Carbon;
-use Illuminate\\Support\\Facades\\DB;
-use Illuminate\\Support\\Facades\\Hash;
-use Illuminate\\Support\\Facades\\Schema;
+use App\Models\Usuario;
+use App\Services\Alumno\ExamenIndependienteService;
+use App\Services\IntentoService;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schema;
 use RuntimeException;
 
 /** 20 alumnos ficticios y 2 simulacros calificados por alumno. Solo local/testing. */
