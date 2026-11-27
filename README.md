@@ -117,3 +117,21 @@ Antes de activar, **en copia de desarrollo con respaldo**:
 5. **Solo entonces** modificar la configuración local de esa instalación a `CNI_ALUMNO_AREAS_ENABLED=true` y aplicar `php artisan config:clear` (o regenerar config cache según despliegue). Si se detecta un problema, regresar a `false` y limpiar caché: no cambia ni elimina registros por sí solo.
 
 GitHub Actions ejecuta la suite completa tanto en SQLite como en MariaDB 11.4 **temporales**. Una CI verde prueba el código, no el estado de la MariaDB del equipo. Consultar `docs/validacion-mariadb-areas.md`.
+
+
+## Asistentes con IA
+
+Se integran dos asistentes independientes: uno para estudiantes y otro para superadministradores (`usuarios.rol = 'admin'`). No hay asistente para docentes. El navegador se comunica solo con Laravel; Laravel toma el rol e ID de la sesión y es el único que llama al agente Python. Cada rol registra exclusivamente sus herramientas MCP, de solo lectura.
+
+### Orden de encendido
+
+1. En XAMPP, inicia **Apache y MySQL**.
+2. Copia `agente/.env.example` a `agente/.env` y configura DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, GEMINI_API_KEY, MODELO y AGENTE_TOKEN. En el `.env` de Laravel activa `ASISTENTE_ENABLED=true` y define el mismo secreto en `ASISTENTE_TOKEN`. No subas ningún `.env`.
+3. Desde la carpeta `agente`, crea y activa un entorno virtual, instala `pip install -r requirements.txt` y ejecuta `uvicorn agente:app --port 8001`. **No uses `--reload`.**
+4. Abre la aplicación e inicia sesión como estudiante o admin.
+
+Crea manualmente el usuario MariaDB de solo lectura con `agente/crear_usuario_solo_lectura.sql`, sustituyendo el nombre de la base de datos y configurando una contraseña segura. No concedas permisos de escritura ni acceso a `usuarios.password`.
+
+El portal del alumno y el panel administrativo requieren los flags `CNI_ALUMNO_AREAS_ENABLED=true` y `CNI_ADMIN_ACADEMICO_ENABLED=true`; sin ellos esas secciones no abren.
+
+**Advertencia:** utiliza únicamente datos de demostración. No realices demostraciones con datos personales ni credenciales reales de estudiantes.

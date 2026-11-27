@@ -34,3 +34,8 @@ Homestead.json
 /database/*.sqlite
 /.idea/
 /.vscode/
+
+# Entorno local del agente IA
+agente/.env
+agente/.venv/
+__pycache__/

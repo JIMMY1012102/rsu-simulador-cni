@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\SessionController;
+use App\Http\Controllers\AsistenteController;
 use App\Http\Controllers\Admin\BancoPreguntasController;
 use App\Http\Controllers\Admin\VaciarBancoPreguntasController;
 use App\Http\Controllers\Admin\BancoGestionController;
@@ -132,3 +133,6 @@ if (app()->environment('local')) {
     });
 }
 
+
+// Chat protegido: rol e identidad proceden de la sesión autenticada.
+Route::post('/asistente/chat', AsistenteController::class)->middleware(['auth:web', EnsureActiveUser::class, 'throttle:20,1'])->name('asistente.chat');
