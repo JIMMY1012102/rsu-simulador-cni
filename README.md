@@ -135,3 +135,6 @@ Crea manualmente el usuario MariaDB de solo lectura con `agente/crear_usuario_so
 El portal del alumno y el panel administrativo requieren los flags `CNI_ALUMNO_AREAS_ENABLED=true` y `CNI_ADMIN_ACADEMICO_ENABLED=true`; sin ellos esas secciones no abren.
 
 **Advertencia:** utiliza únicamente datos de demostración. No realices demostraciones con datos personales ni credenciales reales de estudiantes.
+
+
+Guía detallada para ejecutar el agente en una laptop con XAMPP y Python: [`agente/README-local.md`](agente/README-local.md). La configuración local mantiene `ASISTENTE_ENABLED=false` hasta que FastAPI esté instalado y listo.
