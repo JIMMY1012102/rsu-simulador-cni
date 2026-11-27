@@ -31,12 +31,12 @@ class AsistenteChatTest extends TestCase
         Http::fake(['agente.test/*' => Http::response(['respuesta' => 'Resultados'], 200)]);
         $usuario = $this->usuario('estudiante');
         $this->actingAs($usuario, 'web')->postJson('/asistente/chat', ['mensaje' => 'Mis resultados'])->assertOk();
-        Http::assertSent(fn ($r) => $r['rol'] === 'estudiante' && (int) $r['usuario_id'] === $usuario->id && $r->hasHeader('X-Agente-Token', 'secreto'));
+        Http::assertSent(fn ($r) => $r['rol'] === 'estudiante' && (int) $r['usuario_id'] === $usuario->id && is_string($r['sesion']) && $r['sesion'] !== '' && $r->hasHeader('X-Agente-Token', 'secreto'));
     }
 
     public function test_admin_envia_rol_e_id_correctos(): void
     {
-        config(['asistente.url' => 'http://agente.test/chat', 'asistente.token' => 'secreto']);
+        config(['asistente.enabled' => true, 'asistente.url' => 'http://agente.test/chat', 'asistente.token' => 'secreto']);
         Http::fake(['agente.test/*' => Http::response(['respuesta' => 'Resumen'], 200)]);
         $usuario = $this->usuario('admin');
         $this->actingAs($usuario, 'web')->postJson('/asistente/chat', ['mensaje' => 'Resumen'])->assertOk();
@@ -57,7 +57,7 @@ class AsistenteChatTest extends TestCase
 
     public function test_agente_caido_devuelve_mensaje_amable(): void
     {
-        config(['asistente.url' => 'http://agente.test/chat', 'asistente.token' => 'secreto']);
+        config(['asistente.enabled' => true, 'asistente.url' => 'http://agente.test/chat', 'asistente.token' => 'secreto']);
         Http::fake(['agente.test/*' => Http::response([], 500)]);
         $this->actingAs($this->usuario('estudiante'), 'web')->postJson('/asistente/chat', ['mensaje' => 'Hola'])
             ->assertStatus(503)->assertJson(['respuesta' => 'El asistente no está disponible en este momento. Intente de nuevo en un minuto.']);
