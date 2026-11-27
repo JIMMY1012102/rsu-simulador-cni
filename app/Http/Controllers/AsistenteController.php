@@ -22,7 +22,7 @@ class AsistenteController extends Controller
                 ->withHeader('X-Agente-Token', (string) config('asistente.token'))
                 ->timeout((int) config('asistente.timeout', 60))
                 ->post(config('asistente.url'), [
-                    'sesion' => $datos['sesion'] ?? $request->session()->getId(),
+                    'sesion' => $request->session()->getId(),
                     'mensaje' => $datos['mensaje'],
                     'rol' => $usuario->rol,
                     'usuario_id' => (int) $usuario->id,
