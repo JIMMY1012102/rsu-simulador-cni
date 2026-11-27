@@ -98,7 +98,7 @@ La configuración por defecto es:
 
 ```dotenv
 GEMINI_MODEL=gemini-3.8-flash
-GEMINI_FALLBACK_MODELS=gemini-4-hydrogen,gemini-3.5-flash-lite
+GEMINI_FALLBACK_MODELS=gemini-3.5-flash-lite,gemini-4-hydrogen
 ```
 
 GEMINI_FALLBACK_MODELS es opcional y acepta IDs separados por comas. Si no se define en .env, Laravel utiliza los dos respaldos predeterminados de config/services.php. Después de modificar .env, ejecuta:
