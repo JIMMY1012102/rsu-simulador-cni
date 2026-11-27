@@ -27,7 +27,7 @@ class AsistenteChatTest extends TestCase
 
     public function test_estudiante_envia_rol_e_id_de_sesion(): void
     {
-        config(['asistente.url' => 'http://agente.test/chat', 'asistente.token' => 'secreto']);
+        config(['asistente.enabled' => true, 'asistente.url' => 'http://agente.test/chat', 'asistente.token' => 'secreto']);
         Http::fake(['agente.test/*' => Http::response(['respuesta' => 'Resultados'], 200)]);
         $usuario = $this->usuario('estudiante');
         $this->actingAs($usuario, 'web')->postJson('/asistente/chat', ['mensaje' => 'Mis resultados'])->assertOk();
@@ -63,9 +63,23 @@ class AsistenteChatTest extends TestCase
             ->assertStatus(503)->assertJson(['respuesta' => 'El asistente no está disponible en este momento. Intente de nuevo en un minuto.']);
     }
 
-    public function test_componente_no_se_renderiza_con_asistente_desactivado(): void
+    public function test_agente_desactivado_devuelve_mensaje_claro(): void
     {
         config(['asistente.enabled' => false]);
-        $this->actingAs($this->usuario('admin'), 'web')->get('/panel')->assertDontSee('Asistente IA');
+
+        $this->actingAs($this->usuario('estudiante'), 'web')
+            ->postJson('/asistente/chat', ['mensaje' => 'Hola'])
+            ->assertStatus(503)
+            ->assertJson(['respuesta' => 'El asistente está desactivado en este momento. Inténtelo nuevamente más tarde.']);
+    }
+
+    public function test_chat_sigue_visible_cuando_el_agente_esta_desactivado(): void
+    {
+        config(['asistente.enabled' => false]);
+
+        $this->actingAs($this->usuario('estudiante'), 'web')
+            ->get('/panel')
+            ->assertSee('Servicio desactivado')
+            ->assertSee('El asistente está desactivado en este momento.');
     }
 }
