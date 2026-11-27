@@ -1,5 +1,5 @@
 """Puente FastAPI para Gemini y las herramientas MCP."""
-import asyncio, json, os
+import asyncio, os
 from contextlib import AsyncExitStack
 from pathlib import Path
 from dotenv import load_dotenv
@@ -67,5 +67,6 @@ async def chat(datos: Solicitud, x_agente_token: str|None=Header(default=None)):
         historial.append({"role":"model","parts":[{"text":texto}]})
         historiales[clave]=recortar(historial)
         return {"respuesta":texto}
-    except Exception:
+    except Exception as error:
+        print('Error del agente:', error)
         return {"respuesta":"Lo siento, no pude consultar la información en este momento. Inténtalo nuevamente en un minuto."}
