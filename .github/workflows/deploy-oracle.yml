@@ -1,0 +1,120 @@
+name: Deploy to Oracle server
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_migrations:
+        description: Run reviewed Laravel migrations on the server
+        type: boolean
+        required: true
+        default: false
+      seed_demo_data:
+        description: Seed fictitious teacher demo data on an isolated demo database only
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    if: github.ref == 'refs/heads/OFICIAL#1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out official branch
+        uses: actions/checkout@v4
+        with:
+          ref: OFICIAL#1
+
+      - name: Configure verified SSH access
+        shell: bash
+        env:
+          ORACLE_DEPLOY_KEY: ${{ secrets.ORACLE_DEPLOY_KEY }}
+          ORACLE_DEPLOY_KNOWN_HOSTS: ${{ secrets.ORACLE_DEPLOY_KNOWN_HOSTS }}
+          ORACLE_DEPLOY_HOST: ${{ secrets.ORACLE_DEPLOY_HOST }}
+          ORACLE_DEPLOY_USER: ${{ secrets.ORACLE_DEPLOY_USER }}
+          ORACLE_APP_PATH: ${{ secrets.ORACLE_APP_PATH }}
+        run: |
+          set -euo pipefail
+          for name in ORACLE_DEPLOY_KEY ORACLE_DEPLOY_KNOWN_HOSTS ORACLE_DEPLOY_HOST ORACLE_DEPLOY_USER ORACLE_APP_PATH; do
+            if [[ -z "${!name}" ]]; then
+              echo "Missing required GitHub Actions secret: $name" >&2
+              exit 1
+            fi
+          done
+          if [[ ! "$ORACLE_APP_PATH" =~ ^/[A-Za-z0-9._/-]+$ || "$ORACLE_APP_PATH" == *".."* ]]; then
+            echo "ORACLE_APP_PATH must be a safe absolute path" >&2
+            exit 1
+          fi
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$ORACLE_DEPLOY_KEY" > ~/.ssh/id_ed25519
+          printf '%s\n' "$ORACLE_DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_ed25519 ~/.ssh/known_hosts
+
+      - name: Verify the existing Laravel target
+        shell: bash
+        env:
+          ORACLE_DEPLOY_HOST: ${{ secrets.ORACLE_DEPLOY_HOST }}
+          ORACLE_DEPLOY_USER: ${{ secrets.ORACLE_DEPLOY_USER }}
+          ORACLE_APP_PATH: ${{ secrets.ORACLE_APP_PATH }}
+        run: |
+          set -euo pipefail
+          ssh "$ORACLE_DEPLOY_USER@$ORACLE_DEPLOY_HOST" bash -s -- "$ORACLE_APP_PATH" <<'REMOTE'
+          set -euo pipefail
+          APP_PATH="$1"
+          test -f "$APP_PATH/artisan"
+          test -f "$APP_PATH/.env"
+          test -d "$APP_PATH/storage"
+          REMOTE
+      - name: Copy release files (preserve server .env and storage)
+        shell: bash
+        env:
+          ORACLE_DEPLOY_HOST: ${{ secrets.ORACLE_DEPLOY_HOST }}
+          ORACLE_DEPLOY_USER: ${{ secrets.ORACLE_DEPLOY_USER }}
+          ORACLE_APP_PATH: ${{ secrets.ORACLE_APP_PATH }}
+        run: |
+          set -euo pipefail
+          rsync -az \
+            --exclude='.env' \
+            --exclude='.git/***' \
+            --exclude='storage/***' \
+            --exclude='vendor/***' \
+            --exclude='node_modules/***' \
+            ./ "$ORACLE_DEPLOY_USER@$ORACLE_DEPLOY_HOST:$ORACLE_APP_PATH/"
+
+      - name: Install and activate Laravel release
+        shell: bash
+        env:
+          ORACLE_DEPLOY_HOST: ${{ secrets.ORACLE_DEPLOY_HOST }}
+          ORACLE_DEPLOY_USER: ${{ secrets.ORACLE_DEPLOY_USER }}
+          ORACLE_APP_PATH: ${{ secrets.ORACLE_APP_PATH }}
+          RUN_MIGRATIONS: ${{ inputs.run_migrations }}
+          SEED_DEMO_DATA: ${{ inputs.seed_demo_data }}
+        run: |
+          set -euo pipefail
+          ssh "$ORACLE_DEPLOY_USER@$ORACLE_DEPLOY_HOST" bash -s -- "$ORACLE_APP_PATH" "$RUN_MIGRATIONS" "$SEED_DEMO_DATA" <<'REMOTE'
+          set -euo pipefail
+          APP_PATH="$1"
+          RUN_MIGRATIONS="$2"
+          SEED_DEMO_DATA="$3"
+          cd "$APP_PATH"
+
+          php -v
+          composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+          php artisan config:clear
+          php artisan route:clear
+          php artisan view:clear
+          php artisan event:clear
+
+          if [[ "$RUN_MIGRATIONS" == "true" ]]; then
+            php artisan migrate --force
+          fi
+
+          if [[ "$SEED_DEMO_DATA" == "true" ]]; then
+            php artisan db:seed --class='Database\Seeders\DocenteResultadosDemoSeeder' --force
+          fi
+
+          php artisan config:cache
+          php artisan view:cache
+          REMOTE
