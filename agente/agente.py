@@ -14,6 +14,7 @@ load_dotenv(Path(__file__).with_name(".env"))
 app=FastAPI(title="Agente IA CNI")
 historiales={}
 MODELO=os.getenv("MODELO") or "gemini-2.5-flash"
+ERRORES_GEMINI_REINTENTABLES = {429, 500, 502, 503, 504}
 
 class Solicitud(BaseModel):
     sesion: str = Field(min_length=1,max_length=120)
@@ -25,6 +26,29 @@ def recortar(historial):
     datos=historial[-11:]
     while datos and datos[0]["role"]!="user": datos.pop(0)
     return datos
+
+async def generar_con_reintentos(cliente, **argumentos):
+    """Reintenta fallos transitorios del servicio Gemini sin duplicar llamadas MCP."""
+    for intento in range(3):
+        try:
+            return await asyncio.to_thread(
+                cliente.models.generate_content, **argumentos
+            )
+        except Exception as error:
+            codigo = getattr(error, "status_code", None)
+            transitorio = (
+                codigo in ERRORES_GEMINI_REINTENTABLES
+                or isinstance(error, (TimeoutError, ConnectionError, OSError))
+            )
+            if not transitorio or intento == 2:
+                raise
+            espera = 2 ** intento
+            print(
+                f"Gemini presentó un fallo temporal (código={codigo}); "
+                f"reintento {intento + 1}/2 en {espera}s.",
+                flush=True,
+            )
+            await asyncio.sleep(espera)
 
 @app.post("/chat")
 async def chat(datos: Solicitud, x_agente_token: str|None=Header(default=None)):
@@ -51,8 +75,12 @@ async def chat(datos: Solicitud, x_agente_token: str|None=Header(default=None)):
             declaraciones=[types.FunctionDeclaration(name=h.name,description=h.description or "",parameters=h.inputSchema) for h in disponibles.tools]
             herramienta_mcp=types.Tool(function_declarations=declaraciones)
             contenido=[types.Content(role=m["role"],parts=[types.Part.from_text(text=p["text"]) for p in m["parts"]]) for m in historial]
-            respuesta=await asyncio.to_thread(cliente.models.generate_content,model=MODELO,contents=contenido,
-                config=types.GenerateContentConfig(system_instruction=instrucciones,tools=[herramienta_mcp],temperature=0.2))
+            respuesta=await generar_con_reintentos(
+                cliente,
+                model=MODELO,
+                contents=contenido,
+                config=types.GenerateContentConfig(system_instruction=instrucciones,tools=[herramienta_mcp],temperature=0.2),
+            )
             for _ in range(5):
                 llamadas=[p.function_call for p in (respuesta.candidates[0].content.parts if respuesta.candidates else []) if p.function_call]
                 if not llamadas: break
@@ -61,8 +89,12 @@ async def chat(datos: Solicitud, x_agente_token: str|None=Header(default=None)):
                     resultado=await sesion_mcp.call_tool(llamada.name,llamada.args or {})
                     partes.append(types.Part.from_function_response(name=llamada.name,response={"resultado":"\n".join(c.text for c in resultado.content if hasattr(c,"text"))}))
                 contenido.extend([respuesta.candidates[0].content,types.Content(role="user",parts=partes)])
-                respuesta=await asyncio.to_thread(cliente.models.generate_content,model=MODELO,contents=contenido,
-                    config=types.GenerateContentConfig(system_instruction=instrucciones,tools=[herramienta_mcp],temperature=0.2))
+                respuesta=await generar_con_reintentos(
+                    cliente,
+                    model=MODELO,
+                    contents=contenido,
+                    config=types.GenerateContentConfig(system_instruction=instrucciones,tools=[herramienta_mcp],temperature=0.2),
+                )
             texto=respuesta.text or "No pude completar la consulta. Inténtalo nuevamente."
         historial.append({"role":"model","parts":[{"text":texto}]})
         historiales[clave]=recortar(historial)
