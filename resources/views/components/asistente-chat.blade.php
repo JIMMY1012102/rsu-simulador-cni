@@ -39,13 +39,24 @@
 .cni-asistente__eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:#3b82f6}
 .cni-asistente__bienvenida h3{margin:0;color:#172b4d;font-size:26px;line-height:1.15;font-weight:850;letter-spacing:-.8px}
 .cni-asistente__bienvenida p{margin:0 0 9px;color:#71809a;font-size:13px;line-height:1.55;max-width:290px}
-.cni-asistente__atajos{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:3px;text-align:left}
-.cni-asistente__atajo{display:flex;align-items:center;gap:10px;min-height:66px;padding:11px;border:1px solid #e3ebf7;border-radius:17px;background:#fff;color:#263b5d;font:inherit;font-size:12px;font-weight:700;line-height:1.3;text-align:left;cursor:pointer;box-shadow:0 3px 12px #29466d08;transition:transform .18s,border-color .18s,box-shadow .18s}
-.cni-asistente__atajo:hover{transform:translateY(-2px);border-color:#b8d2fb;box-shadow:0 8px 20px #29466d12}
-.cni-asistente__atajo-icono{width:34px;height:34px;flex:none;display:grid;place-items:center;border-radius:11px;background:#edf4ff;color:#3676db;font-size:17px}
-.cni-asistente__atajo:nth-child(2) .cni-asistente__atajo-icono{background:#e8faff;color:#0891b2}
-.cni-asistente__atajo:nth-child(3) .cni-asistente__atajo-icono{background:#f1edff;color:#7859d6}
-.cni-asistente__atajo:nth-child(4) .cni-asistente__atajo-icono{background:#e9fbf2;color:#15945b}
+.cni-asistente__bienvenida{position:relative;isolation:isolate;min-height:100%;justify-content:center;padding:34px 12px 28px;gap:13px}
+.cni-asistente__bienvenida:before{content:"";position:absolute;z-index:-1;top:13%;left:50%;width:290px;height:290px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,.20),rgba(34,211,238,.09) 48%,transparent 72%);filter:blur(8px);pointer-events:none}
+.cni-asistente__bienvenida-avatar{position:relative;width:116px;height:116px;padding:7px;margin:0 0 10px;border-radius:36px;background:linear-gradient(145deg,#2563eb,#06b6d4 55%,#8b5cf6);box-shadow:0 18px 42px rgba(37,99,235,.22),0 0 0 9px rgba(219,234,254,.65);animation:cni-mascota-float 4s ease-in-out infinite}
+.cni-asistente__bienvenida-avatar:after{content:"";position:absolute;inset:4px;border:1px solid rgba(255,255,255,.75);border-radius:30px;pointer-events:none}
+.cni-asistente__bienvenida-avatar img{position:relative;z-index:1;border-radius:29px;background:linear-gradient(145deg,#fff,#eff7ff)}
+.cni-asistente__eyebrow{padding:6px 12px;border:1px solid #dbeafe;border-radius:999px;background:rgba(239,246,255,.9);font-size:9px;letter-spacing:2.1px}
+.cni-asistente__bienvenida h3{font-size:clamp(27px,7vw,34px);line-height:1.12;letter-spacing:-1.1px;background:linear-gradient(100deg,#102d63 10%,#2563eb 58%,#0891b2);-webkit-background-clip:text;background-clip:text;color:transparent}
+.cni-asistente__bienvenida p{max-width:285px;margin:0;color:#64748b;font-size:13px;line-height:1.75}
+@keyframes cni-mascota-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+.cni-asistente__mensajes{background:radial-gradient(ellipse at 50% 0%,rgba(219,234,254,.75),transparent 48%),radial-gradient(ellipse at 100% 100%,rgba(207,250,254,.42),transparent 42%),#f8fbff}
+.cni-asistente__cabecera{background:linear-gradient(115deg,#fff 0%,#f4f8ff 58%,#effbff 100%)}
+.cni-asistente__avatar{padding:2px;border:2px solid #fff;box-shadow:0 0 0 2px #b8d5ff,0 5px 16px rgba(37,99,235,.15)}
+.cni-asistente__pie{background:rgba(255,255,255,.96);backdrop-filter:blur(14px)}
+.cni-asistente__form{border-radius:19px;background:#f7faff}
+.cni-asistente__enviar{width:46px;height:46px;border-radius:15px;background:linear-gradient(135deg,#1d4ed8,#0891b2);box-shadow:0 9px 20px rgba(37,99,235,.28)}
+.cni-asistente__nota{letter-spacing:.15px}
+.cni-asistente__abrir{border-color:#d8e5f8;background:rgba(255,255,255,.96);box-shadow:0 12px 34px rgba(20,55,105,.16)}
+.cni-asistente__lanzador-avatar{box-shadow:0 0 0 2px #b9d5ff,0 5px 14px rgba(37,99,235,.18)}
 .cni-asistente__fila{display:flex;align-items:flex-end;gap:9px;max-width:96%}
 .cni-asistente__fila--usuario{align-self:flex-end;justify-content:flex-end}
 .cni-asistente__mini-avatar{width:31px;height:31px;flex:none;padding:1px;border-radius:11px;background:#fff}
@@ -82,13 +93,8 @@
             <div class="cni-asistente__bienvenida-avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="" width="78" height="78"></div>
             <span class="cni-asistente__eyebrow">ASISTENTE IA · CNI</span>
             <h3>¡Hola! Soy {{ $nombreAsistente }}</h3>
-            <p>Tu asistente está listo para ayudarte. ¿Qué necesitas aprender o resolver hoy?</p>
-            <div class="cni-asistente__atajos">
-                <button class="cni-asistente__atajo" type="button" data-prompt="Explícame un tema paso a paso"><span class="cni-asistente__atajo-icono">▤</span><span>Explícame un tema</span></button>
-                <button class="cni-asistente__atajo" type="button" data-prompt="Ayúdame a organizar mi plan de estudio"><span class="cni-asistente__atajo-icono">▦</span><span>Plan de estudio</span></button>
-                <button class="cni-asistente__atajo" type="button" data-prompt="Quiero resolver un ejercicio"><span class="cni-asistente__atajo-icono">✧</span><span>Resolver un ejercicio</span></button>
-                <button class="cni-asistente__atajo" type="button" data-prompt="¿Cómo va mi rendimiento por áreas?"><span class="cni-asistente__atajo-icono">▥</span><span>Mi progreso</span></button>
-            </div>
+            <p>Tu asistente está listo para ayudarte. Estoy aquí para acompañarte en tu aprendizaje. Escríbeme tu consulta y la resolveremos juntos, paso a paso.</p>
+
         </div>
     </div>
     <div class="cni-asistente__pie">
@@ -185,10 +191,7 @@
     };
     open.addEventListener('click', () => toggle(true));
     close.addEventListener('click', () => toggle(false));
-    root.querySelectorAll('[data-prompt]').forEach(button => {
-        button.addEventListener('click', () => sendMessage(button.dataset.prompt));
-    });
-    document.addEventListener('keydown', event => {
+        document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && root.classList.contains('is-abierto')) toggle(false);
     });
     form.addEventListener('submit', event => {
