@@ -2,27 +2,24 @@
 
 Aplicación web académica construida con **Laravel 12, Livewire 3 y MariaDB**.
 
-Esta rama, `local-xampp-antix`, está preparada para instalar una copia de desarrollo en **antiX Linux + XAMPP** y abrirla desde el navegador en `http://localhost/rsu-cni`. No modifica la rama `OFICIAL#1`.
+Esta rama, `local-xampp-antix`, está preparada para instalar una copia de desarrollo en **antiX Linux + XAMPP** y abrirla en `http://localhost/rsu-cni`. La rama `OFICIAL#1` no se modifica.
 
-## Instalación local en antiX Linux con XAMPP
+## Instalación rápida: antiX Linux + XAMPP
 
 ### 1. Requisitos
 
-- XAMPP para Linux instalado (normalmente en `/opt/lampp`).
-- PHP 8.2 o superior con extensiones de Laravel y `pdo_mysql`.
-- Composer 2.
-- Node.js y npm (para compilar los recursos CSS/JS).
-- Git (opcional, si clonas en vez de descargar ZIP).
+- XAMPP para Linux (por defecto, `/opt/lampp`).
+- PHP 8.2+ con extensiones Laravel y `pdo_mysql`.
+- Composer 2, Node.js y npm.
+- Git (solo si clonas el repositorio).
 
-Inicia Apache y MySQL desde el panel de XAMPP:
+Inicia XAMPP:
 
 ```bash
 sudo /opt/lampp/lampp start
 ```
 
-### 2. Descargar el proyecto
-
-Descomprime esta rama dentro de `/opt/lampp/htdocs/rsu-simulador-cni` (o clónala allí):
+### 2. Descargar esta rama
 
 ```bash
 cd /opt/lampp/htdocs
@@ -30,30 +27,30 @@ git clone --branch local-xampp-antix https://github.com/JIMMY1012102/rsu-simulad
 cd rsu-simulador-cni
 ```
 
-Si descargaste el ZIP, entra en la carpeta que contiene `artisan`.
+También puedes descargar el ZIP de la rama desde GitHub y descomprimirlo en `/opt/lampp/htdocs/rsu-simulador-cni`.
 
-### 3. Instalar dependencias y preparar Laravel
+### 3. Ejecutar el preparador
 
-Desde la raíz del proyecto:
+Desde la carpeta del proyecto:
 
 ```bash
-composer install
-cp .env.example .env
-php artisan key:generate
-npm install
-npm run build
-php artisan storage:link
+bash scripts/preparar-xampp-antix.sh
 ```
 
-Si `composer` no encuentra PHP, ejecuta Composer con el PHP de XAMPP o añade `/opt/lampp/bin` al PATH. Comprueba que el PHP usado por Composer tenga habilitadas las extensiones `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `xml` y `tokenizer`.
+El script:
+- instala dependencias de Composer y npm;
+- crea `.env` solo si todavía no existe y genera `APP_KEY` si está vacía;
+- compila CSS/JavaScript y prepara `public/storage`;
+- configura un alias Apache para publicar solo `public/` en `/rsu-cni`;
+- valida Apache y reinicia su servicio.
 
-### 4. Crear la base de datos local
+No sobrescribe un `.env` que ya exista. Si XAMPP está en otra carpeta, puedes indicarla así: `XAMPP_DIR=/ruta/xampp bash scripts/preparar-xampp-antix.sh`.
 
-Entra a `http://localhost/phpmyadmin`, inicia sesión y crea una base de datos llamada:
+### 4. Crear y configurar la base local
 
-`rsu_cni_local`
+Abre `http://localhost/phpmyadmin` y crea una base llamada `rsu_cni_local`.
 
-En el archivo `.env` configura la conexión de XAMPP. En una instalación XAMPP nueva, el usuario suele ser `root` y la contraseña suele estar vacía; si configuraste una contraseña, coloca la tuya solo en tu archivo local:
+En `.env`, revisa la conexión. En una instalación XAMPP nueva suele usarse `root` sin contraseña; si configuraste una contraseña, escribe la tuya localmente:
 
 ```dotenv
 APP_ENV=local
@@ -66,71 +63,25 @@ DB_PORT=3306
 DB_DATABASE=rsu_cni_local
 DB_USERNAME=root
 DB_PASSWORD=
-
-SESSION_DRIVER=file
-CACHE_STORE=file
-QUEUE_CONNECTION=sync
 ```
 
-**Base vacía:** revisa las migraciones disponibles y luego ejecuta:
+**Base vacía:** revisa las migraciones y ejecuta `php artisan migrate` solo si el esquema de esta copia debe crearse desde cero.
 
-```bash
-php artisan migrate
-```
+**Base SQL existente:** impórtala en `rsu_cni_local` y revisa `php artisan migrate:status` antes de ejecutar migraciones. No uses `migrate:fresh`; elimina las tablas. Haz una copia de seguridad antes de modificar una base importada.
 
-**Si vas a importar una base SQL existente:** impórtala en `rsu_cni_local` y no ejecutes `migrate:fresh`. Antes de ejecutar `migrate`, revisa el historial de migraciones con `php artisan migrate:status`; no mezcles una importación SQL con migraciones sin verificar su correspondencia. Haz siempre una copia de seguridad antes de modificar una base importada.
-
-### 5. Configurar Apache para abrir localhost/rsu-cni
-
-Por seguridad, Apache debe publicar **solo la carpeta `public`** de Laravel, nunca la raíz del proyecto. Crea el archivo de configuración de alias de XAMPP:
-
-`/opt/lampp/etc/extra/httpd-rsu-cni.conf`
-
-Con este contenido (ajusta la ruta si guardaste el proyecto en otro lugar):
-
-```apache
-Alias /rsu-cni "/opt/lampp/htdocs/rsu-simulador-cni/public"
-
-<Directory "/opt/lampp/htdocs/rsu-simulador-cni/public">
-    Options FollowSymLinks
-    AllowOverride All
-    Require all granted
-</Directory>
-```
-
-Luego abre `/opt/lampp/etc/httpd.conf` y agrega al final:
-
-```apache
-Include etc/extra/httpd-rsu-cni.conf
-```
-
-Verifica que `mod_rewrite` esté habilitado (la línea `LoadModule rewrite_module modules/mod_rewrite.so` no debe tener `#) y que `AllowOverride All` esté permitido en el bloque anterior. Reinicia Apache:
-
-```bash
-sudo /opt/lampp/lampp restartapache
-```
-
-Abre:
+### 5. Abrir la aplicación
 
 **http://localhost/rsu-cni**
 
-Si Apache no inicia, revisa `/opt/lampp/logs/error_log` y corrige la ruta del alias o la línea `Include`.
+Inicia sesión con una cuenta que exista en la base de datos que preparaste o importaste. No se crean cuentas reales automáticamente.
 
-### 6. Comprobación rápida
+Si Apache no inicia, revisa `/opt/lampp/logs/error_log`. El script guarda una copia inicial de `httpd.conf` en `httpd.conf.backup-rsu-cni` antes de agregar el Include. Para quitar la integración, elimina la línea `Include etc/extra/httpd-rsu-cni.conf` de `httpd.conf` y el archivo `etc/extra/httpd-rsu-cni.conf`, y reinicia Apache.
 
-```bash
-php artisan optimize:clear
-php artisan about
-php artisan route:list
-```
-
-Inicia sesión con una cuenta que exista en la base de datos que importaste o preparaste. No se crean usuarios reales automáticamente.
-
-## Funciones que requieren configuración adicional
+## Configuración adicional opcional
 
 - **Davis (asistente docente):** requiere una clave válida en `GEMINI_API_KEY` dentro de `.env`. La clave no se incluye en Git.
 - **Asistente de estudiante/administrador:** es un servicio Python separado; consulta la documentación de `agente/`. No es necesario para abrir el portal Laravel.
-- Los flags `CNI_ALUMNO_AREAS_ENABLED` y `CNI_ADMIN_ACADEMICO_ENABLED` permanecen desactivados por defecto. Actívalos solo después de verificar que la base local tiene el esquema y los datos requeridos.
+- `CNI_ALUMNO_AREAS_ENABLED` y `CNI_ADMIN_ACADEMICO_ENABLED` permanecen desactivados por defecto. Actívalos solo después de verificar que la base local tiene el esquema y los datos requeridos.
 - Los seeders de demostración son opcionales. No los ejecutes sobre datos reales.
 
 ## Pruebas
@@ -142,6 +93,6 @@ php artisan test
 
 Las pruebas usan SQLite en memoria mediante `phpunit.xml`; no deberían modificar tu MariaDB local.
 
-## Despliegue en Oracle
+## Oracle
 
-La rama `OFICIAL#1` y sus procedimientos de Oracle no se modifican con esta rama. Consulta `docs/despliegue-oracle.md` para el despliegue del servidor.
+Esta rama es para desarrollo local y no reemplaza `OFICIAL#1`. Consulta `docs/despliegue-oracle.md` para el despliegue de Oracle.
