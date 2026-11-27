@@ -1,0 +1,6 @@
+mcp[cli]<2
+mysql-connector-python
+python-dotenv
+google-genai
+fastapi
+uvicorn
