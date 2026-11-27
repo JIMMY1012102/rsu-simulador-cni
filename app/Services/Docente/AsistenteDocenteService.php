@@ -159,7 +159,6 @@ PROMPT;
                             'contents' => $contents,
                             'generationConfig' => [
                                 'maxOutputTokens' => $maxOutputTokens,
-                                'temperature' => 0.7,
                             ],
                         ]);
 
