@@ -263,43 +263,382 @@ if ROL == "estudiante":
         return consultar(sql, tuple(parametros))
 
 elif ROL == "admin":
-    @mcp.tool(description="Úsala para un resumen global de usuarios activos por rol, simulacros y preguntas activos e intentos calificados.")
-    def resumen_general() -> str:
+    @mcp.tool(description=(
+        "Panel ejecutivo del superadministrador: concentra usuarios activos/inactivos por rol, "
+        "catálogo, banco, simulacros, intentos y actividad reciente. Úsala primero ante "
+        "saludos como '¿cómo está la plataforma?', 'dame un panorama' o '¿qué debo atender hoy?'."
+    ))
+    def panel_superadmin() -> str:
         admin()
-        return json.dumps({
-            "usuarios_activos_por_rol": json.loads(consultar(
-                "SELECT rol, COUNT(*) total FROM usuarios WHERE activo=1 GROUP BY rol LIMIT 10"
+        datos = {
+            "usuarios_por_rol_y_estado": json.loads(consultar(
+                "SELECT rol, activo, COUNT(*) total FROM usuarios GROUP BY rol, activo ORDER BY rol, activo LIMIT 20"
             )),
-            "simulacros_activos": json.loads(consultar(
-                "SELECT COUNT(*) total FROM simulacros WHERE activo=1 LIMIT 1"
+            "catalogo": json.loads(consultar(
+                """SELECT
+                    (SELECT COUNT(*) FROM areas WHERE activo=1) asignaturas_activas,
+                    (SELECT COUNT(*) FROM temas WHERE activo=1) temas_activos,
+                    (SELECT COUNT(*) FROM preguntas WHERE activo=1) preguntas_activas,
+                    (SELECT COUNT(*) FROM alternativas) alternativas_totales
+                  LIMIT 1"""
             )),
-            "preguntas_activas": json.loads(consultar(
-                "SELECT COUNT(*) total FROM preguntas WHERE activo=1 LIMIT 1"
+            "simulacros": json.loads(consultar(
+                """SELECT
+                    SUM(CASE WHEN activo=1 AND fecha_inicio<=NOW() AND fecha_fin>=NOW() THEN 1 ELSE 0 END) vigentes,
+                    SUM(CASE WHEN activo=1 AND fecha_inicio>NOW() THEN 1 ELSE 0 END) proximos,
+                    SUM(CASE WHEN fecha_fin<NOW() THEN 1 ELSE 0 END) finalizados_o_vencidos,
+                    COUNT(*) total
+                  FROM simulacros LIMIT 1"""
             )),
-            "intentos_calificados": json.loads(consultar(
-                "SELECT COUNT(*) total FROM intentos WHERE estado IN ('finalizado','enviado_auto') "
-                "AND puntaje_total IS NOT NULL LIMIT 1"
+            "intentos": json.loads(consultar(
+                """SELECT estado, tipo, COUNT(*) total,
+                    ROUND(AVG(CASE WHEN puntaje_total IS NOT NULL THEN puntaje_total END),3) promedio_puntaje
+                  FROM intentos GROUP BY estado,tipo ORDER BY estado,tipo LIMIT 20"""
             )),
-        }, ensure_ascii=False)
+            "actividad_ultimos_7_dias": json.loads(consultar(
+                """SELECT COUNT(*) intentos_iniciados,
+                    COUNT(DISTINCT usuario_id) usuarios_participantes,
+                    SUM(CASE WHEN estado IN ('finalizado','enviado_auto') AND puntaje_total IS NOT NULL THEN 1 ELSE 0 END) intentos_calificados
+                  FROM intentos WHERE fecha_inicio>=DATE_SUB(NOW(),INTERVAL 7 DAY) LIMIT 1"""
+            )),
+            "preguntas_con_problemas": json.loads(consultar(
+                """SELECT COUNT(*) total FROM (
+                    SELECT p.id FROM preguntas p
+                    LEFT JOIN alternativas al ON al.pregunta_id=p.id
+                    GROUP BY p.id
+                    HAVING COUNT(al.id)<>4 OR SUM(CASE WHEN al.es_correcta=1 THEN 1 ELSE 0 END)<>1
+                  ) incidencias LIMIT 1"""
+            )),
+        }
+        return json.dumps(datos, ensure_ascii=False)
 
-    @mcp.tool(description="Úsala para conocer la cantidad de preguntas activas agrupadas por área y nivel de dificultad.")
-    def estado_del_banco_de_preguntas() -> str:
+    @mcp.tool(description=(
+        "Busca usuarios por nombre, apellido, nombre de usuario o ID. Permite filtrar por rol "
+        "(admin/docente/estudiante) y estado (todos/activos/inactivos). Nunca devuelve contraseñas, "
+        "hashes ni tokens. Úsala para localizar cuentas y revisar su adscripción."
+    ))
+    def buscar_usuarios(buscar: str, rol: str = "", estado: str = "todos", limite: int = 10) -> str:
         admin()
-        return consultar("""SELECT a.nombre AS area,p.nivel,COUNT(*) AS preguntas_activas
-            FROM preguntas p JOIN temas t ON t.id=p.tema_id JOIN areas a ON a.id=t.area_id
-            WHERE p.activo=1 GROUP BY a.id,a.nombre,p.nivel ORDER BY a.nombre,p.nivel LIMIT 100""")
+        buscar = str(buscar or "").strip()[:100]
+        if len(buscar) < 2:
+            return json.dumps({"necesita_dato": "Escribe al menos dos caracteres del nombre, apellido, usuario o ID."}, ensure_ascii=False)
+        if rol and rol not in ("admin", "docente", "estudiante"):
+            return json.dumps({"error": "Rol no válido."}, ensure_ascii=False)
+        if estado not in ("todos", "activos", "inactivos"):
+            return json.dumps({"error": "Estado debe ser todos, activos o inactivos."}, ensure_ascii=False)
+        filtros = ["(u.nombres LIKE %s OR u.apellidos LIKE %s OR u.usuario LIKE %s OR CAST(u.id AS CHAR)=%s)"]
+        patron = f"%{buscar}%"
+        params = [patron, patron, patron, buscar]
+        if rol:
+            filtros.append("u.rol=%s")
+            params.append(rol)
+        if estado != "todos":
+            filtros.append("u.activo=%s")
+            params.append(1 if estado == "activos" else 0)
+        params.append(acotar_limite(limite, 25))
+        return consultar(
+            f"""SELECT u.id,u.nombres,u.apellidos,u.usuario,u.rol,u.activo,u.created_at,
+                       se.nombre AS seccion,se.grado,ca.nombre AS carrera,ap.codigo AS area_postulacion
+                FROM usuarios u
+                LEFT JOIN secciones se ON se.id=u.seccion_id
+                LEFT JOIN carreras ca ON ca.id=u.carrera_id
+                LEFT JOIN areas_postulacion ap ON ap.id=COALESCE(u.area_postulacion_id,ca.area_postulacion_id)
+                WHERE {' AND '.join(filtros)}
+                ORDER BY u.activo DESC,u.rol,u.apellidos,u.nombres LIMIT %s""",
+            tuple(params),
+        )
 
-    @mcp.tool(description="Úsala para revisar simulacros recientes, fechas, estado, número de intentos y puntaje promedio.")
-    def simulacros_recientes(limite: int = 5) -> str:
+    @mcp.tool(description=(
+        "Obtiene la ficha académica resumida de un estudiante por ID o nombre de usuario exacto: "
+        "adscripción, estado, fecha de alta, cantidad de intentos y sus últimos resultados. "
+        "No devuelve credenciales. Pide el ID o usuario si la búsqueda es ambigua."
+    ))
+    def ficha_estudiante(identificador: str) -> str:
         admin()
-        return consultar("""SELECT s.nombre,s.fecha_inicio,s.fecha_fin,s.activo,
-            COUNT(i.id) cantidad_intentos,AVG(i.puntaje_total) puntaje_promedio
-            FROM simulacros s LEFT JOIN intentos i ON i.simulacro_id=s.id
-            AND i.estado IN ('finalizado','enviado_auto') AND i.puntaje_total IS NOT NULL
-            GROUP BY s.id,s.nombre,s.fecha_inicio,s.fecha_fin,s.activo
-            ORDER BY s.fecha_inicio DESC LIMIT %s""", (acotar_limite(limite),))
+        identificador = str(identificador or "").strip()[:50]
+        if not identificador:
+            return json.dumps({"necesita_dato": "Indica el ID o nombre de usuario exacto del estudiante."}, ensure_ascii=False)
+        filas = json.loads(consultar(
+            """SELECT u.id,u.nombres,u.apellidos,u.usuario,u.activo,u.created_at,
+                      se.nombre AS seccion,se.grado,ca.nombre AS carrera,ap.nombre AS area_postulacion
+               FROM usuarios u
+               LEFT JOIN secciones se ON se.id=u.seccion_id
+               LEFT JOIN carreras ca ON ca.id=u.carrera_id
+               LEFT JOIN areas_postulacion ap ON ap.id=COALESCE(u.area_postulacion_id,ca.area_postulacion_id)
+               WHERE u.rol='estudiante' AND (u.usuario=%s OR CAST(u.id AS CHAR)=%s)
+               LIMIT 1""",
+            (identificador, identificador),
+        ))
+        if not filas:
+            return json.dumps({"resultado": "No se encontró un estudiante con ese ID o usuario."}, ensure_ascii=False)
+        usuario = filas[0]
+        usuario["resumen_intentos"] = json.loads(consultar(
+            """SELECT tipo,estado,COUNT(*) cantidad,
+                      MAX(COALESCE(fecha_fin,fecha_inicio)) ultima_actividad,
+                      ROUND(AVG(CASE WHEN puntaje_total IS NOT NULL THEN puntaje_total END),3) promedio_puntaje
+               FROM intentos WHERE usuario_id=%s GROUP BY tipo,estado ORDER BY tipo,estado LIMIT 10""",
+            (usuario["id"],),
+        ))
+        usuario["ultimos_resultados"] = json.loads(consultar(
+            """SELECT i.id intento_id,i.tipo,i.fecha_inicio,i.fecha_fin,i.puntaje_total,
+                      i.correctas,i.incorrectas,i.en_blanco,s.nombre simulacro
+               FROM intentos i LEFT JOIN simulacros s ON s.id=i.simulacro_id
+               WHERE i.usuario_id=%s AND i.estado IN ('finalizado','enviado_auto')
+                 AND i.puntaje_total IS NOT NULL
+               ORDER BY COALESCE(i.fecha_fin,i.fecha_inicio) DESC,i.id DESC LIMIT 5""",
+            (usuario["id"],),
+        ))
+        return json.dumps(usuario, ensure_ascii=False)
 
-    @mcp.tool(description="Úsala para comparar el promedio del último intento calificado de simulacro por sección, considerando estudiantes activos.")
+    @mcp.tool(description=(
+        "Detecta estudiantes activos sin intentos recientes o que nunca han rendido. "
+        "Permite definir antigüedad en días (1 a 180) y priorizar seguimiento académico."
+    ))
+    def estudiantes_sin_actividad(dias: int = 14, limite: int = 20) -> str:
+        admin()
+        dias = max(1, min(int(dias), 180))
+        return consultar(
+            f"""SELECT u.id,u.nombres,u.apellidos,u.usuario,se.nombre seccion,se.grado,
+                       ca.nombre carrera,ult.ultimo_intento,
+                       DATEDIFF(NOW(),ult.ultimo_intento) dias_sin_actividad
+                FROM usuarios u
+                LEFT JOIN secciones se ON se.id=u.seccion_id
+                LEFT JOIN carreras ca ON ca.id=u.carrera_id
+                LEFT JOIN (SELECT usuario_id,MAX(COALESCE(fecha_fin,fecha_inicio)) ultimo_intento
+                           FROM intentos GROUP BY usuario_id) ult ON ult.usuario_id=u.id
+                WHERE u.rol='estudiante' AND u.activo=1
+                  AND (ult.ultimo_intento IS NULL OR ult.ultimo_intento<DATE_SUB(NOW(),INTERVAL {dias} DAY))
+                ORDER BY ult.ultimo_intento IS NOT NULL,ult.ultimo_intento ASC,u.apellidos
+                LIMIT %s""",
+            (acotar_limite(limite, 50),),
+        )
+
+    @mcp.tool(description=(
+        "Resume rendimiento por asignatura para toda la plataforma: estudiantes evaluados, "
+        "intentos, promedio porcentual, aciertos, errores y blancos. Úsala para detectar áreas débiles."
+    ))
+    def rendimiento_por_asignatura() -> str:
+        admin()
+        return consultar(
+            """SELECT a.id area_id,a.nombre asignatura,a.bloque,
+                      COUNT(DISTINCT i.usuario_id) estudiantes_evaluados,
+                      COUNT(DISTINCT i.id) intentos_calificados,
+                      ROUND(AVG(ra.porcentaje),2) promedio_porcentaje,
+                      SUM(ra.aciertos) aciertos,SUM(ra.incorrectas) incorrectas,
+                      SUM(ra.en_blanco) en_blanco
+               FROM resultados_area ra
+               JOIN intentos i ON i.id=ra.intento_id
+               JOIN areas a ON a.id=ra.area_id
+               WHERE i.estado IN ('finalizado','enviado_auto') AND i.puntaje_total IS NOT NULL
+               GROUP BY a.id,a.nombre,a.bloque
+               ORDER BY promedio_porcentaje ASC,a.nombre LIMIT 100"""
+        )
+
+    @mcp.tool(description=(
+        "Lista estudiantes cuyo último simulacro calificado tiene un puntaje menor al umbral indicado. "
+        "Úsala para identificar casos que requieren acompañamiento; no diagnostiques causas sin evidencia."
+    ))
+    def estudiantes_en_riesgo(umbral_puntaje: float = 50, limite: int = 20) -> str:
+        admin()
+        umbral = max(-1000.0, min(float(umbral_puntaje), 10000.0))
+        return consultar(
+            """SELECT u.id,u.nombres,u.apellidos,u.usuario,se.nombre seccion,se.grado,
+                      ult.fecha_fin,ult.puntaje_total,ult.correctas,ult.incorrectas,ult.en_blanco
+               FROM usuarios u
+               JOIN (
+                   SELECT i.usuario_id,i.id intento_id,i.fecha_fin,i.puntaje_total,
+                          i.correctas,i.incorrectas,i.en_blanco
+                   FROM intentos i
+                   WHERE i.tipo='simulacro' AND i.estado IN ('finalizado','enviado_auto')
+                     AND i.puntaje_total IS NOT NULL
+                     AND i.id=(SELECT i2.id FROM intentos i2
+                               WHERE i2.usuario_id=i.usuario_id AND i2.tipo='simulacro'
+                                 AND i2.estado IN ('finalizado','enviado_auto')
+                                 AND i2.puntaje_total IS NOT NULL
+                               ORDER BY COALESCE(i2.fecha_fin,i2.fecha_inicio) DESC,i2.id DESC LIMIT 1)
+               ) ult ON ult.usuario_id=u.id
+               LEFT JOIN secciones se ON se.id=u.seccion_id
+               WHERE u.rol='estudiante' AND u.activo=1 AND ult.puntaje_total<%s
+               ORDER BY ult.puntaje_total ASC,ult.fecha_fin DESC LIMIT %s""",
+            (umbral, acotar_limite(limite, 50)),
+        )
+
+    @mcp.tool(description=(
+        "Muestra el avance de cada simulacro: vigencia, áreas de postulación asociadas, "
+        "preguntas configuradas, participantes, intentos calificados y promedio."
+    ))
+    def simulacros_operativos(limite: int = 20) -> str:
+        admin()
+        return consultar(
+            """SELECT s.id,s.nombre,s.fecha_inicio,s.fecha_fin,s.activo,s.total_preguntas,
+                      s.tiempo_limite,s.carrera_id,c.nombre carrera,
+                      COUNT(DISTINCT aps.area_postulacion_id) areas_postulacion,
+                      COALESCE(SUM(DISTINCT sa.cantidad_preguntas),0) preguntas_configuradas,
+                      COUNT(DISTINCT i.id) intentos,
+                      COUNT(DISTINCT CASE WHEN i.estado IN ('finalizado','enviado_auto')
+                           AND i.puntaje_total IS NOT NULL THEN i.id END) intentos_calificados,
+                      ROUND(AVG(CASE WHEN i.puntaje_total IS NOT NULL THEN i.puntaje_total END),3) promedio_puntaje
+               FROM simulacros s
+               LEFT JOIN carreras c ON c.id=s.carrera_id
+               LEFT JOIN area_postulacion_simulacro aps ON aps.simulacro_id=s.id
+               LEFT JOIN simulacro_area sa ON sa.simulacro_id=s.id
+               LEFT JOIN intentos i ON i.simulacro_id=s.id
+               GROUP BY s.id,s.nombre,s.fecha_inicio,s.fecha_fin,s.activo,s.total_preguntas,
+                        s.tiempo_limite,s.carrera_id,c.nombre
+               ORDER BY s.fecha_inicio DESC LIMIT %s""",
+            (acotar_limite(limite, 50),),
+        )
+
+    @mcp.tool(description=(
+        "Consulta un simulacro específico por ID y devuelve su configuración, áreas de postulación "
+        "y distribución de preguntas por asignatura. Solicita el ID si no se identifica el simulacro."
+    ))
+    def detalle_simulacro(simulacro_id: int) -> str:
+        admin()
+        simulacro_id = max(1, int(simulacro_id))
+        cabecera = json.loads(consultar(
+            """SELECT s.id,s.nombre,s.fecha_inicio,s.fecha_fin,s.activo,s.tiempo_limite,
+                      s.total_preguntas,s.cantidad_alternativas,s.puntaje_correcta,
+                      s.puntaje_incorrecta,s.puntaje_blanco,s.puntaje_maximo,c.nombre carrera
+               FROM simulacros s LEFT JOIN carreras c ON c.id=s.carrera_id
+               WHERE s.id=%s LIMIT 1""",
+            (simulacro_id,),
+        ))
+        if not cabecera:
+            return json.dumps({"resultado": "No se encontró ese simulacro."}, ensure_ascii=False)
+        cabecera[0]["areas_postulacion"] = json.loads(consultar(
+            """SELECT ap.codigo,ap.nombre FROM area_postulacion_simulacro aps
+               JOIN areas_postulacion ap ON ap.id=aps.area_postulacion_id
+               WHERE aps.simulacro_id=%s ORDER BY ap.codigo LIMIT 20""",
+            (simulacro_id,),
+        ))
+        cabecera[0]["distribucion"] = json.loads(consultar(
+            """SELECT a.nombre asignatura,sa.nivel,sa.cantidad_preguntas
+               FROM simulacro_area sa JOIN areas a ON a.id=sa.area_id
+               WHERE sa.simulacro_id=%s ORDER BY a.nombre,sa.nivel LIMIT 100""",
+            (simulacro_id,),
+        ))
+        return json.dumps(cabecera[0], ensure_ascii=False)
+
+    @mcp.tool(description=(
+        "Audita la calidad estructural del banco. Detecta preguntas que no tienen exactamente "
+        "cuatro alternativas o no tienen exactamente una respuesta correcta. Devuelve IDs y contexto "
+        "para corregirlas desde el panel, sin modificar datos."
+    ))
+    def auditar_banco_preguntas(limite: int = 30) -> str:
+        admin()
+        return consultar(
+            """SELECT p.id,p.codigo,LEFT(p.enunciado,160) enunciado,p.nivel,p.activo,
+                      a.nombre asignatura,t.nombre tema,COUNT(al.id) cantidad_alternativas,
+                      COALESCE(SUM(CASE WHEN al.es_correcta=1 THEN 1 ELSE 0 END),0) respuestas_correctas
+               FROM preguntas p
+               JOIN temas t ON t.id=p.tema_id
+               JOIN areas a ON a.id=t.area_id
+               LEFT JOIN alternativas al ON al.pregunta_id=p.id
+               GROUP BY p.id,p.codigo,p.enunciado,p.nivel,p.activo,a.nombre,t.nombre
+               HAVING COUNT(al.id)<>4 OR COALESCE(SUM(CASE WHEN al.es_correcta=1 THEN 1 ELSE 0 END),0)<>1
+               ORDER BY p.activo DESC,p.id DESC LIMIT %s""",
+            (acotar_limite(limite, 100),),
+        )
+
+    @mcp.tool(description=(
+        "Resume la cobertura del catálogo por asignatura: bloque, temas activos/inactivos, "
+        "preguntas activas y preguntas válidas para simulacros (cuatro alternativas y una correcta)."
+    ))
+    def cobertura_catalogo_academico() -> str:
+        admin()
+        return consultar(
+            """SELECT a.id,a.nombre asignatura,a.bloque,
+                      COUNT(DISTINCT CASE WHEN t.activo=1 THEN t.id END) temas_activos,
+                      COUNT(DISTINCT CASE WHEN t.activo=0 THEN t.id END) temas_inactivos,
+                      COUNT(DISTINCT CASE WHEN p.activo=1 THEN p.id END) preguntas_activas,
+                      COUNT(DISTINCT CASE WHEN p.activo=1
+                           AND (SELECT COUNT(*) FROM alternativas al WHERE al.pregunta_id=p.id)=4
+                           AND (SELECT COUNT(*) FROM alternativas ac WHERE ac.pregunta_id=p.id AND ac.es_correcta=1)=1
+                           THEN p.id END) preguntas_validas
+               FROM areas a
+               LEFT JOIN temas t ON t.area_id=a.id
+               LEFT JOIN preguntas p ON p.tema_id=t.id
+               GROUP BY a.id,a.nombre,a.bloque ORDER BY a.nombre LIMIT 100"""
+        )
+
+    @mcp.tool(description=(
+        "Detecta intentos de examen que siguen en_curso durante más horas que el umbral indicado. "
+        "Sirve para localizar sesiones posiblemente abandonadas o problemas de cierre automático."
+    ))
+    def intentos_atrapados(horas: int = 3, limite: int = 20) -> str:
+        admin()
+        horas = max(1, min(int(horas), 168))
+        return consultar(
+            f"""SELECT i.id intento_id,i.tipo,i.fecha_inicio,i.fecha_limite,i.estado,
+                       u.id usuario_id,u.nombres,u.apellidos,u.usuario,s.nombre simulacro
+                FROM intentos i JOIN usuarios u ON u.id=i.usuario_id
+                LEFT JOIN simulacros s ON s.id=i.simulacro_id
+                WHERE i.estado='en_curso'
+                  AND i.fecha_inicio<DATE_SUB(NOW(),INTERVAL {horas} HOUR)
+                ORDER BY i.fecha_inicio ASC LIMIT %s""",
+            (acotar_limite(limite, 50),),
+        )
+
+    @mcp.tool(description=(
+        "Muestra actividad de la plataforma agrupada por día, tipo de intento y estado, "
+        "con usuarios participantes y puntaje promedio. Úsala para tendencias recientes."
+    ))
+    def actividad_plataforma(dias: int = 7, limite: int = 30) -> str:
+        admin()
+        dias = max(1, min(int(dias), 90))
+        return consultar(
+            f"""SELECT DATE(fecha_inicio) fecha,tipo,estado,COUNT(*) intentos,
+                       COUNT(DISTINCT usuario_id) usuarios,
+                       ROUND(AVG(CASE WHEN puntaje_total IS NOT NULL THEN puntaje_total END),3) promedio_puntaje
+                FROM intentos
+                WHERE fecha_inicio>=DATE_SUB(NOW(),INTERVAL {dias} DAY)
+                GROUP BY DATE(fecha_inicio),tipo,estado
+                ORDER BY fecha DESC,tipo,estado LIMIT %s""",
+            (acotar_limite(limite, 100),),
+        )
+
+    @mcp.tool(description=(
+        "Compara el rendimiento de las áreas de postulación A-E: estudiantes activos, "
+        "carreras disponibles, simulacros asociados y participación en intentos."
+    ))
+    def resumen_por_area_postulacion() -> str:
+        admin()
+        return consultar(
+            """SELECT ap.id,ap.codigo,ap.nombre,ap.activo,
+                      COUNT(DISTINCT CASE WHEN u.rol='estudiante' AND u.activo=1 THEN u.id END) estudiantes_activos,
+                      COUNT(DISTINCT CASE WHEN c.activo=1 THEN c.id END) carreras_activas,
+                      COUNT(DISTINCT CASE WHEN s.activo=1 THEN s.id END) simulacros_activos
+               FROM areas_postulacion ap
+               LEFT JOIN usuarios u ON u.area_postulacion_id=ap.id
+                    OR u.carrera_id IN (SELECT c2.id FROM carreras c2 WHERE c2.area_postulacion_id=ap.id)
+               LEFT JOIN carreras c ON c.area_postulacion_id=ap.id
+               LEFT JOIN area_postulacion_simulacro aps ON aps.area_postulacion_id=ap.id
+               LEFT JOIN simulacros s ON s.id=aps.simulacro_id
+               GROUP BY ap.id,ap.codigo,ap.nombre,ap.activo
+               ORDER BY ap.codigo LIMIT 20"""
+        )
+
+    @mcp.tool(description=(
+        "Lista las cuentas docentes y su sección asignada, para revisar cobertura de acompañamiento. "
+        "No devuelve credenciales ni información de autenticación."
+    ))
+    def resumen_docentes(limite: int = 30) -> str:
+        admin()
+        return consultar(
+            """SELECT u.id,u.nombres,u.apellidos,u.usuario,u.activo,
+                      se.nombre seccion,se.grado,
+                      COUNT(DISTINCT CASE WHEN e.rol='estudiante' AND e.activo=1 THEN e.id END) estudiantes_asignados
+               FROM usuarios u
+               LEFT JOIN secciones se ON se.id=u.seccion_id
+               LEFT JOIN usuarios e ON e.seccion_id=u.seccion_id
+               WHERE u.rol='docente'
+               GROUP BY u.id,u.nombres,u.apellidos,u.usuario,u.activo,se.nombre,se.grado
+               ORDER BY u.activo DESC,se.grado,se.nombre,u.apellidos LIMIT %s""",
+            (acotar_limite(limite, 100),),
+        )
+
+    @mcp.tool(description="Úsala para comparar el promedio del último intento calificado por sección, considerando estudiantes activos.")
     def rendimiento_por_seccion() -> str:
         admin()
         return consultar("""SELECT se.nombre AS seccion,se.grado,AVG(ult.puntaje_total) puntaje_promedio,
@@ -327,7 +666,8 @@ elif ROL == "admin":
             WHERE i.estado IN ('finalizado','enviado_auto') AND i.puntaje_total IS NOT NULL
               AND re.estado_respuesta IS NOT NULL
             GROUP BY p.id,p.enunciado,a.nombre,t.nombre HAVING COUNT(*)>=5
-            ORDER BY porcentaje_acierto ASC LIMIT %s""", (acotar_limite(limite),))
+            ORDER BY porcentaje_acierto ASC LIMIT %s""", (acotar_limite(limite, 50),))
+
 else:
     raise RuntimeError("Rol no autorizado")
 
