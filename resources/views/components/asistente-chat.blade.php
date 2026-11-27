@@ -8,7 +8,7 @@
         : 'images/escudo-cni.png';
     $mascotaAsistenteUrl = asset($rutaMascotaAsistente).'?v='.filemtime(public_path($rutaMascotaAsistente));
 @endphp
-<div class="cni-asistente" data-asistente>
+<div class="cni-asistente" data-asistente data-habilitado="{{ config('asistente.enabled') ? '1' : '0' }}">
 <style>
 .cni-asistente{--cni-blue:#2563eb;--cni-cyan:#0891b2;--cni-ink:#17233f;--cni-muted:#71809a;position:fixed;right:26px;bottom:24px;z-index:10000;font-family:inherit;color:var(--cni-ink)}
 .cni-asistente *{box-sizing:border-box}
@@ -85,7 +85,7 @@
         <span class="cni-asistente__avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="Mascota de {{ $nombreAsistente }}" width="49" height="49"></span>
         <span class="cni-asistente__identidad">
             <span class="cni-asistente__nombre">{{ $nombreAsistente }} <span class="cni-asistente__insignia">IA</span></span>
-            <span class="cni-asistente__estado">En línea · listo para ayudarte</span>
+            <span class="cni-asistente__estado">{{ config('asistente.enabled') ? 'Servicio habilitado · listo para ayudarte' : 'Servicio desactivado' }}</span>
         </span>
         <button class="cni-asistente__cerrar" type="button" data-cerrar aria-label="Cerrar chat">×</button>
     </header>
@@ -94,14 +94,14 @@
             <div class="cni-asistente__bienvenida-avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="" width="78" height="78"></div>
             <span class="cni-asistente__eyebrow">ASISTENTE IA · CNI</span>
             <h3>¡Hola! Soy {{ $nombreAsistente }}</h3>
-            <p>Tu asistente está listo para ayudarte. Estoy aquí para acompañarte en tu aprendizaje.</p>
+            <p>{{ config('asistente.enabled') ? 'Soy tu asistente de inteligencia artificial. Puedo ayudarte con tus resultados, rendimiento, progreso, simulacros y práctica académica.' : 'El asistente está desactivado en este momento. El chat seguirá visible, pero podrás enviar consultas cuando el servicio vuelva a estar habilitado.' }}</p>
 
         </div>
     </div>
     <div class="cni-asistente__pie">
         <form class="cni-asistente__form" data-form>
-            <input class="cni-asistente__entrada" name="mensaje" maxlength="500" required placeholder="Escribe tu pregunta…" autocomplete="off" aria-label="Escribe tu pregunta">
-            <button class="cni-asistente__enviar" type="submit" aria-label="Enviar mensaje">↑</button>
+            <input class="cni-asistente__entrada" name="mensaje" maxlength="500" required placeholder="Escribe tu pregunta…" autocomplete="off" aria-label="Escribe tu pregunta" @disabled(!config('asistente.enabled'))>
+            <button class="cni-asistente__enviar" type="submit" aria-label="Enviar mensaje" @disabled(!config('asistente.enabled'))>↑</button>
         </form>
         <p class="cni-asistente__nota">Asistente inteligente · Simulador CNI</p>
     </div>
