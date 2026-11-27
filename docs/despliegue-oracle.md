@@ -54,3 +54,37 @@ Después inicia sesión con una cuenta docente activa y prueba una consulta brev
 ## Despliegue automatizado opcional
 
 El workflow Deploy to Oracle server sigue siendo manual y requiere configurar previamente los cinco secrets SSH indicados en GitHub Actions. No es necesario usarlo si actualizas con SSH y git pull.
+
+## Actualización manual por SSH (git pull)
+
+Davis es un servicio Laravel: no necesita levantar el agente Python/MCP ni abrir el puerto 8001. No incorpora migraciones de base de datos.
+
+Antes de actualizar, entra a la raíz del proyecto y revisa los cambios locales. No uses reset --hard, git clean ni descartes modificaciones locales. Si hay cambios locales en archivos que GitHub también modificó, resuélvelos antes del pull.
+
+```bash
+git fetch origin
+git status --short
+git pull --ff-only origin 'OFICIAL#1'
+composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+php artisan optimize:clear
+php artisan config:cache
+php artisan view:cache
+```
+
+En el .env de Oracle conserva tu clave real y confirma estas variables (no compartas ni publiques el valor de la clave):
+
+```dotenv
+GEMINI_API_KEY=TU_CLAVE_REAL
+GEMINI_MODEL=gemini-3.8-flash
+GEMINI_API_URL=https://generativelanguage.googleapis.com/v1beta
+```
+
+El nombre que Davis lee es GEMINI_API_KEY. Si otros asistentes usan otra variable de entorno, no se reutiliza automáticamente. Si editas .env, ejecuta php artisan optimize:clear y luego php artisan config:cache.
+
+No ejecutes php artisan migrate para Davis ni seeders de demostración en la base real. Comprueba la configuración sin revelar secretos:
+
+```bash
+php artisan tinker --execute="dump(['gemini_key_configured' => filled(config('services.gemini.key')), 'gemini_model' => config('services.gemini.model'), 'gemini_url' => config('services.gemini.url')]);"
+```
+
+El valor gemini_key_configured debe ser true. Luego inicia sesión con una cuenta docente activa y prueba una consulta breve en /docente. Si falla, revisa storage/logs/laravel.log sin compartir claves ni datos sensibles.
