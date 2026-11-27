@@ -46,8 +46,8 @@ if [[ -n "$SQL_FILE" ]]; then
   N="$("${MYSQL[@]}" -Nse "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='$DB_NAME';")"
   [[ "$N" == 0 ]] || fail "La base $DB_NAME ya contiene tablas. No se tocó. Usa una base nueva/vacía y cambia DB_DATABASE en .env."
   info "Importando respaldo Oracle: $SQL_FILE"
-  if [[ "$SQL_FILE" == *.gz ]]; then gzip -dc "$SQL_FILE" | sed -E '/^[[:space:]]*(CREATE DATABASE|USE )[[:space:]]/Id' | "${MYSQL[@]}" "$DB_NAME"
-  else sed -E '/^[[:space:]]*(CREATE DATABASE|USE )[[:space:]]/Id' "$SQL_FILE" | "${MYSQL[@]}" "$DB_NAME"; fi
+  if [[ "$SQL_FILE" == *.gz ]]; then gzip -dc "$SQL_FILE" | sed -E '/^[[:space:]]*(CREATE[[:space:]]+DATABASE|USE)[[:space:]]+/Id' | "${MYSQL[@]}" "$DB_NAME"
+  else sed -E '/^[[:space:]]*(CREATE[[:space:]]+DATABASE|USE)[[:space:]]+/Id' "$SQL_FILE" | "${MYSQL[@]}" "$DB_NAME"; fi
   info "Aplicando migraciones pendientes"
   php artisan migrate --force
 else
