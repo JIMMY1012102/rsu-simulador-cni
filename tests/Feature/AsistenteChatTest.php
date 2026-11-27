@@ -66,6 +66,6 @@ class AsistenteChatTest extends TestCase
     public function test_componente_no_se_renderiza_con_asistente_desactivado(): void
     {
         config(['asistente.enabled' => false]);
-        $this->actingAs($this->usuario('estudiante'), 'web')->get('/panel')->assertDontSee('Asistente IA');
+        $this->actingAs($this->usuario('admin'), 'web')->get('/panel')->assertDontSee('Asistente IA');
     }
 }
