@@ -41,6 +41,7 @@ def consultar(sql, params=()):
         user=os.environ["DB_USER"],
         password=os.environ["DB_PASSWORD"],
         database=os.environ["DB_NAME"],
+        port=int(os.getenv("DB_PORT", "3306")),
         charset="utf8mb4",
         connection_timeout=5,
         read_timeout=15,
