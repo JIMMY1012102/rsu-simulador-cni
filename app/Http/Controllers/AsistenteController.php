@@ -13,16 +13,16 @@ class AsistenteController extends Controller
         $usuario = $request->user('web');
         abort_unless($usuario && in_array($usuario->rol, ['estudiante', 'admin'], true), 403);
 
+        $datos = $request->validate([
+            'mensaje' => ['required', 'string', 'min:1', 'max:500'],
+            'sesion' => ['nullable', 'string', 'max:120'],
+        ]);
+
         if (!config('asistente.enabled')) {
             return response()->json([
                 'respuesta' => 'El asistente está desactivado en este momento. Inténtelo nuevamente más tarde.',
             ], 503);
         }
-
-        $datos = $request->validate([
-            'mensaje' => ['required', 'string', 'min:1', 'max:500'],
-            'sesion' => ['nullable', 'string', 'max:120'],
-        ]);
 
         try {
             $respuesta = Http::acceptJson()
