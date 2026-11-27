@@ -29,7 +29,19 @@ cd rsu-simulador-cni
 
 También puedes descargar el ZIP de la rama desde GitHub y descomprimirlo en `/opt/lampp/htdocs/rsu-simulador-cni`.
 
-### 3. Ejecutar el preparador
+### 3. Colocar el respaldo descargado de Oracle
+
+Copia el respaldo completo de la base de datos (archivo `.sql` o `.sql.gz`) en:
+
+```text
+database/backups/
+```
+
+Puedes crear esa carpeta si no existe. No uses `base-de-datos.sql`: es un esquema inicial antiguo incluido como referencia, no el respaldo actual de Oracle. El respaldo debe contener tanto la estructura como los datos (tablas, registros y, si corresponde, la tabla `migrations`).
+
+Si guardaste el archivo en otra ubicación, puedes pasar su ruta al instalador (ver abajo).
+
+### 4. Ejecutar un solo instalador
 
 Desde la carpeta del proyecto:
 
@@ -37,43 +49,33 @@ Desde la carpeta del proyecto:
 bash scripts/preparar-xampp-antix.sh
 ```
 
-El script:
+El instalador:
 - instala dependencias de Composer y npm;
-- crea `.env` solo si todavía no existe y genera `APP_KEY` si está vacía;
+- crea `.env` solo si no existe y genera `APP_KEY` si está vacía;
+- detecta un único respaldo `.sql` o `.sql.gz` en `database/backups/`, `backups/` o la raíz del proyecto;
+- crea la base local, importa el respaldo y ajusta `DB_DATABASE` si el dump declara otro nombre de esquema;
 - compila CSS/JavaScript y prepara `public/storage`;
-- configura un alias Apache para publicar solo `public/` en `/rsu-cni`;
-- valida Apache y reinicia su servicio.
+- configura Apache para publicar únicamente `public/` en `/rsu-cni`, valida la configuración y reinicia Apache.
 
-No sobrescribe un `.env` que ya exista. Si XAMPP está en otra carpeta, puedes indicarla así: `XAMPP_DIR=/ruta/xampp bash scripts/preparar-xampp-antix.sh`.
+Si el respaldo está en otra ruta:
 
-### 4. Crear y configurar la base local
-
-Abre `http://localhost/phpmyadmin` y crea una base llamada `rsu_cni_local`.
-
-En `.env`, revisa la conexión. En una instalación XAMPP nueva suele usarse `root` sin contraseña; si configuraste una contraseña, escribe la tuya localmente:
-
-```dotenv
-APP_ENV=local
-APP_DEBUG=true
-APP_URL=http://localhost/rsu-cni
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=rsu_cni_local
-DB_USERNAME=root
-DB_PASSWORD=
+```bash
+bash scripts/preparar-xampp-antix.sh /ruta/al/respaldo-oracle.sql
 ```
 
-**Base vacía:** revisa las migraciones y ejecuta `php artisan migrate` solo si el esquema de esta copia debe crearse desde cero.
+No sobrescribe un `.env` existente. Revisa en él `DB_HOST`, `DB_PORT`, `DB_USERNAME` y `DB_PASSWORD`; en una instalación XAMPP nueva suele ser `root` sin contraseña. Si XAMPP está en otra carpeta, puedes indicar ambas opciones:
 
-**Base SQL existente:** impórtala en `rsu_cni_local` y revisa `php artisan migrate:status` antes de ejecutar migraciones. No uses `migrate:fresh`; elimina las tablas. Haz una copia de seguridad antes de modificar una base importada.
+```bash
+XAMPP_DIR=/ruta/xampp bash scripts/preparar-xampp-antix.sh /ruta/respaldo.sql
+```
+
+**Protección de datos:** el importador se detiene si la base de destino ya contiene tablas. No elimina bases, no ejecuta `migrate:fresh` ni sobrescribe una importación previa. Si encuentra varios respaldos, te pide indicar la ruta exacta. Si no encuentra ninguno, termina la preparación web y te indica dónde copiar el dump.
 
 ### 5. Abrir la aplicación
 
 **http://localhost/rsu-cni**
 
-Inicia sesión con una cuenta que exista en la base de datos que preparaste o importaste. No se crean cuentas reales automáticamente.
+Inicia sesión con una cuenta que exista en el respaldo de Oracle. El instalador no crea usuarios ni cambia contraseñas.
 
 Si Apache no inicia, revisa `/opt/lampp/logs/error_log`. El script guarda una copia inicial de `httpd.conf` en `httpd.conf.backup-rsu-cni` antes de agregar el Include. Para quitar la integración, elimina la línea `Include etc/extra/httpd-rsu-cni.conf` de `httpd.conf` y el archivo `etc/extra/httpd-rsu-cni.conf`, y reinicia Apache.
 
