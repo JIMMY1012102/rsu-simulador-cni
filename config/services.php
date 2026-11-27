@@ -39,7 +39,7 @@ return [
         'model' => env('GEMINI_MODEL', 'gemini-3.8-flash'),
         'fallback_models' => env(
             'GEMINI_FALLBACK_MODELS',
-            'gemini-4-hydrogen,gemini-3.5-flash-lite'
+            'gemini-3.5-flash-lite,gemini-4-hydrogen'
         ),
         'url' => env(
             'GEMINI_API_URL',
