@@ -14,12 +14,14 @@ class DatabaseSeeder extends Seeder
             AreaPostulacionSeeder::class,
             CarreraSeeder::class,
             UsuarioSeeder::class,
-            AlumnosSimulacroCincoDemoSeeder::class,
         ]);
 
         // Los cuatro docentes ficticios existen solo para desarrollo y pruebas.
         if (app()->environment(['local', 'testing'])) {
-            $this->call(DocentesSeccionDemoSeeder::class);
+            $this->call([
+                DocentesSeccionDemoSeeder::class,
+                AlumnosSimulacroCincoDemoSeeder::class,
+            ]);
         }
     }
 }
