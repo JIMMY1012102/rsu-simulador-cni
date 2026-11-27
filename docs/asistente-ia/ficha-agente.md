@@ -22,6 +22,14 @@
 4. `consultar_mis_simulacros(estado, limite)`: `disponibles`, `proximos` o `historial`, limitado al área/carrera del estudiante.
 5. `consultar_banco_academico(tema, nivel, buscar, incluir_solucion, limite)`: preguntas y alternativas; la solución y clave se omiten salvo solicitud de explicación.
 
+## Configuración de modelos Gemini
+
+- `MODELO`: modelo principal. Si no se define, se usa `gemini-3.5-flash-lite`.
+- `MODELOS_RESPALDO`: lista opcional separada por comas y en orden de prioridad. Valor predeterminado: `gemini-3.6-flash,gemini-3.5-flash`.
+- `MODELO_FALLBACK`: variable heredada de compatibilidad; se usa como único respaldo cuando `MODELOS_RESPALDO` no está definido.
+- El agente recorre los modelos en orden solo ante errores transitorios HTTP 429, 500, 502, 503 o 504. Los demás errores se propagan sin probar otros modelos.
+- La misma configuración, historial y declaraciones de herramientas MCP se conservan al cambiar de modelo, tanto en la respuesta inicial como después de cada llamada a una herramienta.
+
 ## Asistente del superadministrador
 
 Se conserva el asistente admin existente y sus cinco herramientas: `resumen_general`, `estado_del_banco_de_preguntas`, `simulacros_recientes`, `rendimiento_por_seccion` y `preguntas_mas_falladas`. Todas son SELECT de solo lectura y no consultan contraseñas.
