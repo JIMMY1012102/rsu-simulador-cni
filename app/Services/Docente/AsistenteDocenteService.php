@@ -143,6 +143,7 @@ PROMPT;
         $maxOutputTokens = 2048;
 
         foreach ($modelos as $indice => $modelo) {
+            $maxOutputTokens = 2048;
             $endpoint = rtrim($url, '/') . '/models/' . $modelo . ':generateContent';
 
             try {
