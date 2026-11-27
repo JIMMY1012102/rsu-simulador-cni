@@ -32,7 +32,15 @@
 
 ## Asistente del superadministrador
 
-Se conserva el asistente admin existente y sus cinco herramientas: `resumen_general`, `estado_del_banco_de_preguntas`, `simulacros_recientes`, `rendimiento_por_seccion` y `preguntas_mas_falladas`. Todas son SELECT de solo lectura y no consultan contraseñas.
+El Super_Admin dispone de herramientas MCP de supervisión y diagnóstico, todas de solo lectura:
+
+- Panel ejecutivo y actividad: `panel_superadmin`, `actividad_plataforma`, `intentos_atrapados`.
+- Cuentas y acompañamiento: `buscar_usuarios`, `ficha_estudiante`, `estudiantes_sin_actividad`, `estudiantes_en_riesgo`, `resumen_docentes`.
+- Rendimiento: `rendimiento_por_asignatura`, `rendimiento_por_seccion`, `preguntas_mas_falladas`, `resumen_por_area_postulacion`.
+- Banco y catálogo: `cobertura_catalogo_academico`, `estado_del_banco_de_preguntas`, `auditar_banco_preguntas`.
+- Simulacros: `simulacros_operativos`, `detalle_simulacro`, `simulacros_recientes`.
+
+El guard MCP verifica tanto el rol `admin` como que el ID autenticado corresponda a la cuenta única `Super_Admin`. No consulta contraseñas, hashes, tokens ni claves API. Para el inventario de parámetros y preguntas de uso, consulta `agente/GUIA-SUPERADMIN.md`. Las operaciones de escritura continúan exclusivamente en el panel Laravel `/administracion`.
 
 ## Roles pendientes de definición
 
