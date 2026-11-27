@@ -34,5 +34,8 @@
         @yield('content')
     </main>
     @livewireScripts
+    @if (config('asistente.enabled') && auth('web')->check() && auth('web')->user()->rol === 'estudiante')
+        <x-asistente-chat />
+    @endif
 </body>
 </html>
