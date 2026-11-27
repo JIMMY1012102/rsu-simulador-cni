@@ -29,7 +29,7 @@
 .cni-asistente__nombre{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:800;letter-spacing:-.3px;color:#172b4d}
 .cni-asistente__insignia{padding:3px 8px;border-radius:999px;background:#e8f1ff;color:#2563eb;font-size:9px;font-weight:800;letter-spacing:1px}
 .cni-asistente__estado{display:flex;align-items:center;gap:7px;font-size:11px;color:#71809a}
-.cni-asistente__estado:before{content:"";width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 0 3px #dcfce7}
+.cni-asistente__estado:before{content:"";width:7px;height:7px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 3px #e2e8f0}.cni-asistente__estado.is-enabled:before{background:#22c55e;box-shadow:0 0 0 3px #dcfce7}
 .cni-asistente__cerrar{width:36px;height:36px;border:1px solid #e1e8f2;border-radius:12px;background:#fff;color:#64748b;font-size:21px;line-height:1;cursor:pointer;transition:background .2s}
 .cni-asistente__cerrar:hover{background:#f1f5f9}
 .cni-asistente__mensajes{padding:18px 17px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:14px;background:radial-gradient(ellipse at 8% 0%,#edf5ff 0,transparent 44%),radial-gradient(ellipse at 100% 100%,#effbff 0,transparent 40%),#fbfdff}
@@ -85,7 +85,7 @@
         <span class="cni-asistente__avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="Mascota de {{ $nombreAsistente }}" width="49" height="49"></span>
         <span class="cni-asistente__identidad">
             <span class="cni-asistente__nombre">{{ $nombreAsistente }} <span class="cni-asistente__insignia">IA</span></span>
-            <span class="cni-asistente__estado">{{ config('asistente.enabled') ? 'Servicio habilitado · listo para ayudarte' : 'Servicio desactivado' }}</span>
+            <span class="cni-asistente__estado {{ config('asistente.enabled') ? 'is-enabled' : 'is-disabled' }}">{{ config('asistente.enabled') ? 'Servicio habilitado · listo para ayudarte' : 'Servicio desactivado' }}</span>
         </span>
         <button class="cni-asistente__cerrar" type="button" data-cerrar aria-label="Cerrar chat">×</button>
     </header>
