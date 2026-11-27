@@ -35,7 +35,7 @@ En esta rama se usa la Ruta B del instructivo: `agente/agente.py` (FastAPI) y `a
 
 4. Usa una copia local de la base de datos de desarrollo. No conectes el agente a la base de producción ni uses datos personales reales.
 5. Si creas la base desde cero, revisa las migraciones y sigue el procedimiento de instalación del README principal. Si importas `base-de-datos.sql`, no ejecutes `migrate:fresh` ni vuelvas a importar el SQL sobre una base con datos. La aplicación requiere el esquema actualizado, incluida la columna `usuarios.area_postulacion_id` y las tablas de resultados.
-6. Crea un usuario MariaDB de solo lectura. Abre `agente/crear_usuario_solo_lectura.sql`, reemplaza el nombre de base `simulador_cni` por el de tu base local y ejecuta el archivo como administrador de MySQL. El usuario `agente` solo tendrá permisos SELECT sobre las tablas que usan las herramientas; en `usuarios` solo se conceden las columnas necesarias, no `password`.
+6. Crea un usuario MariaDB de solo lectura. Abre `agente/crear_usuario_solo_lectura.sql`, reemplaza el nombre de base `simulador_cni` por el de tu base local y ejecuta el archivo como administrador de MySQL. El usuario `agente` solo tendrá permisos SELECT sobre las tablas que usan las herramientas; en `usuarios` solo se conceden las columnas necesarias para identificar cuentas, nunca `password`, `remember_token` ni credenciales.
 
 ## 3. Configurar el agente
 
@@ -138,7 +138,7 @@ Desde la raíz del proyecto:
 php artisan serve --host=127.0.0.1 --port=8000
 ```
 
-Abre http://127.0.0.1:8000/login e inicia sesión con una cuenta local de demostración con rol `estudiante` o `admin`.
+Abre http://127.0.0.1:8000/login e inicia sesión con una cuenta local de demostración `estudiante` o con la cuenta `Super_Admin` para probar el conjunto de herramientas administrativas.
 
 Si se utiliza Apache de XAMPP en lugar de `artisan serve`, configura el VirtualHost para que el DocumentRoot sea la carpeta `public` del proyecto y conserva la misma configuración de Laravel.
 
@@ -147,7 +147,7 @@ Si se utiliza Apache de XAMPP en lugar de `artisan serve`, configura el VirtualH
 El servidor MCP se inicia automáticamente cuando el agente recibe una consulta. El agente registra herramientas diferentes según el rol:
 
 - Estudiante: resultados propios, rendimiento por asignatura, progreso por temas, simulacros de su área y banco académico.
-- Admin: resumen general, estado del banco, simulacros recientes, rendimiento por sección y preguntas más falladas.
+- Super_Admin: panel ejecutivo, búsqueda y ficha de usuarios/estudiantes, inactividad y riesgo académico, rendimiento por asignatura/sección, análisis de preguntas falladas, auditoría y cobertura del banco, seguimiento de simulacros, intentos atrapados, actividad de la plataforma, áreas de postulación y docentes. El acceso MCP admin se limita a la cuenta `Super_Admin`.
 
 Todas las herramientas son de solo lectura. Las consultas usan parámetros enlazados, columnas explícitas y límites de filas. La herramienta de banco no devuelve solución ni clave correcta salvo que se solicite una explicación.
 
