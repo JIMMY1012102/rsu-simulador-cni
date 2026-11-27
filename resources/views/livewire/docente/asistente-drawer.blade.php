@@ -23,8 +23,12 @@
                     </div>
                 </div>
                 <div class="cni-ai-drawer-actions">
-                    <button type="button" wire:click="nuevaConversacion" aria-label="Iniciar nueva conversación" title="Nueva conversación">＋</button>
-                    <button type="button" wire:click="cerrarAsistente" aria-label="Cerrar asistente">×</button>
+                    <button type="button" wire:click="nuevaConversacion" aria-label="Iniciar nueva conversación" title="Nueva conversación">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg>
+                    </button>
+                    <button type="button" wire:click="cerrarAsistente" aria-label="Cerrar asistente" title="Cerrar">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+                    </button>
                 </div>
             </header>
 
@@ -37,6 +41,15 @@
             </div>
 
             <div class="cni-ai-messages" aria-live="polite" aria-relevant="additions">
+                {{-- Indicador de carga: nube pequeña fija en la esquina superior izquierda. --}}
+                <div wire:loading.block wire:target="enviarPregunta" class="cni-ai-thinking-anchor">
+                    <div role="status" class="cni-ai-thinking-cloud">
+                        <img src="{{ asset('images/mascotas/asistente-davis-pensativo.png') }}" alt="" aria-hidden="true">
+                        <span class="cni-ai-thinking-text"><strong>Davis</strong><span class="cni-ai-typing-dots">está pensando<span>…</span></span></span>
+                        <span class="cni-ai-thinking-puff is-big" aria-hidden="true"></span>
+                        <span class="cni-ai-thinking-puff is-small" aria-hidden="true"></span>
+                    </div>
+                </div>
                 @forelse($mensajes as $mensaje)
                     @if($mensaje['role'] === 'user')
                         <article class="cni-ai-message is-user">
@@ -60,13 +73,6 @@
                         <p>Puedo ayudarte con estrategias de enseñanza, actividades y reforzamiento académico.</p>
                     </div>
                 @endforelse
-                <div wire:loading wire:target="enviarPregunta" role="status" class="cni-ai-loading cni-ai-typing">
-                    <span class="cni-ai-message-avatar" aria-hidden="true">
-                        <span class="cni-ai-avatar-art"><img src="{{ asset('images/mascotas/asistente-davis-pensativo.png') }}" alt=""></span>
-                        <span class="cni-ai-question-mark">?</span><span class="cni-ai-question-mark is-second">?</span>
-                    </span>
-                    <span><strong>Davis</strong><span class="cni-ai-typing-dots">Está pensando<span>…</span></span></span>
-                </div>
             </div>
 
             <div class="cni-ai-suggestions" aria-label="Preguntas sugeridas">

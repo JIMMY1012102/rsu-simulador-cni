@@ -93,6 +93,16 @@ Reglas:
 - Utiliza lenguaje claro y profesional.
 - No solicites datos personales de los estudiantes.
 - Distingue los promedios de los resultados individuales.
+
+Formato de respuesta (obligatorio):
+- Responde de forma breve, precisa y coherente: máximo 90 palabras.
+- Ve directo a lo que se pregunta. Sin introducciones, títulos ni
+  despedidas, y sin repetir la pregunta.
+- Si propones actividades, da como máximo 3 viñetas de una línea cada una.
+- Si no hay datos de la sección, menciónalo en una sola frase corta y
+  continúa con la recomendación; no lo repitas en mensajes siguientes.
+- Si el docente pide más detalle de forma explícita, puedes extenderte
+  hasta 180 palabras.
 PROMPT;
 
         $datos = json_encode(
@@ -103,7 +113,8 @@ PROMPT;
         $entrada = "Datos académicos disponibles para esta sección (pueden estar vacíos):\n"
             . ($datos ?: '{}')
             . "\n\nNueva consulta del docente:\n"
-            . trim($pregunta);
+            . trim($pregunta)
+            . "\n\n(Responde breve y preciso, según el formato indicado.)";
 
         $contents = [];
         foreach (array_slice($historial, -12) as $turno) {
