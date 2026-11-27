@@ -40,6 +40,13 @@ if ! grep -Eq '^APP_KEY=base64:.+' .env; then
     php artisan key:generate
 fi
 
+info "Importando automáticamente el respaldo Oracle si está disponible"
+if [[ -n "${1:-}" ]]; then
+    bash "$PROJECT_DIR/scripts/importar-base-oracle.sh" "$1"
+else
+    bash "$PROJECT_DIR/scripts/importar-base-oracle.sh"
+fi
+
 info "Instalando y compilando recursos del frontend"
 npm install
 npm run build
