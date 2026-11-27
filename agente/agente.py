@@ -1,5 +1,5 @@
 """Puente FastAPI para Gemini y las herramientas MCP."""
-import asyncio, os, traceback
+import asyncio, os, sys, traceback
 from contextlib import AsyncExitStack
 from pathlib import Path
 from dotenv import load_dotenv
@@ -78,7 +78,7 @@ async def chat(datos: Solicitud, x_agente_token: str|None=Header(default=None)):
         instrucciones=Path(__file__).with_name(archivo).read_text(encoding="utf-8")
         entorno=os.environ.copy()
         entorno.update({"AGENTE_ROL":datos.rol,"AGENTE_USUARIO_ID":str(datos.usuario_id)})
-        parametros=StdioServerParameters(command=os.getenv("PYTHON_EXECUTABLE","python"),
+        parametros=StdioServerParameters(command=os.getenv("PYTHON_EXECUTABLE", sys.executable),
             args=[str(Path(__file__).with_name("servidor_mcp.py"))],env=entorno)
         cliente=genai.Client(api_key=os.environ["GEMINI_API_KEY"])
         async with AsyncExitStack() as pila:
