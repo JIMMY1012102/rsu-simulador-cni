@@ -155,3 +155,115 @@ body:has(.cni-notas){background:#eef6fd}
     outline: 2px solid #d3a842;
     outline-offset: 2px;
 }
+/* Acceso flotante al asistente, acompañado por Jesu. */
+.cni-ai-widget{position:relative;z-index:1200}
+.cni-ai-launcher{position:fixed;right:24px;bottom:24px;z-index:1180;display:flex;align-items:center;gap:11px;min-height:76px;padding:8px 19px 8px 8px;border:1px solid #d6e7fb;border-radius:999px;background:#fff;color:#10345f;box-shadow:0 12px 38px #073a7650;cursor:pointer;transition:transform .2s ease,box-shadow .2s ease}
+.cni-ai-launcher:hover{transform:translateY(-3px);box-shadow:0 16px 42px #073a7660}
+.cni-ai-launcher-mascot{position:relative;display:grid;place-items:center;width:60px;height:60px;overflow:hidden;border-radius:50%;background:radial-gradient(circle at 50% 38%,#fff 0,#e8f4ff 65%,#c8e1fb 100%)}
+.cni-ai-launcher-mascot img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 4px #12365c30);transform-origin:62% 74%;animation:cni-jesu-pointer-wave 2.25s ease-in-out infinite}
+.cni-ai-launcher-label{display:grid;gap:3px;text-align:left}
+.cni-ai-launcher-label strong{font-size:14px}
+.cni-ai-launcher-label small{font-size:11px;color:#527195}
+.cni-ai-launcher-pulse{position:absolute;top:8px;left:52px;width:11px;height:11px;border:2px solid white;border-radius:50%;background:#22c55e;box-shadow:0 0 0 0 #22c55e80;animation:cni-ai-pulse 1.8s ease-out infinite}
+.cni-ai-backdrop{position:fixed;inset:0;z-index:1190;width:100%;height:100%;border:0;background:#061a3270;backdrop-filter:blur(2px);cursor:pointer;animation:cni-ai-fade .18s ease-out both}
+.cni-ai-drawer{position:fixed;top:16px;right:16px;bottom:16px;z-index:1200;display:flex;flex-direction:column;width:min(460px,calc(100vw - 32px));overflow:hidden;border:1px solid #dce8f6;border-radius:24px;background:#f8fbff;box-shadow:0 22px 80px #001d3c55;animation:cni-ai-slide-in .26s cubic-bezier(.2,.8,.2,1) both}
+.cni-ai-drawer-header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:17px 17px 15px;background:linear-gradient(125deg,#073b7c,#0877b7);color:#fff}
+.cni-ai-drawer-brand{display:flex;align-items:center;gap:12px;min-width:0}
+.cni-ai-drawer-avatar{position:relative;display:grid;place-items:center;flex:0 0 54px;width:54px;height:54px;overflow:hidden;border:1px solid #ffffff70;border-radius:50%;background:#ffffff30}
+.cni-ai-drawer-avatar img{width:100%;height:100%;object-fit:contain;transform-origin:62% 74%;animation:cni-jesu-pointer-wave 2.25s ease-in-out infinite}
+.cni-ai-drawer-brand h2{margin:0;font-size:17px;line-height:1.25}
+.cni-ai-drawer-brand p{margin:4px 0 0;color:#e4f3ff;font-size:12px}
+.cni-ai-drawer-actions{display:flex;gap:7px}
+.cni-ai-drawer-actions button{display:grid;place-items:center;width:36px;height:36px;border:1px solid #ffffff70;border-radius:11px;background:#ffffff1a;color:#fff;font-size:23px;line-height:1;cursor:pointer}
+.cni-ai-drawer-actions button:hover{background:#ffffff35}
+.cni-ai-drawer-description{padding:12px 17px;border-bottom:1px solid #e4edf7;background:#fff;color:#4c6582;font-size:12px;line-height:1.5}
+.cni-ai-messages{display:flex;flex:1;flex-direction:column;gap:12px;min-height:100px;padding:20px 16px;overflow-y:auto;overscroll-behavior:contain;background:linear-gradient(180deg,#f4f8fd,#f8fbff 40%)}
+.cni-ai-message{width:fit-content;max-width:88%;min-height:0;padding:11px 14px;border:1px solid #e0eaf5;border-radius:17px 17px 17px 5px;background:#fff;color:#203b5b;box-shadow:0 4px 14px #143b5d10;white-space:pre-wrap;overflow-wrap:anywhere}
+.cni-ai-message.is-user{align-self:flex-end;border-color:#216dbb;border-radius:17px 17px 5px 17px;background:linear-gradient(135deg,#1768b2,#287fc7);color:#fff;box-shadow:0 6px 16px #1768b226}
+.cni-ai-message strong{display:block;margin-bottom:5px;color:#24517f;font-size:11px}
+.cni-ai-message.is-user strong{color:#dceeff}
+.cni-ai-message p{margin:0;font-size:13px;line-height:1.55}
+.cni-ai-welcome{display:flex;flex-direction:column;align-items:center;gap:6px;margin:auto;padding:10px 18px;border:0;border-radius:18px;background:transparent;color:#456381;font-size:13px;line-height:1.55;text-align:center}
+.cni-ai-welcome-mascot{display:block;width:min(190px,72%);height:178px;object-fit:contain;filter:drop-shadow(0 10px 9px #143b5d20);transform-origin:62% 74%;animation:cni-jesu-pointer-wave 2.25s ease-in-out infinite}
+.cni-ai-welcome p{margin:0}
+.cni-ai-suggestions{display:flex;gap:7px;padding:0 14px 12px;overflow-x:auto;scrollbar-width:thin}
+.cni-ai-suggestions button{flex:0 0 auto;max-width:235px;padding:8px 11px;border:1px solid #cfe0f2;border-radius:14px;background:#fff;color:#31577e;font-size:11px;line-height:1.35;text-align:left;cursor:pointer}
+.cni-ai-suggestions button:hover{border-color:#62a3e3;background:#eff7ff}
+.cni-ai-composer{display:grid;grid-template-columns:1fr auto;align-items:end;gap:9px;padding:12px 13px;border-top:1px solid #e0eaf5;background:#fff}
+.cni-ai-composer textarea{width:100%;min-height:55px;max-height:130px;resize:vertical;padding:11px 12px;border:1px solid #cddbeb;border-radius:13px;background:#fbfdff;color:#173656;font:inherit;font-size:13px;line-height:1.45;outline:none}
+.cni-ai-composer textarea:focus{border-color:#438ed0;box-shadow:0 0 0 3px #438ed01e}
+.cni-ai-composer>button{display:flex;align-items:center;gap:8px;min-height:42px;padding:0 14px;border:0;border-radius:12px;background:#07539a;color:#fff;font-weight:700;cursor:pointer}
+.cni-ai-composer>button:disabled{opacity:.65;cursor:wait}
+.cni-ai-validation{grid-column:1/-1;margin:0;color:#b42318;font-size:12px}
+.cni-ai-loading{display:flex;align-items:center;gap:8px;padding:0 15px 13px;background:#fff;color:#526c89;font-size:12px}
+.cni-ai-spinner{width:15px;height:15px;border:2px solid #d5e7f7;border-top-color:#0877b7;border-radius:50%;animation:cni-ai-spin .8s linear infinite}
+.cni-ai-error{margin:0;padding:12px 15px;border-top:1px solid #fecaca;background:#fff1f2;color:#a61b1b;font-size:12px;line-height:1.45}
+@keyframes cni-jesu-float{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-5px) rotate(1deg)}}
+@keyframes cni-siamese-sway{0%,100%{transform:translateY(1px) rotate(-1deg) scale(1.02)}50%{transform:translateY(-3px) rotate(1.2deg) scale(1.09)}}
+@keyframes cni-siamese-wave{0%,42%,100%{transform:rotate(-8deg) translateY(1px)}58%{transform:rotate(22deg) translateY(-2px)}72%{transform:rotate(-18deg) translateY(0)}86%{transform:rotate(20deg) translateY(-2px)}}
+@keyframes cni-jesu-pointer-wave{0%,100%{transform:translateY(0) rotate(-1.2deg)}22%{transform:translateY(-2px) rotate(1deg)}48%{transform:translateY(1px) rotate(-1.5deg)}70%{transform:translateY(-2px) rotate(1.4deg)}86%{transform:translateY(0) rotate(-.7deg)}}
+@keyframes cni-ai-pulse{0%{box-shadow:0 0 0 0 #22c55e80}70%{box-shadow:0 0 0 8px #22c55e00}100%{box-shadow:0 0 0 0 #22c55e00}}
+@keyframes cni-ai-slide-in{from{opacity:0;transform:translateX(22px)}to{opacity:1;transform:translateX(0)}}
+@keyframes cni-ai-fade{from{opacity:0}to{opacity:1}}
+@keyframes cni-ai-spin{to{transform:rotate(360deg)}}
+@media(max-width:540px){.cni-ai-launcher{right:14px;bottom:14px;min-height:66px;gap:8px;padding:6px 15px 6px 6px}.cni-ai-launcher-mascot{width:52px;height:52px}.cni-ai-launcher-mascot img{width:100%;height:100%}.cni-ai-launcher-pulse{left:44px}.cni-ai-drawer{top:8px;right:8px;bottom:8px;width:calc(100vw - 16px);border-radius:18px}.cni-ai-drawer-header{padding:14px}.cni-ai-suggestions button{max-width:200px}.cni-ai-welcome-mascot{height:145px}}
+@media(prefers-reduced-motion:reduce){.cni-ai-launcher-mascot img,.cni-ai-drawer-avatar img,.cni-ai-welcome-mascot,.cni-ai-launcher-pulse,.cni-ai-spinner{animation:none}.cni-ai-backdrop,.cni-ai-drawer{animation:none}.cni-ai-launcher{transition:none}}
+
+/* Acabado editorial del asistente y saludo de Davis. */
+.cni-ai-widget{font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif;letter-spacing:.005em}
+.cni-ai-drawer{border-color:#d9e5f2;background:#f7f9fc}
+.cni-ai-drawer-header{background:linear-gradient(120deg,#123b69 0%,#17659c 58%,#2482b7 100%)}
+.cni-ai-drawer-brand h2{font-size:16px;font-weight:750;letter-spacing:-.025em}
+.cni-ai-drawer-brand h2 span{font-weight:550;opacity:.92}
+.cni-ai-drawer-copy{min-width:0}
+.cni-ai-drawer-brand p.cni-ai-header-greeting{display:table;max-width:100%;margin-top:6px;padding:5px 9px;border:1px solid #ffffff32;border-radius:10px;background:#ffffff16;color:#f1f8ff;font-size:11px;line-height:1.35;letter-spacing:.005em;animation:cni-davis-greeting-in .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:.22s}
+.cni-ai-drawer-description{color:#5b6d82;font-size:11.5px}
+.cni-ai-messages{background:linear-gradient(180deg,#f2f6fb,#f8fafd 48%)}
+.cni-ai-message{box-sizing:border-box;flex:0 0 auto;width:fit-content;max-width:88%;min-width:0;padding:12px 15px;border-color:#e1e8f0;border-radius:16px 16px 16px 5px;color:#33475e;box-shadow:0 3px 12px #15324d0c}
+.cni-ai-message strong{color:#53718f;font-size:10px;font-weight:700;letter-spacing:.035em}
+.cni-ai-message p,.cni-ai-answer{min-width:0;max-width:100%;font-size:12.5px;line-height:1.65}
+.cni-ai-answer{white-space:normal;overflow-wrap:anywhere}
+.cni-ai-message.is-user{border-color:#246ba6;background:linear-gradient(135deg,#155d99,#287db5);color:#fff}
+.cni-ai-message.is-user strong{color:#d7eaff}
+.cni-ai-answer p{margin:0 0 9px}
+.cni-ai-answer p:last-child{margin-bottom:0}
+.cni-ai-answer strong{color:#183e66}
+.cni-ai-answer ul,.cni-ai-answer ol{margin:6px 0 9px;padding-left:20px}
+.cni-ai-answer li{margin:3px 0}
+.cni-ai-answer h1,.cni-ai-answer h2,.cni-ai-answer h3{margin:10px 0 5px;color:#193c60;font-size:13px;line-height:1.4}
+.cni-ai-welcome{gap:9px;max-width:330px}
+.cni-ai-welcome-mascot{width:min(174px,68%);height:150px}
+.cni-ai-welcome>p{max-width:280px;color:#748398;font-size:11.5px}
+.cni-ai-suggestions button{border-color:#d9e4ef;color:#3e5e7b;font-size:10.5px}
+.cni-ai-composer{border-top-color:#e4eaf1}
+.cni-ai-composer textarea{border-color:#d8e2ec;border-radius:14px;background:#fafcff;font-family:inherit;font-size:12.5px}
+.cni-ai-composer>button{border-radius:12px;background:linear-gradient(135deg,#145f9d,#2379b4);font-family:inherit;font-size:12px;box-shadow:0 4px 12px #176aa52c}
+@keyframes cni-davis-greeting-in{from{opacity:0;transform:translateY(7px) scale(.97);filter:blur(2px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@media(prefers-reduced-motion:reduce){.cni-ai-drawer-brand p.cni-ai-header-greeting{animation:none}}
+
+/* Correcciones de contraste y tamaño: los estilos globales del portal también afectan a <p>. */
+.cni-ai-messages>.cni-ai-message{display:grid!important;grid-template-columns:minmax(0,1fr);align-content:start;justify-items:start;row-gap:4px;flex:0 0 auto!important;width:fit-content!important;height:auto!important;min-height:0!important;margin:0!important;padding:10px 14px!important;}
+.cni-ai-messages>.cni-ai-message.is-user{align-self:flex-end;}
+.cni-ai-messages>.cni-ai-message>strong{display:block;margin:0!important;}
+.cni-ai-messages>.cni-ai-message>p{display:block;height:auto!important;min-height:0!important;margin:0!important;padding:0!important;color:#33475e;line-height:1.45;}
+.cni-ai-messages>.cni-ai-message.is-user>p{color:#fff!important;}
+.cni-ai-composer>button{border:1px solid #d9ad55;background:linear-gradient(135deg,#b9821d,#94620c);color:#fff;box-shadow:0 5px 14px #8f620d35;transition:transform .18s ease,box-shadow .18s ease,background .18s ease}
+.cni-ai-composer>button:hover:not(:disabled){transform:translateY(-1px);background:linear-gradient(135deg,#c8932c,#a16c10);box-shadow:0 7px 18px #8f620d45}
+.cni-ai-composer>button:focus-visible{outline:3px solid #e8c46d;outline-offset:3px}
+.cni-ai-messages>.cni-ai-message.is-assistant{grid-template-columns:50px minmax(0,1fr);column-gap:8px;align-self:stretch;width:100%!important;max-width:100%;padding:0!important;border:0;background:transparent;box-shadow:none}
+.cni-ai-message-avatar{position:sticky;top:5px;display:block;width:50px;height:54px;overflow:visible}
+.cni-ai-avatar-art{position:absolute;inset:0;display:block;overflow:visible;background:transparent}
+.cni-ai-avatar-art img{display:block;width:100%;height:100%;object-fit:contain;transform:none}
+.cni-ai-question-mark{position:absolute;top:-5px;right:-4px;z-index:2;display:grid;place-items:center;width:16px;height:16px;border:1px solid #fff;border-radius:50%;background:#e7b63d;color:#fff;font-size:12px;font-weight:850;line-height:1;animation:cni-ai-question-float 1.8s ease-in-out infinite}
+.cni-ai-question-mark.is-second{top:auto;right:auto;bottom:-2px;left:-5px;width:12px;height:12px;background:#2f79b5;color:#fff;font-size:9px;animation-delay:.6s}
+.cni-ai-message-body{display:block!important;align-self:start;width:fit-content;max-width:100%;min-width:0;height:auto!important;min-height:0!important;margin:0!important;padding:9px 12px!important;border:1px solid #e1e8f0;border-radius:15px 15px 15px 5px;background:#fff;color:#33475e;box-shadow:0 3px 12px #15324d0c;overflow-wrap:anywhere}
+.cni-ai-message-body>.cni-ai-answer{display:block;margin:0!important;padding:0!important}
+.cni-ai-message-body>.cni-ai-answer>:first-child{margin-top:0!important}
+.cni-ai-typing{gap:8px;padding:0!important;background:transparent;color:#536b83}
+.cni-ai-typing>.cni-ai-message-avatar{position:static;flex:none}
+.cni-ai-typing>span{display:grid;gap:3px;padding:8px 12px;border:1px solid #e1e8f0;border-radius:13px;background:#fff;font-size:11px}
+.cni-ai-typing>span>strong{color:#53718f;font-size:10px}
+.cni-ai-typing-dots>span{display:inline-block;margin-left:2px;animation:cni-ai-thinking-dots 1s steps(2,end) infinite}
+@keyframes cni-ai-thinking-dots{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes cni-ai-question-float{0%,100%{transform:translateY(2px) rotate(-9deg) scale(.88);opacity:.72}50%{transform:translateY(-3px) rotate(9deg) scale(1.08);opacity:1}}
+@media(prefers-reduced-motion:reduce){.cni-ai-question-mark,.cni-ai-typing-dots>span{animation:none}}

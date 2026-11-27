@@ -3,10 +3,13 @@
 namespace Tests\Feature;
 
 use App\Livewire\Docente\CalificacionesSalon;
+use App\Livewire\Docente\PanelDocente;
 use App\Models\Seccion;
 use App\Models\Usuario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -165,5 +168,66 @@ class SeccionesDocenteTest extends TestCase
 
         $this->actingAs($admin, 'web')->getJson('/api/resultados')
             ->assertOk()->assertJsonCount(4, 'data.data');
+    }
+
+    public function test_asistente_consulta_gemini_y_conserva_contexto_entre_preguntas(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::response([
+                'candidates' => [[
+                    'content' => ['parts' => [['text' => 'Prueba una actividad guiada en grupos pequeños.']]],
+                ]],
+            ]),
+        ]);
+        config([
+            'services.gemini.key' => 'test-key',
+            'services.gemini.model' => 'gemini-3.8-flash',
+            'services.gemini.url' => 'https://generativelanguage.googleapis.com/v1beta',
+        ]);
+
+        $this->actingAs($this->docentes['A'], 'web')->get('/docente')
+            ->assertOk()->assertSee('Asistente IA del docente');
+
+        $componente = Livewire::actingAs($this->docentes['A'], 'web')
+            ->test(PanelDocente::class)
+            ->set('pregunta', '¿Cómo refuerzo comprensión lectora?')
+            ->call('enviarPregunta')
+            ->assertSee('Prueba una actividad guiada en grupos pequeños.')
+            ->assertSet('pregunta', '');
+
+        $componente->set('pregunta', '¿Puedes darme un ejemplo?')
+            ->call('enviarPregunta')
+            ->assertSee('Prueba una actividad guiada en grupos pequeños.');
+
+        Http::assertSentCount(2);
+        Http::assertSent(fn ($request) => str_contains($request->url(), '/models/gemini-3.8-flash:generateContent')
+            && str_contains($request['contents'][0]['parts'][0]['text'], '¿Cómo refuerzo comprensión lectora?')
+            && str_contains($request['contents'][0]['parts'][0]['text'], 'resultados_por_area'));
+        Http::assertSent(fn ($request) => count($request['contents']) === 3
+            && $request['contents'][0]['role'] === 'user'
+            && $request['contents'][1]['role'] === 'model'
+            && $request['contents'][2]['role'] === 'user');
+    }
+
+    public function test_asistente_muestra_error_de_conexion_y_permite_nueva_conversacion(): void
+    {
+        Http::fake([
+            'generativelanguage.googleapis.com/*' => Http::failedConnection(),
+        ]);
+        config([
+            'services.gemini.key' => 'test-key',
+            'services.gemini.model' => 'gemini-3.8-flash',
+            'services.gemini.url' => 'https://generativelanguage.googleapis.com/v1beta',
+        ]);
+        RateLimiter::clear('asistente-docente:' . $this->docentes['A']->id);
+
+        Livewire::actingAs($this->docentes['A'], 'web')
+            ->test(PanelDocente::class)
+            ->set('pregunta', 'Dame una estrategia de aprendizaje.')
+            ->call('enviarPregunta')
+            ->assertSee('No se pudo conectar con Gemini.')
+            ->call('nuevaConversacion')
+            ->assertSet('mensajes', [])
+            ->assertHasNoErrors();
     }
 }

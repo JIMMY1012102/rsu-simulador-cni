@@ -1,5 +1,5 @@
 <div class="cni-notas" id="cni-notas">
-    <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=36">
+    <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=50">
     <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=8">
     @php
         $esPreview = app()->environment('local') && (request()->is('docente-preview') || request()->is('preview-docente'));
@@ -131,6 +131,12 @@
                     <button class="cni-notas-export cni-notas-export-disabled" type="button" title="No hay registros para exportar" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M4 17v4h16v-4"/></svg> Exportar Excel (.csv)</button>
                 @endif
             </div>
+@if($esPreview)
+    @livewire('docente.preview-asistente-docente')
+@else
+    @include('livewire.docente.asistente-drawer')
+@endif
+
             <div class="cni-notas-filtros">
                 <label><span>Buscar estudiante</span><div class="cni-input-wrap"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg><input id="cni-buscar" type="search" autocomplete="off" placeholder="Ingresa nombre o apellido..."></div></label>
                 <label><span>Simulacro</span><select id="cni-simulacro"><option value="">Todos</option>@foreach($simulacrosDisponibles as $sim)<option value="{{ $sim }}">{{ $sim }}</option>@endforeach</select></label>

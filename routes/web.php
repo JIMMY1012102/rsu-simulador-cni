@@ -119,7 +119,7 @@ if (app()->environment('local')) {
         return view('alumno.elegir-area', compact('areas'));
     })->name('alumno.preview-areas');
 
-    Route::view('/docente-preview', 'livewire.docente.panel-docente');
+    Route::view('/docente-preview', 'livewire.docente.preview');
     Route::redirect('/preview-docente', '/docente-preview');
 
     Route::get('/docente/calificaciones-preview', function () {
