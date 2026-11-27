@@ -17,7 +17,7 @@ class AsistenteDocenteFallbackTest extends TestCase
             'services.gemini.key' => 'test-key',
             'services.gemini.model' => 'gemini-3.8-flash',
             'services.gemini.url' => 'https://generativelanguage.googleapis.com/v1beta',
-            'services.gemini.fallback_models' => 'gemini-4-hydrogen,gemini-3.5-flash-lite',
+            'services.gemini.fallback_models' => 'gemini-3.5-flash-lite,gemini-4-hydrogen',
         ]);
     }
 
@@ -45,7 +45,7 @@ class AsistenteDocenteFallbackTest extends TestCase
         ));
         Http::assertSent(fn ($request) => str_contains(
             $request->url(),
-            '/models/gemini-4-hydrogen:generateContent'
+            '/models/gemini-3.5-flash-lite:generateContent'
         ));
     }
 
