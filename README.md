@@ -118,7 +118,8 @@ Antes de activar, **en copia de desarrollo con respaldo**:
 
 GitHub Actions ejecuta la suite completa tanto en SQLite como en MariaDB 11.4 **temporales**. Una CI verde prueba el código, no el estado de la MariaDB del equipo. Consultar `docs/validacion-mariadb-areas.md`.
 
-\n## Asistentes con IA
+
+## Asistentes con IA
 
 Se integran dos asistentes independientes: uno para estudiantes y otro para superadministradores (`usuarios.rol = 'admin'`). No hay asistente para docentes. El navegador se comunica solo con Laravel; Laravel toma el rol e ID de la sesión y es el único que llama al agente Python. Cada rol registra exclusivamente sus herramientas MCP, de solo lectura.
 
