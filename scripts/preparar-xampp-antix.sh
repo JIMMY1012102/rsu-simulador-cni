@@ -99,13 +99,11 @@ cat <<EOF
 Preparación terminada.
 Proyecto: $PROJECT_DIR
 URL: $URL
+Base configurada: $(grep '^DB_DATABASE=' .env | cut -d= -f2-)
 
-Siguiente paso:
-1. Abre http://localhost/phpmyadmin
-2. Crea una base de datos llamada rsu_cni_local.
-3. Revisa .env (DB_DATABASE, DB_USERNAME y DB_PASSWORD).
-4. Importa tu SQL de respaldo o, si la base está vacía y corresponde a este esquema, ejecuta: php artisan migrate
-5. Abre $URL
+Abre $URL e inicia sesión con un usuario que exista en la copia de Oracle.
+Si no había un respaldo, colócalo en database/backups/ y ejecuta:
+  bash scripts/importar-base-oracle.sh
 
-El script no crea usuarios, no importa SQL y no ejecuta migraciones automáticamente.
+El instalador no borra bases existentes ni ejecuta migraciones destructivas.
 EOF
