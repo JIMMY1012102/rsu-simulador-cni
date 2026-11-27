@@ -26,7 +26,7 @@ class DemoAlumnosSimulacrosSeeder extends Seeder
 
         $nombres = ['Alex','Camila','Diego','Valeria','Mateo','Luciana','Sebastián','Daniela','Thiago','Mariana','Gabriel','Fernanda','Adrián','Sofía','Nicolás','Alessia','Joaquín','Ximena','Bruno','Mía'];
         $apellidos = ['Demo Rojas','Demo Flores','Demo Torres','Demo Castro','Demo Vega','Demo Ramos','Demo Salazar','Demo Paredes','Demo Medina','Demo León','Demo Cruz','Demo Vargas','Demo Silva','Demo Herrera','Demo Campos','Demo Navarro','Demo Ruiz','Demo Mendoza','Demo Castillo','Demo Reyes'];
-        $codigos = ['A','B','C','D','E'];
+        $codigoAreaDemo = 'C'; // Área C ya está disponible en el banco local del simulador.
         $areas = DB::table('areas_postulacion')->where('activo', true)->get()->keyBy('codigo');
         $secciones = DB::table('secciones')->where('grado', '5to')->where('activo', true)->get()->keyBy('nombre');
 
@@ -35,10 +35,8 @@ class DemoAlumnosSimulacrosSeeder extends Seeder
                 throw new RuntimeException("No existe la sección 5to {$letra}; ejecuta SeccionSeeder.");
             }
         }
-        foreach ($codigos as $codigo) {
-            if (! $areas->has($codigo) || ! DB::table('carreras')->where('area_postulacion_id', $areas[$codigo]->id)->where('activo', true)->exists()) {
-                throw new RuntimeException("Falta el área {$codigo} o una carrera activa asociada.");
-            }
+        if (! $areas->has($codigoAreaDemo) || ! DB::table('carreras')->where('area_postulacion_id', $areas[$codigoAreaDemo]->id)->where('activo', true)->exists()) {
+            throw new RuntimeException('Falta el área C o una carrera activa asociada.');
         }
 
         $tieneArea = Schema::hasColumn('usuarios', 'area_postulacion_id');
@@ -46,7 +44,7 @@ class DemoAlumnosSimulacrosSeeder extends Seeder
         foreach (['A','B','C','D'] as $i => $letra) {
             for ($n = 1; $n <= 5; $n++) {
                 $idx = $i * 5 + $n - 1;
-                $codigo = $codigos[$n - 1];
+                $codigo = $codigoAreaDemo;
                 $areaId = (int) $areas[$codigo]->id;
                 $carreraId = (int) DB::table('carreras')->where('area_postulacion_id', $areaId)->where('activo', true)->orderBy('id')->value('id');
                 $login = 'demo_' . strtolower($letra) . str_pad((string) $n, 2, '0', STR_PAD_LEFT);
