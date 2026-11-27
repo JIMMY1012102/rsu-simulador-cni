@@ -203,64 +203,6 @@ if ROL == "estudiante":
         params = (int(USUARIO_ID), int(USUARIO_ID), limite_sql) if filtro_historial else (int(USUARIO_ID), limite_sql)
         return consultar(sql, params)
 
-    @mcp.tool(description=(
-        "Busca preguntas académicas activas del banco en asignaturas habilitadas para el área "
-        "del estudiante. Permite filtrar por tema, dificultad basico/intermedio/avanzado o texto. "
-        "Por defecto NO revela solución ni clave; incluir_solucion=true solo cuando el alumno "
-        "pida explicación o haya intentado responder. Máximo 10 preguntas."
-    ))
-    def consultar_banco_academico(
-        tema: str = "",
-        nivel: str = "",
-        buscar: str = "",
-        incluir_solucion: bool = False,
-        limite: int = 5,
-    ) -> str:
-        estudiante()
-        if nivel and nivel not in ("basico", "intermedio", "avanzado"):
-            return json.dumps({"error": "Nivel no válido."}, ensure_ascii=False)
-        tema = str(tema or "").strip()[:100]
-        buscar = str(buscar or "").strip()[:120]
-        if not tema and not buscar:
-            return json.dumps({"necesita_dato": "Indica una asignatura, tema o concepto para buscar preguntas."}, ensure_ascii=False)
-
-        filtros = [
-            "p.activo = 1", "t.activo = 1", "a.activo = 1",
-            f"a.id IN ({AREAS_DEL_ESTUDIANTE})",
-        ]
-        parametros = []
-        if tema:
-            filtros.append("t.nombre LIKE %s")
-            parametros.append(f"%{tema}%")
-        if nivel:
-            filtros.append("p.nivel = %s")
-            parametros.append(nivel)
-        if buscar:
-            filtros.append("(p.enunciado LIKE %s OR t.nombre LIKE %s)")
-            parametros.extend([f"%{buscar}%", f"%{buscar}%"])
-
-        solucion_select = (
-            "p.solucion AS solucion, "
-            "(SELECT GROUP_CONCAT(CONCAT(ac.letra, '. ', ac.texto) ORDER BY ac.letra SEPARATOR ' | ') "
-            " FROM alternativas ac WHERE ac.pregunta_id = p.id AND ac.es_correcta = 1 LIMIT 26) AS respuesta_correcta"
-            if incluir_solucion else
-            "NULL AS solucion, NULL AS respuesta_correcta"
-        )
-        sql = f"""SELECT p.id AS pregunta_id, a.nombre AS asignatura, t.nombre AS tema,
-                         p.nivel, p.enunciado,
-                         (SELECT GROUP_CONCAT(CONCAT(al.letra, '. ', al.texto) ORDER BY al.letra SEPARATOR ' | ')
-                          FROM alternativas al WHERE al.pregunta_id = p.id LIMIT 26) AS alternativas,
-                         {solucion_select}
-                  FROM preguntas p
-                  JOIN temas t ON t.id = p.tema_id
-                  JOIN areas a ON a.id = t.area_id
-                  WHERE {' AND '.join(filtros)}
-                  ORDER BY CASE p.nivel WHEN 'basico' THEN 1 WHEN 'intermedio' THEN 2 ELSE 3 END,
-                           p.id DESC
-                  LIMIT %s"""
-        parametros = [int(USUARIO_ID)] + parametros + [acotar_limite(limite, 10)]
-        return consultar(sql, tuple(parametros))
-
 elif ROL == "admin":
     @mcp.tool(description="Úsala para un resumen global de usuarios activos por rol, simulacros y preguntas activos e intentos calificados.")
     def resumen_general() -> str:
