@@ -116,7 +116,7 @@
     </div>
     @stack('scripts')
     @livewireScripts
-    @if (config('asistente.enabled') && auth('web')->check() && in_array(auth('web')->user()->rol, ['estudiante', 'admin'], true))
+    @if (auth('web')->check() && in_array(auth('web')->user()->rol, ['estudiante', 'admin'], true))
         <x-asistente-chat />
     @endif
 </body>
