@@ -34,7 +34,7 @@
         @yield('content')
     </main>
     @livewireScripts
-    @if (config('asistente.enabled') && auth('web')->check() && auth('web')->user()->rol === 'estudiante' && !request()->routeIs('admin.*'))
+    @if (auth('web')->check() && in_array(auth('web')->user()->rol, ['estudiante', 'admin'], true) && !request()->routeIs('admin.*'))
         <x-asistente-chat />
     @endif
 </body>
