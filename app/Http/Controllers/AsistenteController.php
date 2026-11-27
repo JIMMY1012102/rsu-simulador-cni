@@ -10,6 +10,9 @@ class AsistenteController extends Controller
 {
     public function __invoke(Request $request)
     {
+        $usuario = $request->user('web');
+        abort_unless($usuario && in_array($usuario->rol, ['estudiante', 'admin'], true), 403);
+
         if (!config('asistente.enabled')) {
             return response()->json([
                 'respuesta' => 'El asistente está desactivado en este momento. Inténtelo nuevamente más tarde.',
@@ -20,8 +23,6 @@ class AsistenteController extends Controller
             'mensaje' => ['required', 'string', 'min:1', 'max:500'],
             'sesion' => ['nullable', 'string', 'max:120'],
         ]);
-        $usuario = $request->user('web');
-        abort_unless($usuario && in_array($usuario->rol, ['estudiante', 'admin'], true), 403);
 
         try {
             $respuesta = Http::acceptJson()
