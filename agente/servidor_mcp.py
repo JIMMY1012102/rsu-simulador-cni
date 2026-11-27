@@ -52,7 +52,7 @@ if ROL == "estudiante":
         GROUP BY a.id,a.nombre ORDER BY promedio_porcentaje ASC LIMIT 50""",(int(USUARIO_ID),))
 
     @mcp.tool(description="Úsala para encontrar temas que debe reforzar y porcentaje de aciertos; exige al menos tres respuestas calificadas por tema.")
-    def mis_temas_a_reforzar(limite_resultados: int = 5) -> str:
+    def mis_temas_a_reforzar(limite: int = 5) -> str:
         estudiante()
         return consultar("""SELECT a.nombre AS area,t.nombre AS tema,COUNT(*) AS respuestas,
         SUM(CASE WHEN re.estado_respuesta='correcta' THEN 1 ELSE 0 END) AS aciertos,
@@ -61,7 +61,7 @@ if ROL == "estudiante":
         JOIN temas t ON t.id=p.tema_id JOIN areas a ON a.id=t.area_id
         WHERE i.usuario_id=%s AND i.estado IN ('finalizado','enviado_auto') AND i.puntaje_total IS NOT NULL
         AND re.estado_respuesta IS NOT NULL GROUP BY a.id,a.nombre,t.id,t.nombre HAVING COUNT(*)>=3
-        ORDER BY porcentaje_acierto ASC LIMIT %s""",(int(USUARIO_ID),limite(limite_resultados)))
+        ORDER BY porcentaje_acierto ASC LIMIT %s""",(int(USUARIO_ID),acotar_limite(limite)))
 
     @mcp.tool(description="Úsala cuando consulte los simulacros que puede rendir en este momento según vigencia, estado y carrera.")
     def simulacros_disponibles() -> str:
@@ -86,12 +86,12 @@ elif ROL == "admin":
         GROUP BY a.id,a.nombre,p.nivel ORDER BY a.nombre,p.nivel LIMIT 100""")
 
     @mcp.tool(description="Úsala para revisar simulacros recientes, fechas, estado, número de intentos y puntaje promedio.")
-    def simulacros_recientes(limite_resultados: int = 5) -> str:
+    def simulacros_recientes(limite: int = 5) -> str:
         admin()
         return consultar("""SELECT s.nombre,s.fecha_inicio,s.fecha_fin,s.activo,COUNT(i.id) cantidad_intentos,
         AVG(i.puntaje_total) puntaje_promedio FROM simulacros s LEFT JOIN intentos i ON i.simulacro_id=s.id
         AND i.estado IN ('finalizado','enviado_auto') AND i.puntaje_total IS NOT NULL
-        GROUP BY s.id,s.nombre,s.fecha_inicio,s.fecha_fin,s.activo ORDER BY s.fecha_inicio DESC LIMIT %s""",(limite(limite_resultados),))
+        GROUP BY s.id,s.nombre,s.fecha_inicio,s.fecha_fin,s.activo ORDER BY s.fecha_inicio DESC LIMIT %s""",(acotar_limite(limite),))
 
     @mcp.tool(description="Úsala para comparar el promedio del último intento calificado de simulacro por sección, considerando estudiantes activos.")
     def rendimiento_por_seccion() -> str:
@@ -115,7 +115,7 @@ elif ROL == "admin":
         FROM respuestas_estudiante re JOIN intentos i ON i.id=re.intento_id JOIN preguntas p ON p.id=re.pregunta_id
         JOIN temas t ON t.id=p.tema_id JOIN areas a ON a.id=t.area_id
         WHERE i.estado IN ('finalizado','enviado_auto') AND i.puntaje_total IS NOT NULL AND re.estado_respuesta IS NOT NULL
-        GROUP BY p.id,p.enunciado,a.nombre,t.nombre HAVING COUNT(*)>=5 ORDER BY porcentaje_acierto ASC LIMIT %s""",(limite(limite_resultados),))
+        GROUP BY p.id,p.enunciado,a.nombre,t.nombre HAVING COUNT(*)>=5 ORDER BY porcentaje_acierto ASC LIMIT %s""",(acotar_limite(limite),))
 else:
     raise RuntimeError("Rol no autorizado")
 
