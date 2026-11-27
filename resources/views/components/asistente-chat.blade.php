@@ -39,14 +39,14 @@
 .cni-asistente__eyebrow{font-size:10px;font-weight:800;letter-spacing:2px;color:#3b82f6}
 .cni-asistente__bienvenida h3{margin:0;color:#172b4d;font-size:26px;line-height:1.15;font-weight:850;letter-spacing:-.8px}
 .cni-asistente__bienvenida p{margin:0 0 9px;color:#71809a;font-size:13px;line-height:1.55;max-width:290px}
-.cni-asistente__bienvenida{position:relative;isolation:isolate;min-height:100%;justify-content:center;padding:34px 12px 28px;gap:13px}
-.cni-asistente__bienvenida:before{content:"";position:absolute;z-index:-1;top:13%;left:50%;width:290px;height:290px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,.20),rgba(34,211,238,.09) 48%,transparent 72%);filter:blur(8px);pointer-events:none}
-.cni-asistente__bienvenida-avatar{position:relative;width:116px;height:116px;padding:7px;margin:0 0 10px;border-radius:36px;background:linear-gradient(145deg,#2563eb,#06b6d4 55%,#8b5cf6);box-shadow:0 18px 42px rgba(37,99,235,.22),0 0 0 9px rgba(219,234,254,.65);animation:cni-mascota-float 4s ease-in-out infinite}
-.cni-asistente__bienvenida-avatar:after{content:"";position:absolute;inset:4px;border:1px solid rgba(255,255,255,.75);border-radius:30px;pointer-events:none}
-.cni-asistente__bienvenida-avatar img{position:relative;z-index:1;border-radius:29px;background:linear-gradient(145deg,#fff,#eff7ff)}
+.cni-asistente__bienvenida{position:relative;isolation:isolate;min-height:100%;width:100%;justify-content:center;align-self:center;padding:22px 16px 20px;gap:11px}
+.cni-asistente__bienvenida:before{content:"";position:absolute;z-index:-1;top:13%;left:50%;width:min(260px,78vw);height:min(260px,78vw);transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(96,165,250,.20),rgba(34,211,238,.09) 48%,transparent 72%);filter:blur(8px);pointer-events:none}
+.cni-asistente__bienvenida-avatar{position:relative;width:92px;height:92px;padding:6px;margin:0 auto 5px;border-radius:29px;background:linear-gradient(145deg,#2563eb,#06b6d4 55%,#8b5cf6);box-shadow:0 18px 42px rgba(37,99,235,.22),0 0 0 9px rgba(219,234,254,.65);animation:cni-mascota-float 4s ease-in-out infinite}
+.cni-asistente__bienvenida-avatar:after{content:"";position:absolute;inset:4px;border:1px solid rgba(255,255,255,.75);border-radius:24px;pointer-events:none}
+.cni-asistente__bienvenida-avatar img{position:relative;z-index:1;border-radius:23px;background:linear-gradient(145deg,#fff,#eff7ff)}
 .cni-asistente__eyebrow{padding:6px 12px;border:1px solid #dbeafe;border-radius:999px;background:rgba(239,246,255,.9);font-size:9px;letter-spacing:2.1px}
 .cni-asistente__bienvenida h3{font-size:clamp(27px,7vw,34px);line-height:1.12;letter-spacing:-1.1px;background:linear-gradient(100deg,#102d63 10%,#2563eb 58%,#0891b2);-webkit-background-clip:text;background-clip:text;color:transparent}
-.cni-asistente__bienvenida p{max-width:285px;margin:0;color:#64748b;font-size:13px;line-height:1.75}
+.cni-asistente__bienvenida p{width:min(100%,300px);max-width:300px;margin:0 auto;color:#64748b;font-size:13px;line-height:1.65}
 @keyframes cni-mascota-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 .cni-asistente__mensajes{background:radial-gradient(ellipse at 50% 0%,rgba(219,234,254,.75),transparent 48%),radial-gradient(ellipse at 100% 100%,rgba(207,250,254,.42),transparent 42%),#f8fbff}
 .cni-asistente__cabecera{background:linear-gradient(115deg,#fff 0%,#f4f8ff 58%,#effbff 100%)}
@@ -76,7 +76,8 @@
 .cni-asistente__enviar{width:43px;height:43px;flex:none;display:grid;place-items:center;border:0;border-radius:14px;background:linear-gradient(135deg,#2563eb,#0891b2);color:#fff;cursor:pointer;font-size:19px;box-shadow:0 7px 15px #2563eb30;transition:transform .15s,opacity .15s}
 .cni-asistente__enviar:hover{transform:translateY(-1px)}.cni-asistente__enviar:disabled{opacity:.55;cursor:wait}
 .cni-asistente__nota{margin:8px 3px 0;text-align:center;color:#9aa5b7;font-size:10px}
-@media(max-width:480px){.cni-asistente{right:13px;bottom:13px}.cni-asistente__ventana{right:-3px;bottom:66px;width:min(420px,calc(100vw - 20px));height:min(680px,calc(100dvh - 92px));min-height:360px}.cni-asistente__abrir{padding-right:14px}.cni-asistente__bienvenida{padding-top:9px}.cni-asistente__bienvenida-avatar{width:70px;height:70px}.cni-asistente__bienvenida h3{font-size:23px}}
+@media(max-width:480px){.cni-asistente{right:13px;bottom:13px}.cni-asistente__ventana{right:-3px;bottom:66px;width:min(420px,calc(100vw - 20px));height:min(680px,calc(100dvh - 92px));min-height:360px}.cni-asistente__abrir{padding-right:14px}.cni-asistente__bienvenida{min-height:100%;padding:14px 12px 16px;gap:9px}.cni-asistente__bienvenida-avatar{width:76px;height:76px;padding:5px;margin-bottom:2px;border-radius:25px}.cni-asistente__bienvenida-avatar:after{border-radius:20px}.cni-asistente__bienvenida-avatar img{border-radius:19px}.cni-asistente__bienvenida h3{font-size:clamp(21px,6vw,25px)}.cni-asistente__bienvenida p{font-size:12px;line-height:1.55}}
+@media(max-height:620px){.cni-asistente__bienvenida{min-height:auto;padding:12px 10px;gap:8px}.cni-asistente__bienvenida-avatar{width:68px;height:68px;padding:4px;margin-bottom:0;border-radius:22px}.cni-asistente__bienvenida-avatar:after{border-radius:18px}.cni-asistente__bienvenida-avatar img{border-radius:17px}.cni-asistente__bienvenida h3{font-size:22px}.cni-asistente__bienvenida p{font-size:12px;line-height:1.45}}
 @media(prefers-reduced-motion:reduce){.cni-asistente *{animation:none!important;transition:none!important}}
 </style>
 <section class="cni-asistente__ventana" role="dialog" aria-label="Asistente de inteligencia artificial" aria-modal="false">
@@ -93,7 +94,7 @@
             <div class="cni-asistente__bienvenida-avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="" width="78" height="78"></div>
             <span class="cni-asistente__eyebrow">ASISTENTE IA · CNI</span>
             <h3>¡Hola! Soy {{ $nombreAsistente }}</h3>
-            <p>Tu asistente está listo para ayudarte. Estoy aquí para acompañarte en tu aprendizaje. Escríbeme tu consulta y la resolveremos juntos, paso a paso.</p>
+            <p>Tu asistente está listo para ayudarte. Estoy aquí para acompañarte en tu aprendizaje.</p>
 
         </div>
     </div>
