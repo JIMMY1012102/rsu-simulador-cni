@@ -3,6 +3,11 @@
 CREATE USER IF NOT EXISTS 'agente'@'localhost' IDENTIFIED BY 'CAMBIAR_POR_UNA_CLAVE_SEGURA';
 GRANT SELECT (id, nombres, apellidos, rol, seccion_id, carrera_id, area_postulacion_id, activo) ON simulador_cni.usuarios TO 'agente'@'localhost';
 GRANT SELECT ON simulador_cni.secciones TO 'agente'@'localhost';
+GRANT SELECT ON simulador_cni.carreras TO 'agente'@'localhost';
+GRANT SELECT ON simulador_cni.areas_postulacion TO 'agente'@'localhost';
+GRANT SELECT ON simulador_cni.area_postulacion_simulacro TO 'agente'@'localhost';
+GRANT SELECT ON simulador_cni.simulacro_area TO 'agente'@'localhost';
+GRANT SELECT ON simulador_cni.alternativas TO 'agente'@'localhost';
 GRANT SELECT ON simulador_cni.simulacros TO 'agente'@'localhost';
 GRANT SELECT ON simulador_cni.intentos TO 'agente'@'localhost';
 GRANT SELECT ON simulador_cni.resultados_area TO 'agente'@'localhost';
