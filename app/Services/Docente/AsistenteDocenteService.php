@@ -122,7 +122,7 @@ PROMPT;
         $contents[] = ['role' => 'user', 'parts' => [['text' => $entrada]]];
 
         // Mantener margen para el timeout HTTP de cada intento.
-        set_time_limit(240);
+        set_time_limit(300);
 
         $modelosRespaldo = config('services.gemini.fallback_models', []);
         if (is_string($modelosRespaldo)) {
