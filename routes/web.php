@@ -132,3 +132,4 @@ if (app()->environment('local')) {
     });
 }
 
+\n// Chat protegido: rol e identidad proceden de la sesión autenticada.\nRoute::post('/asistente/chat', AsistenteController::class)->middleware(['auth:web', EnsureActiveUser::class, 'throttle:20,1'])->name('asistente.chat');\n
