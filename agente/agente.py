@@ -14,7 +14,7 @@ load_dotenv(Path(__file__).with_name(".env"))
 app=FastAPI(title="Agente IA CNI")
 historiales={}
 MODELO=os.getenv("MODELO") or "gemini-2.5-flash"
-MODELO_FALLBACK=os.getenv("MODELO_FALLBACK") or "gemini-2.5-flash"
+MODELO_FALLBACK=os.getenv("MODELO_FALLBACK") or "gemini-3.8-flash"
 ERRORES_TRANSITORIOS={429, 500, 502, 503, 504}
 
 class Solicitud(BaseModel):
