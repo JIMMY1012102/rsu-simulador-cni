@@ -121,8 +121,19 @@ GitHub Actions ejecuta la suite completa tanto en SQLite como en MariaDB 11.4 **
 
 ## Asistentes con IA
 
-Se integran dos asistentes independientes: uno para estudiantes y otro para superadministradores (`usuarios.rol = 'admin'`). No hay asistente para docentes. El navegador se comunica solo con Laravel; Laravel toma el rol e ID de la sesión y es el único que llama al agente Python. Cada rol registra exclusivamente sus herramientas MCP, de solo lectura.
+Se integran tres asistentes independientes: estudiante y superadministrador (`usuarios.rol = 'admin'`) usan el agente Python con herramientas MCP de solo lectura; el docente usa Davis en Laravel, que llama directamente a Gemini y consulta resultados agregados de su sección autenticada.
 
+### Asistente docente y dataset de demostración
+
+Davis está disponible en `/docente` para cuentas docentes activas. Usa `GEMINI_API_KEY`, `GEMINI_MODEL` y `GEMINI_API_URL` del `.env` de Laravel; no requiere el proceso Python del agente estudiantil/admin.
+
+Los resultados ficticios se cargan bajo demanda:
+
+```powershell
+php artisan db:seed --class="Database\Seeders\DocenteResultadosDemoSeeder"
+```
+
+El seeder no forma parte de `DatabaseSeeder`. En `local` o `testing` solo permite bases MySQL/MariaDB locales. En nube exige `CNI_DOCENTE_DEMO_SEED_ENABLED=true` y que `CNI_DOCENTE_DEMO_DATABASE` coincida exactamente con el nombre de la base configurada. Úsalo únicamente en una base aislada de demostración, nunca junto a calificaciones reales.
 ### Orden de encendido
 
 1. En XAMPP, inicia **Apache y MySQL**.

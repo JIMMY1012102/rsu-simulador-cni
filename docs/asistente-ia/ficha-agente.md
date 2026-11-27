@@ -34,10 +34,11 @@
 
 Se conserva el asistente admin existente y sus cinco herramientas: `resumen_general`, `estado_del_banco_de_preguntas`, `simulacros_recientes`, `rendimiento_por_seccion` y `preguntas_mas_falladas`. Todas son SELECT de solo lectura y no consultan contraseñas.
 
-## Roles pendientes de definición
+## Asistente docente
 
-El asistente docente no se implementa en este cambio. Su alcance debe confirmarse con la profesora: por ejemplo, si cada docente puede consultar solo sus secciones y qué datos de estudiantes puede visualizar. No se habilita acceso docente por suposición.
+Davis está integrado en el panel Laravel del docente (`/docente`) y llama directamente a Gemini. La sesión autenticada fija la identidad y la sección; el servicio envía totales, promedios y resultados agregados por área, sin nombres ni contraseñas. Si faltan datos, debe indicar esa limitación y ofrecer orientación pedagógica general.
 
+El dataset `DEMO FICTICIO - Muestra de resultados docentes` se carga explícitamente con `DocenteResultadosDemoSeeder`; no se ejecuta desde `DatabaseSeeder`. En ambientes no locales requiere una bandera explícita y el nombre exacto de una base demo. No lo cargues en una base con resultados reales.
 ## Límites y controles
 
 - Laravel autentica y envía `rol`, `usuario_id` y `sesion`; el cliente web no elige el usuario consultado.
