@@ -2,6 +2,7 @@
     $usuarioAsistente = auth('web')->user();
     $codigoAreaAsistente = $usuarioAsistente?->areaPostulacion?->codigo;
     $mascotaAsistente = config('panel_alumno.areas.'.$codigoAreaAsistente.'.mascota_png');
+    $nombreAsistente = config('panel_alumno.areas.'.$codigoAreaAsistente.'.nombre_asistente', 'Asistente CNI');
     $mascotaAsistenteUrl = $mascotaAsistente
         ? asset($mascotaAsistente).'?v='.filemtime(public_path($mascotaAsistente))
         : asset('images/escudo-cni.png');
@@ -56,11 +57,11 @@
 <section class="cni-asistente__ventana" role="dialog" aria-label="Asistente de inteligencia artificial" aria-modal="false">
     <header class="cni-asistente__cabecera">
         <span class="cni-asistente__avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="Mascota del asistente" width="48" height="48"></span>
-        <span class="cni-asistente__identidad"><strong>Asistente CNI</strong><span class="cni-asistente__estado">En línea · listo para ayudarte</span></span>
+        <span class="cni-asistente__identidad"><strong>{{ $nombreAsistente }}</strong><span class="cni-asistente__estado">En línea · listo para ayudarte</span></span>
         <button class="cni-asistente__cerrar" type="button" data-cerrar aria-label="Cerrar chat">×</button>
     </header>
     <div class="cni-asistente__mensajes" data-mensajes aria-live="polite" aria-relevant="additions">
-        <div class="cni-asistente__bienvenida"><span class="cni-asistente__mini-avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="" width="29" height="29"></span><div class="cni-asistente__mensaje">¡Hola! Soy tu asistente de inteligencia artificial. ¿En qué puedo ayudarte?</div></div>
+        <div class="cni-asistente__bienvenida"><span class="cni-asistente__mini-avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="" width="29" height="29"></span><div class="cni-asistente__mensaje">¡Hola! Soy {{ $nombreAsistente }}, tu asistente. ¿En qué puedo ayudarte?</div></div>
     </div>
     <div class="cni-asistente__pie">
         <form class="cni-asistente__form" data-form>
@@ -72,7 +73,7 @@
 </section>
 <button class="cni-asistente__abrir" type="button" data-abrir aria-expanded="false" aria-label="Abrir asistente CNI">
     <span class="cni-asistente__lanzador-avatar"><img src="{{ $mascotaAsistenteUrl }}" alt="" width="43" height="43"></span>
-    <span class="cni-asistente__lanzador-copy">Asistente IA<small>¿Necesitas ayuda?</small></span>
+    <span class="cni-asistente__lanzador-copy">{{ $nombreAsistente }}<small>Tu asistente IA · ¿Necesitas ayuda?</small></span>
 </button>
 <script>
 (() => {
