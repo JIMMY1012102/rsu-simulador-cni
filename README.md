@@ -119,6 +119,10 @@ Antes de activar, **en copia de desarrollo con respaldo**:
 GitHub Actions ejecuta la suite completa tanto en SQLite como en MariaDB 11.4 **temporales**. Una CI verde prueba el código, no el estado de la MariaDB del equipo. Consultar `docs/validacion-mariadb-areas.md`.
 
 
+## Despliegue manual en Oracle Cloud
+
+Consulta docs/despliegue-oracle.md para configurar el despliegue manual de OFICIAL#1 con GitHub Actions. Requiere secrets SSH de la VM; el .env y la base de datos permanecen en el servidor.
+
 ## Asistentes con IA
 
 Se integran tres asistentes independientes: estudiante y superadministrador (`usuarios.rol = 'admin'`) usan el agente Python con herramientas MCP de solo lectura; el docente usa Davis en Laravel, que llama directamente a Gemini y consulta resultados agregados de su sección autenticada.
