@@ -1,152 +1,147 @@
 # RSU-CNI — Simulador CNI
 
-Proyecto de Responsabilidad Social Universitaria de preparación académica para estudiantes del CNI.
+Aplicación web académica construida con **Laravel 12, Livewire 3 y MariaDB**.
 
-## Arquitectura KISS
+Esta rama, `local-xampp-antix`, está preparada para instalar una copia de desarrollo en **antiX Linux + XAMPP** y abrirla desde el navegador en `http://localhost/rsu-cni`. No modifica la rama `OFICIAL#1`.
 
-Una sola aplicación **Laravel 12 + Blade + Livewire 3 + MariaDB**, con autenticación por sesiones de Laravel. Las cuentas usan el modelo `Usuario` y la tabla `usuarios`. No se emiten tokens Bearer y no se necesita Firebase ni un frontend separado.
+## Instalación local en antiX Linux con XAMPP
 
-- **Presentación:** vistas en `resources/views/`, estilos en `public/css/app.css` y componentes en `app/Livewire/`.
-- **Autenticación:** `SessionController` y `AuthService`, usando exclusivamente el guard `web`. Login, logout, regeneración de sesión, CSRF y límite de solicitudes compartido entre HTML y JSON.
-- **Acceso:** `auth:web` y `EnsureActiveUser`; se conserva la autorización por roles y propietario de cada módulo.
-- **Negocio:** servicios existentes de preguntas, simulacros, intentos y resultados.
-- **Persistencia:** modelos/consultas y MariaDB. No cambia el esquema de negocio.
+### 1. Requisitos
 
-Las rutas `/api/*` se conservan para reutilizar el trabajo de los módulos, pero ahora son **rutas JSON de la misma aplicación web**: se cargan desde `routes/web.php`, comparten la cookie de sesión y requieren CSRF en operaciones de escritura. No son una API pública ni una autenticación independiente. Los componentes Livewire pueden llamar directamente a los servicios.
+- XAMPP para Linux instalado (normalmente en `/opt/lampp`).
+- PHP 8.2 o superior con extensiones de Laravel y `pdo_mysql`.
+- Composer 2.
+- Node.js y npm (para compilar los recursos CSS/JS).
+- Git (opcional, si clonas en vez de descargar ZIP).
 
-## Qué incluye esta adaptación
+Inicia Apache y MySQL desde el panel de XAMPP:
 
-- `/`: bienvenida con enlace al acceso.
-- `/login`: formulario de usuario y contraseña.
-- `/panel`: componente Livewire que lista simulacros e intentos propios, incluidos puntajes ya registrados.
-- `/logout`: cierre de sesión por POST.
-- Módulos JSON existentes unificados con la misma sesión; pruebas adaptadas al guard `web`.
+```bash
+sudo /opt/lampp/lampp start
+```
 
-**Alcance:** establece la arquitectura y el acceso web. El panel inicial no sustituye las pantallas completas de gestión de preguntas, creación de simulacros y resolución del examen. El recorrido backend de simulacro (asignación, respuestas, cierre y calificación) cuenta con pruebas de integración; consulta `docs/recorrido-backend.md` para sus reglas y límites. Las pantallas completas siguen pendientes.
+### 2. Descargar el proyecto
 
-## Preparación local
+Descomprime esta rama dentro de `/opt/lampp/htdocs/rsu-simulador-cni` (o clónala allí):
 
-Requiere PHP 8.2+, Composer 2 y MariaDB. PHP necesita las extensiones habituales de Laravel, `pdo_mysql` y, para las pruebas, `pdo_sqlite`.
+```bash
+cd /opt/lampp/htdocs
+git clone --branch local-xampp-antix https://github.com/JIMMY1012102/rsu-simulador-cni.git rsu-simulador-cni
+cd rsu-simulador-cni
+```
+
+Si descargaste el ZIP, entra en la carpeta que contiene `artisan`.
+
+### 3. Instalar dependencias y preparar Laravel
+
+Desde la raíz del proyecto:
 
 ```bash
 composer install
 cp .env.example .env
 php artisan key:generate
+npm install
+npm run build
+php artisan storage:link
 ```
 
-Configura la conexión local en `.env`. No publiques ese archivo ni contraseñas.
+Si `composer` no encuentra PHP, ejecuta Composer con el PHP de XAMPP o añade `/opt/lampp/bin` al PATH. Comprueba que el PHP usado por Composer tenga habilitadas las extensiones `pdo_mysql`, `mbstring`, `openssl`, `fileinfo`, `curl`, `xml` y `tokenizer`.
+
+### 4. Crear la base de datos local
+
+Entra a `http://localhost/phpmyadmin`, inicia sesión y crea una base de datos llamada:
+
+`rsu_cni_local`
+
+En el archivo `.env` configura la conexión de XAMPP. En una instalación XAMPP nueva, el usuario suele ser `root` y la contraseña suele estar vacía; si configuraste una contraseña, coloca la tuya solo en tu archivo local:
 
 ```dotenv
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost/rsu-cni
+
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=simulador_cni_validacion
-DB_USERNAME=cni_dev
-DB_PASSWORD=TU_CONTRASEÑA_LOCAL
+DB_DATABASE=rsu_cni_local
+DB_USERNAME=root
+DB_PASSWORD=
+
 SESSION_DRIVER=file
+CACHE_STORE=file
+QUEUE_CONNECTION=sync
 ```
 
-**Base nueva y vacía:** revisar primero las migraciones y luego ejecutar `php artisan migrate`. Los seeders existentes crean cuentas de demostración con contraseña conocida; úsalos solo en una base local de prueba. No se ejecutan automáticamente.
-
-**Base con el SQL importado:** no ejecutar `migrate`, `migrate:fresh` ni volver a importar `base-de-datos.sql` sin acordar la sincronización del historial de migraciones. `migrate:fresh` elimina tablas. La adaptación KISS no modifica ni elimina datos ni migraciones existentes; la antigua tabla de tokens se conserva por compatibilidad histórica, pero ya no se usa para autenticar.
-
-```bash
-php artisan route:list
-php artisan serve
-```
-
-Abre `http://127.0.0.1:8000/login`. No se necesita `npm run dev` para el login y el panel inicial: CSS local y recursos de Livewire se sirven desde Laravel.
-
-## Uso de respuestas JSON desde el mismo navegador
-
-Primero ingresa por `/login`. Para llamadas `fetch`, envía `Accept: application/json`; en POST/PUT/DELETE añade `X-CSRF-TOKEN` con el valor de la etiqueta `meta[name="csrf-token"]`. No guardes un token Bearer ni contraseñas en localStorage. Las solicitudes sin sesión reciben 401; las escrituras sin CSRF reciben 419. Desde Blade/Livewire se recomienda usar formularios y acciones en lugar de hacer solicitudes HTTP internas a la propia aplicación.
-
-## Verificación
-
-```bash
-composer validate --strict
-php artisan view:cache
-php artisan test
-```
-
-`phpunit.xml` selecciona SQLite en memoria, caché y sesiones de prueba. No uses la base MariaDB compartida para ejecutar tests. El workflow de GitHub repite instalación, validación, compilación de vistas y pruebas.
-
-Los cambios se proponen mediante Pull Request a `develop`; no se modifica `main` directamente.
-
-## Recorrido del simulacro
-
-`php artisan test --filter=RecorridoSimulacroTest` comprueba el recorrido usando SQLite en memoria. El inicio asigna preguntas, la finalización califica y los resultados se consultan con la misma sesión web. No requiere nuevas migraciones ni seeders.
-
-El cierre de intentos vencidos está definido cada minuto en Laravel Scheduler; al desplegar hay que activar el scheduler. En desarrollo puede mantenerse `php artisan schedule:work` en otra terminal. Las preguntas y configuraciones ya usadas no se editan; se crean nuevas versiones para proteger los intentos existentes.
-
-## Banco de preguntas desde Excel
-
-El banco del colegio (`Banco_preguntas_completo.xlsx`, hoja «Banco de preguntas») se carga con:
+**Base vacía:** revisa las migraciones disponibles y luego ejecuta:
 
 ```bash
 php artisan migrate
-php artisan storage:link
-php artisan banco:importar "C:\ruta\Banco_preguntas_completo.xlsx" --simulacros
 ```
 
-- Cada pregunta se identifica por su código (`AM_1`, `LE_12`…), así que el comando se puede repetir cada vez que se actualice el Excel sin duplicar nada.
-- Cada curso (Álgebra, Física, Lenguaje…) queda como asignatura propia, para poder sortear por curso.
-- Las imágenes de preguntas y alternativas se guardan en `storage/app/public/banco` y el examen las muestra desde `/storage/banco/…`.
-- La columna «Respuesta correcta» se guarda en `alternativas.es_correcta`; el examen nunca la envía al navegador.
-- Las preguntas del Excel que aún no tienen respuesta también salen en el examen, pero no suman ni restan puntos hasta completar su respuesta y volver a importar.
-- `--simulacros` crea o actualiza «Simulacro CNI · Área A» … «Área E»: 100 preguntas cada uno, 180 minutos, con la distribución por curso de `ImportarBancoExcel::DISTRIBUCION` (20 de Habilidades comunes y el resto según el área).
-- Para probar cada área en local: `php artisan db:seed --class=EstudiantesPorAreaDemoSeeder` crea `estudiante_a_demo` … `estudiante_e_demo`.
-- El Excel no se sube al repositorio: el repositorio es público y el archivo contiene las respuestas.
+**Si vas a importar una base SQL existente:** impórtala en `rsu_cni_local` y no ejecutes `migrate:fresh`. Antes de ejecutar `migrate`, revisa el historial de migraciones con `php artisan migrate:status`; no mezcles una importación SQL con migraciones sin verificar su correspondencia. Haz siempre una copia de seguridad antes de modificar una base importada.
 
-## Nuevo flujo del estudiante: despliegue seguro (PR #18)
+### 5. Configurar Apache para abrir localhost/rsu-cni
 
-El flujo de primera elección de cinco áreas, panel personalizado y exámenes por área ya está integrado en el código, pero **permanece apagado por defecto** al integrarse en `develop`:
+Por seguridad, Apache debe publicar **solo la carpeta `public`** de Laravel, nunca la raíz del proyecto. Crea el archivo de configuración de alias de XAMPP:
 
-```dotenv
-CNI_ALUMNO_AREAS_ENABLED=false
+`/opt/lampp/etc/extra/httpd-rsu-cni.conf`
+
+Con este contenido (ajusta la ruta si guardaste el proyecto en otro lugar):
+
+```apache
+Alias /rsu-cni "/opt/lampp/htdocs/rsu-simulador-cni/public"
+
+<Directory "/opt/lampp/htdocs/rsu-simulador-cni/public">
+    Options FollowSymLinks
+    AllowOverride All
+    Require all granted
+</Directory>
 ```
 
-Así, las instalaciones que todavía utilizan el esquema o catálogo anterior mantienen el login y `/panel` clásicos. Las rutas nuevas devuelven 404 mientras esté desactivado. No se han cambiado las reglas de login del docente.
+Luego abre `/opt/lampp/etc/httpd.conf` y agrega al final:
 
-Antes de activar, **en copia de desarrollo con respaldo**:
-
-1. `php artisan migrate:status` y `php artisan cni:auditar-areas`; si hay códigos distintos de A-E, detenerse y acordar la migración de datos. El catálogo legado de cuatro áreas NO debe transformarse automáticamente.
-2. Una vez corregido el catálogo sin pérdida de relaciones históricas, aplicar la nueva migración `usuarios.area_postulacion_id` con `php artisan migrate --force`. Si la base se creó desde un SQL importado, sincronizar cuidadosamente el historial de migraciones antes de usar `migrate` (ver advertencia anterior).
-3. Cargar y aprobar los exámenes reales con asociaciones en `area_postulacion_simulacro` y cuotas de preguntas en `simulacro_area`. Los cinco exámenes demo no son oficiales.
-4. Validar en navegador el ingreso de alumno nuevo, selección única, panel, examen, resultados y un segundo inicio de sesión. Probar docentes y administradores también.
-5. **Solo entonces** modificar la configuración local de esa instalación a `CNI_ALUMNO_AREAS_ENABLED=true` y aplicar `php artisan config:clear` (o regenerar config cache según despliegue). Si se detecta un problema, regresar a `false` y limpiar caché: no cambia ni elimina registros por sí solo.
-
-GitHub Actions ejecuta la suite completa tanto en SQLite como en MariaDB 11.4 **temporales**. Una CI verde prueba el código, no el estado de la MariaDB del equipo. Consultar `docs/validacion-mariadb-areas.md`.
-
-
-## Despliegue manual en Oracle Cloud
-
-Consulta docs/despliegue-oracle.md para configurar el despliegue manual de OFICIAL#1 con GitHub Actions. Requiere secrets SSH de la VM; el .env y la base de datos permanecen en el servidor.
-
-## Asistentes con IA
-
-Se integran tres asistentes independientes: estudiante y superadministrador (`usuarios.rol = 'admin'`) usan el agente Python con herramientas MCP de solo lectura; el docente usa Davis en Laravel, que llama directamente a Gemini y consulta resultados agregados de su sección autenticada.
-
-### Asistente docente y dataset de demostración
-
-Davis está disponible en `/docente` para cuentas docentes activas. Usa `GEMINI_API_KEY`, `GEMINI_MODEL` y `GEMINI_API_URL` del `.env` de Laravel; no requiere el proceso Python del agente estudiantil/admin.
-
-Los resultados ficticios se cargan bajo demanda:
-
-```powershell
-php artisan db:seed --class="Database\Seeders\DocenteResultadosDemoSeeder"
+```apache
+Include etc/extra/httpd-rsu-cni.conf
 ```
 
-El seeder no forma parte de `DatabaseSeeder`. En `local` o `testing` solo permite bases MySQL/MariaDB locales. En nube exige `CNI_DOCENTE_DEMO_SEED_ENABLED=true` y que `CNI_DOCENTE_DEMO_DATABASE` coincida exactamente con el nombre de la base configurada. Úsalo únicamente en una base aislada de demostración, nunca junto a calificaciones reales.
-### Orden de encendido
+Verifica que `mod_rewrite` esté habilitado (la línea `LoadModule rewrite_module modules/mod_rewrite.so` no debe tener `#) y que `AllowOverride All` esté permitido en el bloque anterior. Reinicia Apache:
 
-1. En XAMPP, inicia **Apache y MySQL**.
-2. Copia `agente/.env.example` a `agente/.env` y configura DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, GEMINI_API_KEY, MODELO y AGENTE_TOKEN. En el `.env` de Laravel activa `ASISTENTE_ENABLED=true` y define el mismo secreto en `ASISTENTE_TOKEN`. No subas ningún `.env`.
-3. Desde la carpeta `agente`, crea y activa un entorno virtual, instala `pip install -r requirements.txt` y ejecuta `uvicorn agente:app --port 8001`. **No uses `--reload`.**
-4. Abre la aplicación e inicia sesión como estudiante o admin.
+```bash
+sudo /opt/lampp/lampp restartapache
+```
 
-Crea manualmente el usuario MariaDB de solo lectura con `agente/crear_usuario_solo_lectura.sql`, sustituyendo el nombre de la base de datos y configurando una contraseña segura. No concedas permisos de escritura ni acceso a `usuarios.password`.
+Abre:
 
-El portal del alumno y el panel administrativo requieren los flags `CNI_ALUMNO_AREAS_ENABLED=true` y `CNI_ADMIN_ACADEMICO_ENABLED=true`; sin ellos esas secciones no abren.
+**http://localhost/rsu-cni**
 
-**Advertencia:** utiliza únicamente datos de demostración. No realices demostraciones con datos personales ni credenciales reales de estudiantes.
+Si Apache no inicia, revisa `/opt/lampp/logs/error_log` y corrige la ruta del alias o la línea `Include`.
+
+### 6. Comprobación rápida
+
+```bash
+php artisan optimize:clear
+php artisan about
+php artisan route:list
+```
+
+Inicia sesión con una cuenta que exista en la base de datos que importaste o preparaste. No se crean usuarios reales automáticamente.
+
+## Funciones que requieren configuración adicional
+
+- **Davis (asistente docente):** requiere una clave válida en `GEMINI_API_KEY` dentro de `.env`. La clave no se incluye en Git.
+- **Asistente de estudiante/administrador:** es un servicio Python separado; consulta la documentación de `agente/`. No es necesario para abrir el portal Laravel.
+- Los flags `CNI_ALUMNO_AREAS_ENABLED` y `CNI_ADMIN_ACADEMICO_ENABLED` permanecen desactivados por defecto. Actívalos solo después de verificar que la base local tiene el esquema y los datos requeridos.
+- Los seeders de demostración son opcionales. No los ejecutes sobre datos reales.
+
+## Pruebas
+
+```bash
+composer validate --strict
+php artisan test
+```
+
+Las pruebas usan SQLite en memoria mediante `phpunit.xml`; no deberían modificar tu MariaDB local.
+
+## Despliegue en Oracle
+
+La rama `OFICIAL#1` y sus procedimientos de Oracle no se modifican con esta rama. Consulta `docs/despliegue-oracle.md` para el despliegue del servidor.
