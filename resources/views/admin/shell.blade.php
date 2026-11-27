@@ -55,6 +55,9 @@
         </main>
     </div>
 </div>
+@if (config('asistente.enabled') && auth('web')->check() && auth('web')->user()->rol === 'admin')
+    <x-asistente-chat />
+@endif
 <script>
 (() => {
     const workspace = document.querySelector('.cni-workspace');
