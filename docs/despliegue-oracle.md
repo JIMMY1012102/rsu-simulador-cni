@@ -88,3 +88,24 @@ php artisan tinker --execute="dump(['gemini_key_configured' => filled(config('se
 ```
 
 El valor gemini_key_configured debe ser true. Luego inicia sesión con una cuenta docente activa y prueba una consulta breve en /docente. Si falla, revisa storage/logs/laravel.log sin compartir claves ni datos sensibles.
+
+
+## Modelos alternativos de Davis
+
+Davis intenta primero el modelo indicado por GEMINI_MODEL. Si Google devuelve un error transitorio (408, 429, 500, 502, 503 o 504), un error de conexión o indica que el modelo solicitado no existe (404 relacionado con el modelo), prueba los modelos siguientes en orden. Los errores de autenticación (401/403) y de solicitud (400) no generan reintentos, porque cambiar de modelo no corrige esos problemas.
+
+La configuración por defecto es:
+
+```dotenv
+GEMINI_MODEL=gemini-3.8-flash
+GEMINI_FALLBACK_MODELS=gemini-4-hydrogen,gemini-3.5-flash-lite
+```
+
+GEMINI_FALLBACK_MODELS es opcional y acepta IDs separados por comas. Si no se define en .env, Laravel utiliza los dos respaldos predeterminados de config/services.php. Después de modificar .env, ejecuta:
+
+```bash
+php artisan config:clear
+php artisan config:cache
+```
+
+Davis registra en laravel.log el modelo que falla y el modelo que finalmente responde, sin registrar la API key ni el contenido de la consulta.
