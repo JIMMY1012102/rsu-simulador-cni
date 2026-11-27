@@ -18,10 +18,7 @@ class DatabaseSeeder extends Seeder
 
         // Los cuatro docentes ficticios existen solo para desarrollo y pruebas.
         if (app()->environment(['local', 'testing'])) {
-            $this->call([
-                DocentesSeccionDemoSeeder::class,
-                AlumnosSimulacroCincoDemoSeeder::class,
-            ]);
+            $this->call(DocentesSeccionDemoSeeder::class);
         }
     }
 }
