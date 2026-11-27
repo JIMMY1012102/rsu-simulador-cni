@@ -36,6 +36,11 @@ Se conserva el asistente admin existente y sus cinco herramientas: `resumen_gene
 
 ## Asistente docente
 
+| Responsable | Rol |
+|---|---|
+| Nía | Elaboración del asistente Davis (integración con Gemini, instrucciones y diseño del chat). |
+| Jimmy | Administración del servidor Oracle: despliegue y configuración de `GEMINI_API_KEY`. |
+
 Davis está integrado en el panel Laravel del docente (`/docente`) y llama directamente a Gemini. La sesión autenticada fija la identidad y la sección; el servicio envía totales, promedios y resultados agregados por área, sin nombres ni contraseñas. Si faltan datos, debe indicar esa limitación y ofrecer orientación pedagógica general.
 
 El dataset `DEMO FICTICIO - Muestra de resultados docentes` se carga explícitamente con `DocenteResultadosDemoSeeder`; no se ejecuta desde `DatabaseSeeder`. En ambientes no locales requiere una bandera explícita y el nombre exacto de una base demo. No lo cargues en una base con resultados reales.

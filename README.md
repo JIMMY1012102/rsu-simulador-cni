@@ -129,6 +129,8 @@ Se integran tres asistentes independientes: estudiante y superadministrador (`us
 
 ### Asistente docente y dataset de demostración
 
+Responsables: **Nía** elaboró el asistente Davis (Gemini) y **Jimmy** administra el servidor Oracle donde se despliega.
+
 Davis está disponible en `/docente` para cuentas docentes activas. Usa `GEMINI_API_KEY`, `GEMINI_MODEL` y `GEMINI_API_URL` del `.env` de Laravel; no requiere el proceso Python del agente estudiantil/admin.
 
 Los resultados ficticios se cargan bajo demanda:
