@@ -68,6 +68,12 @@ def estudiante():
 def admin():
     if ROL != "admin" or not USUARIO_ID.isdigit() or int(USUARIO_ID) < 1:
         raise PermissionError("Rol o identidad de administrador no autorizados.")
+    identidad = json.loads(consultar(
+        "SELECT usuario FROM usuarios WHERE id=%s AND rol='admin' LIMIT 1",
+        (int(USUARIO_ID),),
+    ))
+    if not identidad or identidad[0].get("usuario") != "Super_Admin":
+        raise PermissionError("Las herramientas de superadministración requieren la cuenta Super_Admin.")
 
 
 if ROL == "estudiante":
@@ -473,7 +479,7 @@ elif ROL == "admin":
             """SELECT s.id,s.nombre,s.fecha_inicio,s.fecha_fin,s.activo,s.total_preguntas,
                       s.tiempo_limite,s.carrera_id,c.nombre carrera,
                       COUNT(DISTINCT aps.area_postulacion_id) areas_postulacion,
-                      COALESCE(SUM(DISTINCT sa.cantidad_preguntas),0) preguntas_configuradas,
+                      COALESCE((SELECT SUM(sa2.cantidad_preguntas) FROM simulacro_area sa2 WHERE sa2.simulacro_id=s.id),0) preguntas_configuradas,
                       COUNT(DISTINCT i.id) intentos,
                       COUNT(DISTINCT CASE WHEN i.estado IN ('finalizado','enviado_auto')
                            AND i.puntaje_total IS NOT NULL THEN i.id END) intentos_calificados,
