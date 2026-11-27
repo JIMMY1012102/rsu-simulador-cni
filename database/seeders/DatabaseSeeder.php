@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
             AreaPostulacionSeeder::class,
             CarreraSeeder::class,
             UsuarioSeeder::class,
+            AlumnosSimulacroCincoDemoSeeder::class,
         ]);
 
         // Los cuatro docentes ficticios existen solo para desarrollo y pruebas.
