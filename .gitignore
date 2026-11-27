@@ -39,3 +39,9 @@ Homestead.json
 agente/.env
 agente/.venv/
 __pycache__/
+
+# Respaldos locales de bases de datos (no subir datos reales a Git)
+/database/backups/*
+!/database/backups/.gitkeep
+/backups/*
+!/backups/.gitkeep
