@@ -94,7 +94,7 @@ Proyecto: $PROJECT_DIR
 URL: $URL
 
 Siguiente paso:
-1. Abre $URL/phpmyadmin? No: abre http://localhost/phpmyadmin
+1. Abre http://localhost/phpmyadmin
 2. Crea una base de datos llamada rsu_cni_local.
 3. Revisa .env (DB_DATABASE, DB_USERNAME y DB_PASSWORD).
 4. Importa tu SQL de respaldo o, si la base está vacía y corresponde a este esquema, ejecuta: php artisan migrate
