@@ -28,9 +28,14 @@ Homestead.json
 .env.backup
 .env.production
 .phpactor.json
-auth.json
+/auth.json
 
 # Archivos locales adicionales
 /database/*.sqlite
 /.idea/
 /.vscode/
+
+# Entorno local del agente IA
+agente/.env
+agente/.venv/
+__pycache__/
