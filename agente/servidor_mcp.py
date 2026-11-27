@@ -28,7 +28,7 @@ def consultar(sql, params=()):
         return json.dumps(normalizar(rows), ensure_ascii=False)
     finally: cnx.close()
 
-def limite(n): return max(1, min(int(n), 20))
+def acotar_limite(n): return max(1, min(int(n), 20))
 def estudiante():
     if ROL != "estudiante" or not USUARIO_ID.isdigit(): raise PermissionError("Rol no autorizado.")
 def admin():
@@ -36,12 +36,12 @@ def admin():
 
 if ROL == "estudiante":
     @mcp.tool(description="Úsala para consultar resultados, puntajes, aciertos y errores recientes del estudiante autenticado.")
-    def mis_ultimos_resultados(limite_resultados: int = 5) -> str:
+    def mis_ultimos_resultados(limite: int = 5) -> str:
         estudiante()
         return consultar("""SELECT i.tipo,i.fecha_inicio,i.fecha_fin,i.puntaje_total,i.correctas,i.incorrectas,i.en_blanco,s.nombre AS simulacro
         FROM intentos i LEFT JOIN simulacros s ON s.id=i.simulacro_id
         WHERE i.usuario_id=%s AND i.estado IN ('finalizado','enviado_auto') AND i.puntaje_total IS NOT NULL
-        ORDER BY COALESCE(i.fecha_fin,i.fecha_inicio) DESC LIMIT %s""",(int(USUARIO_ID),limite(limite_resultados)))
+        ORDER BY COALESCE(i.fecha_fin,i.fecha_inicio) DESC LIMIT %s""",(int(USUARIO_ID),acotar_limite(limite)))
 
     @mcp.tool(description="Úsala cuando pregunte por su rendimiento o promedio por área; ordena desde el área de menor porcentaje.")
     def mi_rendimiento_por_area() -> str:
@@ -107,7 +107,7 @@ elif ROL == "admin":
         ON ult.usuario_id=u.id WHERE se.activo=1 GROUP BY se.id,se.nombre,se.grado ORDER BY puntaje_promedio LIMIT 100""")
 
     @mcp.tool(description="Úsala para identificar preguntas con menor porcentaje de acierto; solo incluye preguntas con cinco o más respuestas calificadas.")
-    def preguntas_mas_falladas(limite_resultados: int = 10) -> str:
+    def preguntas_mas_falladas(limite: int = 10) -> str:
         admin()
         return consultar("""SELECT p.id,LEFT(p.enunciado,120) enunciado,a.nombre area,t.nombre tema,COUNT(*) respuestas,
         SUM(CASE WHEN re.estado_respuesta='correcta' THEN 1 ELSE 0 END) aciertos,
