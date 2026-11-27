@@ -1,31 +1,56 @@
-# Despliegue manual en Oracle Cloud
+# Despliegue manual de Davis en Oracle Cloud
 
-El repositorio no publica cambios automaticamente al hacer git push. Este workflow permite desplegar manualmente la rama OFICIAL#1 mediante SSH. No copia .env ni storage y no borra archivos del servidor.
+Davis es un servicio Laravel: no necesita levantar el agente Python/MCP ni abrir el puerto 8001. No requiere migraciones de base de datos.
 
-## Requisitos del servidor
+## Requisitos
 
-- VM Linux con SSH accesible desde GitHub Actions.
-- PHP 8.2 o superior, Composer y un directorio de aplicacion ya creado.
-- .env existente en el servidor, con APP_ENV=production, APP_DEBUG=false, APP_URL, conexion a la base existente y GEMINI_API_KEY configurada.
-- El usuario SSH debe poder escribir el directorio y ejecutar PHP/Composer.
-- El servidor debe tener rsync. La huella SSH se registra de forma verificada en known_hosts.
-- La base de datos debe tener respaldo antes de aplicar migraciones.
+- PHP 8.2 o superior, Composer y extensiones requeridas por Laravel.
+- .env existente en el servidor y permisos de escritura en storage y bootstrap/cache.
+- Una clave de Gemini AI Studio con acceso a Gemini Developer API.
+- El servidor debe poder realizar conexiones HTTPS salientes a generativelanguage.googleapis.com.
 
-## Secrets de GitHub
+## Configuración de Gemini en Oracle
 
-En Settings > Secrets and variables > Actions, crea estos repository secrets:
+En el archivo .env del servidor (nunca subirlo a Git ni compartir su contenido), verifica que existan estas variables:
 
-- ORACLE_DEPLOY_HOST: host SSH de la VM (no la URL publica si SSH usa otra direccion).
-- ORACLE_DEPLOY_USER: usuario SSH.
-- ORACLE_DEPLOY_KEY: clave privada SSH de despliegue; no compartirla en el chat.
-- ORACLE_DEPLOY_KNOWN_HOSTS: entrada known_hosts con la huella SSH verificada por el administrador.
-- ORACLE_APP_PATH: ruta absoluta a la raiz Laravel; el directorio debe existir y conservar su .env y storage.
+```dotenv
+GEMINI_API_KEY=TU_CLAVE_REAL
+GEMINI_MODEL=gemini-3.8-flash
+GEMINI_API_URL=https://generativelanguage.googleapis.com/v1beta
+```
 
-## Ejecutar el despliegue
+Conserva la clave real que ya tengas configurada. Si el proyecto usa otra variable para los otros asistentes, Davis no la detectará automáticamente: su nombre esperado es GEMINI_API_KEY. No es necesario copiar ni mostrar el valor de la clave.
 
-1. Abre Actions > Deploy to Oracle server > Run workflow.
-2. Selecciona la rama OFICIAL#1.
-3. Deja run_migrations y seed_demo_data desactivados salvo que se haya revisado el cambio y respaldado la base.
-4. Para una base demo aislada, seed_demo_data requiere ademas en el .env remoto CNI_DOCENTE_DEMO_SEED_ENABLED=true y CNI_DOCENTE_DEMO_DATABASE igual al nombre exacto de esa base. El usuario docente_demo debe existir y estar asignado a una seccion demo. No ejecutar con calificaciones reales.
+## Actualizar manualmente desde GitHub
 
-El workflow solo se inicia manualmente en OFICIAL#1; no corre automaticamente en cada push. Al terminar, probar /docente con una cuenta docente activa.
+Antes de actualizar, revisa git status --short. No uses reset --hard, git clean ni descartes modificaciones locales. Si hay cambios locales en archivos que GitHub también modificó, resuélvelos antes del pull.
+
+Desde la raíz del proyecto:
+
+```bash
+git fetch origin
+git status --short
+git pull --ff-only origin 'OFICIAL#1'
+composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader
+php artisan optimize:clear
+php artisan config:cache
+php artisan view:cache
+```
+
+No ejecutes php artisan migrate para Davis: esta integración no incorpora migraciones. Tampoco ejecutes seeders de demostración en la base real.
+
+## Comprobaciones sin revelar secretos
+
+Comprueba que Laravel puede leer la configuración sin imprimir la clave:
+
+```bash
+php artisan tinker --execute="dump(['gemini_key_configured' => filled(config('services.gemini.key')), 'gemini_model' => config('services.gemini.model'), 'gemini_url' => config('services.gemini.url')]);"
+```
+
+El resultado esperado es gemini_key_configured => true, el modelo configurado y la URL de Google. Si acabas de editar .env, ejecuta antes php artisan config:clear y vuelve a generar la caché.
+
+Después inicia sesión con una cuenta docente activa y prueba una consulta breve en /docente. Si falla, revisa storage/logs/laravel.log; no publiques la clave ni registros que puedan contenerla.
+
+## Despliegue automatizado opcional
+
+El workflow Deploy to Oracle server sigue siendo manual y requiere configurar previamente los cinco secrets SSH indicados en GitHub Actions. No es necesario usarlo si actualizas con SSH y git pull.
