@@ -1,100 +1,90 @@
 # RSU-CNI — Simulador CNI
 
-Aplicación web académica construida con **Laravel 12, Livewire 3 y MariaDB**.
+Aplicación Laravel 12 + Livewire 3 + MariaDB. Esta rama prepara una instalación local en **antiX Linux + XAMPP** y publica el portal en `http://localhost/rsu-cni`. No modifica `OFICIAL#1`.
 
-Esta rama, `local-xampp-antix`, está preparada para instalar una copia de desarrollo en **antiX Linux + XAMPP** y abrirla en `http://localhost/rsu-cni`. La rama `OFICIAL#1` no se modifica.
+## Instalación rápida con el respaldo descargado de Oracle
 
-## Instalación rápida: antiX Linux + XAMPP
+### 1. Descarga y coloca el respaldo
 
-### 1. Requisitos
-
-- XAMPP para Linux (por defecto, `/opt/lampp`).
-- PHP 8.2+ con extensiones Laravel y `pdo_mysql`.
-- Composer 2, Node.js y npm.
-- Git (solo si clonas el repositorio).
-
-Inicia XAMPP:
+Descarga el proyecto ZIP de esta rama y descomprímelo en:
 
 ```bash
+/opt/lampp/htdocs/rsu-simulador-cni
+```
+
+Copia el respaldo SQL descargado de Oracle (por ejemplo `respaldo-oracle.sql` o `respaldo-oracle.sql.gz`) a una de estas ubicaciones para que el instalador lo detecte:
+- `database/backups/` dentro del proyecto;
+- carpeta `Descargas` o `Downloads` del usuario;
+- raíz del proyecto con el nombre `respaldo-oracle.sql`.
+
+No subas el respaldo a GitHub: puede contener datos personales. Si tienes varios SQL, indica cuál quieres importar como argumento.
+
+### 2. Ejecuta el instalador
+
+```bash
+cd /opt/lampp/htdocs/rsu-simulador-cni
 sudo /opt/lampp/lampp start
-```
-
-### 2. Descargar esta rama
-
-```bash
-cd /opt/lampp/htdocs
-git clone --branch local-xampp-antix https://github.com/JIMMY1012102/rsu-simulador-cni.git rsu-simulador-cni
-cd rsu-simulador-cni
-```
-
-También puedes descargar el ZIP de la rama desde GitHub y descomprimirlo en `/opt/lampp/htdocs/rsu-simulador-cni`.
-
-### 3. Colocar el respaldo descargado de Oracle
-
-Copia el respaldo completo de la base de datos (archivo `.sql` o `.sql.gz`) en:
-
-```text
-database/backups/
-```
-
-Puedes crear esa carpeta si no existe. No uses `base-de-datos.sql`: es un esquema inicial antiguo incluido como referencia, no el respaldo actual de Oracle. El respaldo debe contener tanto la estructura como los datos (tablas, registros y, si corresponde, la tabla `migrations`).
-
-Si guardaste el archivo en otra ubicación, puedes pasar su ruta al instalador (ver abajo).
-
-### 4. Ejecutar un solo instalador
-
-Desde la carpeta del proyecto:
-
-```bash
 bash scripts/preparar-xampp-antix.sh
 ```
 
+Si el SQL está en otra ruta:
+
+```bash
+bash scripts/preparar-xampp-antix.sh "$HOME/Descargas/mi-respaldo-oracle.sql"
+```
+
+También acepta archivos `.sql.gz`.
+
 El instalador:
-- instala dependencias de Composer y npm;
-- crea `.env` solo si no existe y genera `APP_KEY` si está vacía;
-- detecta un único respaldo `.sql` o `.sql.gz` en `database/backups/`, `backups/` o la raíz del proyecto;
-- crea la base local, importa el respaldo y ajusta `DB_DATABASE` si el dump declara otro nombre de esquema;
-- compila CSS/JavaScript y prepara `public/storage`;
-- configura Apache para publicar únicamente `public/` en `/rsu-cni`, valida la configuración y reinicia Apache.
+- instala Composer y npm dependencies, genera `APP_KEY` si falta y compila frontend;
+- lee la conexión MariaDB desde `.env`, crea la base configurada si no existe;
+- detecta el respaldo SQL, comprueba que la base destino esté vacía e importa los datos;
+- elimina del flujo de importación las líneas iniciales `CREATE DATABASE`/`USE` para dirigir el dump a la base local configurada;
+- ejecuta `php artisan migrate --force` para aplicar migraciones pendientes;
+- configura Apache para exponer únicamente `public/` en `/rsu-cni` y reinicia Apache.
 
-Si el respaldo está en otra ruta:
+### 3. Configuración de base de datos
 
-```bash
-bash scripts/preparar-xampp-antix.sh /ruta/al/respaldo-oracle.sql
+El `.env.example` usa estos valores por defecto para XAMPP:
+
+```dotenv
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost/rsu-cni
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=rsu_cni_local
+DB_USERNAME=root
+DB_PASSWORD=
 ```
 
-No sobrescribe un `.env` existente. Revisa en él `DB_HOST`, `DB_PORT`, `DB_USERNAME` y `DB_PASSWORD`; en una instalación XAMPP nueva suele ser `root` sin contraseña. Si XAMPP está en otra carpeta, puedes indicar ambas opciones:
+Si tu MariaDB local tiene otra contraseña, cambia `.env` antes de ejecutar el instalador.
 
-```bash
-XAMPP_DIR=/ruta/xampp bash scripts/preparar-xampp-antix.sh /ruta/respaldo.sql
-```
+**Protección de datos:** si `rsu_cni_local` ya contiene tablas, el instalador se detiene y no importa encima. Cambia `DB_DATABASE` a un nombre nuevo/vacío o respalda y prepara la base por separado. No se ejecuta `migrate:fresh`, ni se borran tablas.
 
-**Protección de datos:** el importador se detiene si la base de destino ya contiene tablas. No elimina bases, no ejecuta `migrate:fresh` ni sobrescribe una importación previa. Si encuentra varios respaldos, te pide indicar la ruta exacta. Si no encuentra ninguno, termina la preparación web y te indica dónde copiar el dump.
+### 4. Abre el portal
 
-### 5. Abrir la aplicación
+[http://localhost/rsu-cni](http://localhost/rsu-cni)
 
-**http://localhost/rsu-cni**
+Inicia sesión con una cuenta que exista en el respaldo Oracle. El instalador no crea usuarios ficticios.
 
-Inicia sesión con una cuenta que exista en el respaldo de Oracle. El instalador no crea usuarios ni cambia contraseñas.
+## Requisitos
 
-Si Apache no inicia, revisa `/opt/lampp/logs/error_log`. El script guarda una copia inicial de `httpd.conf` en `httpd.conf.backup-rsu-cni` antes de agregar el Include. Para quitar la integración, elimina la línea `Include etc/extra/httpd-rsu-cni.conf` de `httpd.conf` y el archivo `etc/extra/httpd-rsu-cni.conf`, y reinicia Apache.
+- XAMPP para Linux en `/opt/lampp` (o define `XAMPP_DIR`).
+- PHP 8.2+ y extensiones `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `ctype`, `json`, `fileinfo`, `curl`.
+- Composer 2, Node.js y npm.
 
-## Configuración adicional opcional
+## Servicios opcionales
 
-- **Davis (asistente docente):** requiere una clave válida en `GEMINI_API_KEY` dentro de `.env`. La clave no se incluye en Git.
-- **Asistente de estudiante/administrador:** es un servicio Python separado; consulta la documentación de `agente/`. No es necesario para abrir el portal Laravel.
-- `CNI_ALUMNO_AREAS_ENABLED` y `CNI_ADMIN_ACADEMICO_ENABLED` permanecen desactivados por defecto. Actívalos solo después de verificar que la base local tiene el esquema y los datos requeridos.
-- Los seeders de demostración son opcionales. No los ejecutes sobre datos reales.
+- Davis requiere `GEMINI_API_KEY` en `.env`; no se incluye ninguna clave.
+- El agente Python/FastAPI es independiente y no es necesario para abrir el portal Laravel.
+- Los módulos experimentales permanecen desactivados por defecto; habilítalos solo si la base importada contiene sus tablas y datos.
 
-## Pruebas
+## Problemas frecuentes
 
-```bash
-composer validate --strict
-php artisan test
-```
+- Apache: revisa `/opt/lampp/logs/error_log`.
+- MariaDB: confirma que XAMPP esté iniciado y que `DB_HOST`, `DB_PORT`, `DB_USERNAME` y `DB_PASSWORD` coincidan con tu instalación.
+- Si el importador indica que la base no está vacía, no borres las tablas a ciegas: usa una base local nueva.
+- Para un respaldo grande, asegúrate de tener espacio libre y no cierres la terminal durante la importación.
 
-Las pruebas usan SQLite en memoria mediante `phpunit.xml`; no deberían modificar tu MariaDB local.
-
-## Oracle
-
-Esta rama es para desarrollo local y no reemplaza `OFICIAL#1`. Consulta `docs/despliegue-oracle.md` para el despliegue de Oracle.
