@@ -13,8 +13,9 @@ from pydantic import BaseModel, Field
 load_dotenv(Path(__file__).with_name(".env"))
 app=FastAPI(title="Agente IA CNI")
 historiales={}
-MODELO=os.getenv("MODELO") or "gemini-2.5-flash"
-MODELO_FALLBACK=os.getenv("MODELO_FALLBACK") or "gemini-3.8-flash"
+MODELO=os.getenv("MODELO") or "gemini-3.5-flash-lite"
+MODELO_FALLBACK=os.getenv("MODELO_FALLBACK")
+MODELOS_RESPALDO=os.getenv("MODELOS_RESPALDO")
 ERRORES_TRANSITORIOS={429, 500, 502, 503, 504}
 
 class Solicitud(BaseModel):
@@ -28,22 +29,40 @@ def recortar(historial):
     while datos and datos[0]["role"]!="user": datos.pop(0)
     return datos
 
+def obtener_modelos_respaldo():
+    if MODELOS_RESPALDO is not None:
+        candidatos=MODELOS_RESPALDO.split(",")
+    elif MODELO_FALLBACK:
+        candidatos=[MODELO_FALLBACK]
+    else:
+        candidatos=["gemini-3.6-flash","gemini-3.5-flash"]
+    modelos=[]
+    for candidato in candidatos:
+        nombre=candidato.strip()
+        if nombre and nombre not in modelos and nombre != MODELO:
+            modelos.append(nombre)
+    return modelos
+
 def generar_con_respaldo(cliente, contenido, configuracion):
-    try:
-        return cliente.models.generate_content(
-            model=MODELO, contents=contenido, config=configuracion
-        )
-    except errors.APIError as error:
-        if error.code not in ERRORES_TRANSITORIOS or MODELO_FALLBACK == MODELO:
-            raise
-        print(
-            f"Gemini modelo principal no disponible (HTTP {error.code}); "
-            f"probando modelo de respaldo {MODELO_FALLBACK}.",
-            flush=True,
-        )
-        return cliente.models.generate_content(
-            model=MODELO_FALLBACK, contents=contenido, config=configuracion
-        )
+    modelos=[MODELO]+obtener_modelos_respaldo()
+    ultimo_error=None
+    for indice, modelo in enumerate(modelos):
+        try:
+            return cliente.models.generate_content(
+                model=modelo, contents=contenido, config=configuracion
+            )
+        except errors.APIError as error:
+            if error.code not in ERRORES_TRANSITORIOS:
+                raise
+            ultimo_error=error
+            if indice < len(modelos)-1:
+                siguiente=modelos[indice+1]
+                print(
+                    f"Gemini modelo {modelo} no disponible (HTTP {error.code}); "
+                    f"probando respaldo {siguiente}.",
+                    flush=True,
+                )
+    raise ultimo_error
 
 @app.post("/chat")
 async def chat(datos: Solicitud, x_agente_token: str|None=Header(default=None)):
