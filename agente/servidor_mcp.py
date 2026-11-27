@@ -155,8 +155,17 @@ if ROL == "estudiante":
                   WHERE t.activo = 1
                     AND a.id IN ({AREAS_DEL_ESTUDIANTE})
                   GROUP BY a.id, a.nombre, t.id, t.nombre
-                  ORDER BY CASE WHEN porcentaje_acierto IS NULL THEN 0 ELSE 1 END,
-                           porcentaje_acierto ASC, preguntas_respondidas ASC, t.nombre ASC
+                  ORDER BY CASE
+                               WHEN SUM(CASE WHEN i.puntaje_total IS NOT NULL AND re.estado_respuesta IS NOT NULL THEN 1 ELSE 0 END) = 0 THEN 0
+                               ELSE 1
+                           END,
+                           ROUND(
+                               100.0 * SUM(CASE WHEN i.puntaje_total IS NOT NULL AND re.estado_respuesta = 'correcta' THEN 1 ELSE 0 END)
+                               / NULLIF(SUM(CASE WHEN i.puntaje_total IS NOT NULL AND re.estado_respuesta IS NOT NULL THEN 1 ELSE 0 END), 0),
+                               2
+                           ) ASC,
+                           COUNT(DISTINCT CASE WHEN i.puntaje_total IS NOT NULL THEN re.pregunta_id END) ASC,
+                           t.nombre ASC
                   LIMIT %s"""
         return consultar(sql, (int(USUARIO_ID), int(USUARIO_ID), acotar_limite(limite, 20)))
 
