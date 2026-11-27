@@ -1,5 +1,5 @@
 <div class="cni-notas" id="cni-notas">
-    <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=51">
+    <link rel="stylesheet" href="{{ asset('css/panel-docente-nuevo.css') }}?v=52">
     <link rel="stylesheet" href="{{ asset('css/docente-encabezado-v2.css') }}?v=8">
     @php
         $esPreview = app()->environment('local') && (request()->is('docente-preview') || request()->is('preview-docente'));

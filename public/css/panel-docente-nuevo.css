@@ -287,3 +287,6 @@ body:has(.cni-notas){background:#eef6fd}
 @keyframes cni-ai-cloud-in{from{opacity:0;transform:translateY(-6px) scale(.9)}to{opacity:1;transform:none}}
 @keyframes cni-ai-cloud-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
 @media(prefers-reduced-motion:reduce){.cni-ai-thinking-cloud{animation:none}}
+
+/* Evita el espacio en blanco sobre las respuestas de Davis (pre-wrap heredado del mensaje). */
+.cni-ai-messages>.cni-ai-message.is-assistant,.cni-ai-message-body{white-space:normal}
